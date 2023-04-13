@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="images">
+    <file>images/chevron-left.svg</file>
+    <file>images/chevron-right.svg</file>
+
+    <file>images/broom.svg</file>
+    <file>images/brush.svg</file>
+    <file>images/bucket.svg</file>
+
+    <file>images/paintbrush.svg</file>
+    <file>images/palette.svg</file>
+
+    <file>images/font.svg</file>
+  </qresource>
+</RCC>
