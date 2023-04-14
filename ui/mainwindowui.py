@@ -15,10 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout,
-    QMainWindow, QMenuBar, QPushButton, QSizePolicy,
-    QSpacerItem, QStatusBar, QTabWidget, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QMainWindow,
+    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
+    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -60,18 +59,6 @@ class Ui_MainWindow(object):
         self.paintBrushButton_2.setFlat(False)
 
         self.horizontalLayout_2.addWidget(self.paintBrushButton_2)
-
-        self.comboBox = QComboBox(self.toolOptionsWidget)
-        self.comboBox.setObjectName(u"comboBox")
-        self.comboBox.setEditable(True)
-
-        self.horizontalLayout_2.addWidget(self.comboBox)
-
-        self.comboBox_2 = QComboBox(self.toolOptionsWidget)
-        self.comboBox_2.setObjectName(u"comboBox_2")
-        self.comboBox_2.setEditable(True)
-
-        self.horizontalLayout_2.addWidget(self.comboBox_2)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 

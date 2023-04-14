@@ -2,12 +2,37 @@ import json
 import sys
 from pathlib import Path
 from PySide6 import QtCore
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton
 
 from styles.main import main_style
 from ui import mainwindowui
+
+def keymappings(key):
+    switch = {
+        73: 'eyedropper',
+        77: 'move',
+        0: 'dashed_box',
+        0: 'polygon_lasso',
+        0: 'a_pointer',
+        0: 'box',
+        66: 'brush',
+        67: 'crop',
+        0: 'eraser',
+        0: 'frame',
+        0: 'gradient',
+        0: 'pointer_finger',
+        0: 'pin',
+        80: 'pen',
+        0: 'quick_selection',
+        0: 'spot_headling',
+        83: 'stamp',
+        0: 't',
+        0: 'rotate_view',
+        0: 'zoom',
+    }
+    return switch[key] if key in switch else None
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -20,33 +45,44 @@ class MainWindow(QMainWindow):
 
         self.render()
 
-    def on_toolbar_icon_click(self, button):
-        selected_tool = button.objectName()
-        self.current_tool = selected_tool
-        # print(self.current_tool)
-        # self.render()
+    def keyPressEvent(self, e):
+        # print(e.key())
+        self.current_tool = keymappings(e.key())
+
+        if e.key() == Qt.Key_F5:
+            self.close()
+
+        button = self.ui.toolOptionsWidget.findChild(QPushButton, self.current_tool)
+        print('button', button)
+        if button is not None:
+            self.on_toolbar_icon_click(button, self.current_tool)
+
+    def on_toolbar_icon_click(self, button, name):
+        self.refresh_toolbar_icons()
+        self.current_tool = name
+        button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
     def refresh_toolbar_icons(self):
-        # icon_buttons = range(self.ui.verticalLayout.count())
+        for widget in self.ui.toolbarWidget.children():
+            if isinstance(widget, QPushButton):
+                widget.setStyleSheet('QPushButton {background-color: transparent;}')
 
-        # for widget_index in reversed(icon_buttons):
-        #     # Instead of iterating over the children of
-        #     # self.ui.buttonGroupWidget, a reversed index to the
-        #     # widget must be used, otherwise it will result in
-        #     # segmentation faults.
-        #     widget = self.ui.verticalLayout.layout().itemAt(
-        #         widget_index).widget()
+    def add_icon(self, icon_path):
+        button = QPushButton(self.ui.toolOptionsWidget)
+        button.setObjectName(icon_path['name'])
+        button.setMinimumSize(QSize(32, 32))
+        button.setMaximumSize(QSize(32, 32))
+        button.setToolTip(icon_path['tooltip'])
+        icon = QIcon()
+        icon.addFile(icon_path['path'], QSize(), QIcon.Normal, QIcon.Off)
+        button.setIcon(icon)
+        button.setFlat(False)
+        self.ui.verticalLayout.addWidget(button)
+        self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
+        button.setText("")
 
-        #     # if not_widget_decrement_button and not_widget_increment_button:
-        #     self.ui.verticalLayout.layout().removeWidget(widget)
-        #     widget.setParent(None)
-
-
-        # # self.ui.verticalLayout.children()
-        # print(self.ui.verticalLayout.count())
-        # for i in range(self.ui.verticalLayout.count()):
-        #     print(i)
-        pass
+        button.clicked.connect(
+            lambda: self.on_toolbar_icon_click(button, icon_path['name']))
 
     def add_toolbar_icons(self):
         icons = [
@@ -73,23 +109,11 @@ class MainWindow(QMainWindow):
         ]
 
 
-        for icon_path in icons:
-            button = QPushButton(self.ui.toolOptionsWidget)
-
-            button.setObjectName(icon_path['name'])
-            button.setMinimumSize(QSize(32, 32))
-            button.setMaximumSize(QSize(32, 32))
-            button.setToolTip(icon_path['tooltip'])
-            icon = QIcon()
-            icon.addFile(icon_path['path'], QSize(), QIcon.Normal, QIcon.Off)
-            button.setIcon(icon)
-            button.setFlat(False)
-            button.setStyleSheet("QPushButton")
-            self.ui.verticalLayout.addWidget(button)
-            self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() + 1, button)
-            button.setText("")
-            button.clicked.connect(
-                lambda: self.on_toolbar_icon_click(button))
+        try:
+            for icon_path in icons:
+                self.add_icon(icon_path)
+        except:
+            pass
 
     def render(self):
         self.refresh_toolbar_icons()
