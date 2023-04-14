@@ -5,10 +5,12 @@ def main_style():
     }
     QPushButton {
         padding: 10px;
-        border: 1px solid #606060;
-        background-color: #404040;
+        border: none;
+        background-color: transparent;
+        border-radius: 4px;
     }
     QPushButton::hover {
+        border: 1px solid rgba(255, 255, 255, 0.2);
         background-color: #383838;
     }
     QPushButton::pressed {
@@ -33,5 +35,8 @@ def main_style():
     }
     QComboBox::selected {
         background-color: pink;
+    }
+    QWidget#toolOptionsWidget {
+        border-bottom: 1px solid black;
     }
     """

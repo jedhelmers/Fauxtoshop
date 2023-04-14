@@ -38,9 +38,7 @@ class Ui_MainWindow(object):
         self.toolOptionsWidget = QWidget(self.widget)
         self.toolOptionsWidget.setObjectName(u"toolOptionsWidget")
         self.horizontalLayout_2 = QHBoxLayout(self.toolOptionsWidget)
-#ifndef Q_OS_MAC
-        self.horizontalLayout_2.setSpacing(-1)
-#endif
+        self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.paintBrushButton_3 = QPushButton(self.toolOptionsWidget)
@@ -93,7 +91,7 @@ class Ui_MainWindow(object):
         self.toolbarWidget.setMinimumSize(QSize(40, 0))
         self.toolbarWidget.setMaximumSize(QSize(40, 16777215))
         self.verticalLayout = QVBoxLayout(self.toolbarWidget)
-        self.verticalLayout.setSpacing(2)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 2)
         self.paintBrushButton = QPushButton(self.toolbarWidget)
@@ -174,7 +172,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Fauxtoshop", None))
         self.paintBrushButton_3.setText("")
         self.paintBrushButton_2.setText("")
         self.paintBrushButton.setText("")

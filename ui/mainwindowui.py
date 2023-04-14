@@ -38,21 +38,50 @@ class Ui_MainWindow(object):
         self.toolOptionsWidget = QWidget(self.widget)
         self.toolOptionsWidget.setObjectName(u"toolOptionsWidget")
         self.horizontalLayout_2 = QHBoxLayout(self.toolOptionsWidget)
-#ifndef Q_OS_MAC
-        self.horizontalLayout_2.setSpacing(-1)
-#endif
+        self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.paintBrushButton_3 = QPushButton(self.toolOptionsWidget)
-        self.paintBrushButton_3.setObjectName(u"paintBrushButton_3")
-        self.paintBrushButton_3.setMinimumSize(QSize(32, 32))
-        self.paintBrushButton_3.setMaximumSize(QSize(32, 32))
-        icon = QIcon()
-        icon.addFile(u":/images/images/paintbrush.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.paintBrushButton_3.setIcon(icon)
-        self.paintBrushButton_3.setFlat(False)
 
-        self.horizontalLayout_2.addWidget(self.paintBrushButton_3)
+        icons = [
+            u':/images/images/toolbar_move.svg',
+            u':/images/images/toolbar_dashed_box.svg',
+            u':/images/images/toolbar_polygon_lasso.svg',
+            u':/images/images/toolbar_a_pointer.svg',
+            u':/images/images/toolbar_box.svg',
+            u':/images/images/toolbar_brush.svg',
+            u':/images/images/toolbar_crop.svg',
+            u':/images/images/toolbar_eraser.svg',
+            u':/images/images/toolbar_eyedropper.svg',
+            u':/images/images/toolbar_frame.svg',
+            u':/images/images/toolbar_gradient.svg',
+            u':/images/images/toolbar_pointer_finger.svg',
+            u':/images/images/toolbar_pin.svg',
+            u':/images/images/toolbar_pen.svg',
+            u':/images/images/toolbar_quick_selection.svg',
+            u':/images/images/toolbar_spot_headling.svg',
+            u':/images/images/toolbar_stamp.svg',
+            u':/images/images/toolbar_t.svg',
+            u':/images/images/toolbar_rotate_view.svg',
+            u':/images/images/toolbar_zoom.svg',
+        ]
+
+
+        for icon_path in icons:
+            button = QPushButton(self.toolOptionsWidget)
+            button.setObjectName(f"paintBrushButton")
+            print(icon_path)
+            button.setMinimumSize(QSize(32, 32))
+            button.setMaximumSize(QSize(32, 32))
+            icon = QIcon()
+            icon.addFile(icon_path, QSize(), QIcon.Normal, QIcon.Off)
+            button.setIcon(icon)
+            button.setFlat(False)
+            button.setStyleSheet("QPushButton")
+            self.horizontalLayout_2.addWidget(button)
+            button.setText("")
+
+
+
 
         self.paintBrushButton_2 = QPushButton(self.toolOptionsWidget)
         self.paintBrushButton_2.setObjectName(u"paintBrushButton_2")
@@ -93,7 +122,7 @@ class Ui_MainWindow(object):
         self.toolbarWidget.setMinimumSize(QSize(40, 0))
         self.toolbarWidget.setMaximumSize(QSize(40, 16777215))
         self.verticalLayout = QVBoxLayout(self.toolbarWidget)
-        self.verticalLayout.setSpacing(2)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 2)
         self.paintBrushButton = QPushButton(self.toolbarWidget)
@@ -149,6 +178,21 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.paletteButton_2)
 
+
+        for icon_path in icons:
+            button = QPushButton(self.toolOptionsWidget)
+            button.setObjectName(f"paintBrushButton")
+            button.setMinimumSize(QSize(32, 32))
+            button.setMaximumSize(QSize(32, 32))
+            icon = QIcon()
+            icon.addFile(icon_path, QSize(), QIcon.Normal, QIcon.Off)
+            button.setIcon(icon)
+            button.setFlat(False)
+            button.setStyleSheet("QPushButton")
+            self.verticalLayout.addWidget(button)
+            button.setText("")
+
+
         self.verticalSpacer_2 = QSpacerItem(20, 439, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_2)
@@ -174,8 +218,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.paintBrushButton_3.setText("")
+        MainWindow.setWindowTitle(QCoreApplication.translate("Fauxtoshop", u"Fauxtoshop", None))
         self.paintBrushButton_2.setText("")
         self.paintBrushButton.setText("")
         self.paletteButton.setText("")

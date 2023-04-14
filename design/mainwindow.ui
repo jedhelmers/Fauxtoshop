@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Fauxtoshop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -34,7 +34,7 @@
         <widget class="QWidget" name="toolOptionsWidget" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
-           <number>-1</number>
+           <number></number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -154,7 +154,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <property name="spacing">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="leftMargin">
           <number>0</number>

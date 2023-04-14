@@ -9,7 +9,28 @@
 
     <file>images/paintbrush.svg</file>
     <file>images/palette.svg</file>
-
     <file>images/font.svg</file>
+
+    <file>images/toolbar_a_pointer.svg</file>
+    <file>images/toolbar_box.svg</file>
+    <file>images/toolbar_brush_arrow.svg</file>
+    <file>images/toolbar_brush.svg</file>
+    <file>images/toolbar_crop.svg</file>
+    <file>images/toolbar_dashed_box.svg</file>
+    <file>images/toolbar_eraser.svg</file>
+    <file>images/toolbar_eyedropper.svg</file>
+    <file>images/toolbar_frame.svg</file>
+    <file>images/toolbar_gradient.svg</file>
+    <file>images/toolbar_move.svg</file>
+    <file>images/toolbar_pen.svg</file>
+    <file>images/toolbar_pin.svg</file>
+    <file>images/toolbar_pointer_finger.svg</file>
+    <file>images/toolbar_polygon_lasso.svg</file>
+    <file>images/toolbar_quick_selection.svg</file>
+    <file>images/toolbar_rotate_view.svg</file>
+    <file>images/toolbar_spot_headling.svg</file>
+    <file>images/toolbar_stamp.svg</file>
+    <file>images/toolbar_t.svg</file>
+    <file>images/toolbar_zoom.svg</file>
   </qresource>
 </RCC>
