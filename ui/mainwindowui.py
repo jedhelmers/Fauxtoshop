@@ -41,47 +41,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.paintBrushButton_3 = QPushButton(self.toolOptionsWidget)
+        self.paintBrushButton_3.setObjectName(u"paintBrushButton_3")
+        self.paintBrushButton_3.setMinimumSize(QSize(32, 32))
+        self.paintBrushButton_3.setMaximumSize(QSize(32, 32))
+        icon = QIcon()
+        icon.addFile(u":/images/images/paintbrush.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.paintBrushButton_3.setIcon(icon)
+        self.paintBrushButton_3.setFlat(False)
 
-        icons = [
-            u':/images/images/toolbar_move.svg',
-            u':/images/images/toolbar_dashed_box.svg',
-            u':/images/images/toolbar_polygon_lasso.svg',
-            u':/images/images/toolbar_a_pointer.svg',
-            u':/images/images/toolbar_box.svg',
-            u':/images/images/toolbar_brush.svg',
-            u':/images/images/toolbar_crop.svg',
-            u':/images/images/toolbar_eraser.svg',
-            u':/images/images/toolbar_eyedropper.svg',
-            u':/images/images/toolbar_frame.svg',
-            u':/images/images/toolbar_gradient.svg',
-            u':/images/images/toolbar_pointer_finger.svg',
-            u':/images/images/toolbar_pin.svg',
-            u':/images/images/toolbar_pen.svg',
-            u':/images/images/toolbar_quick_selection.svg',
-            u':/images/images/toolbar_spot_headling.svg',
-            u':/images/images/toolbar_stamp.svg',
-            u':/images/images/toolbar_t.svg',
-            u':/images/images/toolbar_rotate_view.svg',
-            u':/images/images/toolbar_zoom.svg',
-        ]
-
-
-        for icon_path in icons:
-            button = QPushButton(self.toolOptionsWidget)
-            button.setObjectName(f"paintBrushButton")
-            print(icon_path)
-            button.setMinimumSize(QSize(32, 32))
-            button.setMaximumSize(QSize(32, 32))
-            icon = QIcon()
-            icon.addFile(icon_path, QSize(), QIcon.Normal, QIcon.Off)
-            button.setIcon(icon)
-            button.setFlat(False)
-            button.setStyleSheet("QPushButton")
-            self.horizontalLayout_2.addWidget(button)
-            button.setText("")
-
-
-
+        self.horizontalLayout_2.addWidget(self.paintBrushButton_3)
 
         self.paintBrushButton_2 = QPushButton(self.toolOptionsWidget)
         self.paintBrushButton_2.setObjectName(u"paintBrushButton_2")
@@ -125,26 +94,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 2)
-        self.paintBrushButton = QPushButton(self.toolbarWidget)
-        self.paintBrushButton.setObjectName(u"paintBrushButton")
-        self.paintBrushButton.setMinimumSize(QSize(32, 32))
-        self.paintBrushButton.setMaximumSize(QSize(32, 32))
-        self.paintBrushButton.setIcon(icon)
-        self.paintBrushButton.setFlat(False)
-
-        self.verticalLayout.addWidget(self.paintBrushButton)
-
-        self.paletteButton = QPushButton(self.toolbarWidget)
-        self.paletteButton.setObjectName(u"paletteButton")
-        self.paletteButton.setMinimumSize(QSize(32, 32))
-        self.paletteButton.setMaximumSize(QSize(32, 32))
-        icon1 = QIcon()
-        icon1.addFile(u":/images/images/palette.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.paletteButton.setIcon(icon1)
-        self.paletteButton.setFlat(False)
-
-        self.verticalLayout.addWidget(self.paletteButton)
-
         self.verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -173,25 +122,12 @@ class Ui_MainWindow(object):
         self.paletteButton_2.setObjectName(u"paletteButton_2")
         self.paletteButton_2.setMinimumSize(QSize(32, 32))
         self.paletteButton_2.setMaximumSize(QSize(32, 32))
+        icon1 = QIcon()
+        icon1.addFile(u":/images/images/palette.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.paletteButton_2.setIcon(icon1)
         self.paletteButton_2.setFlat(False)
 
         self.verticalLayout_2.addWidget(self.paletteButton_2)
-
-
-        for icon_path in icons:
-            button = QPushButton(self.toolOptionsWidget)
-            button.setObjectName(f"paintBrushButton")
-            button.setMinimumSize(QSize(32, 32))
-            button.setMaximumSize(QSize(32, 32))
-            icon = QIcon()
-            icon.addFile(icon_path, QSize(), QIcon.Normal, QIcon.Off)
-            button.setIcon(icon)
-            button.setFlat(False)
-            button.setStyleSheet("QPushButton")
-            self.verticalLayout.addWidget(button)
-            button.setText("")
-
 
         self.verticalSpacer_2 = QSpacerItem(20, 439, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -214,16 +150,18 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
+        self.workspaceTabWidget.setCurrentIndex(0)
+
+
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("Fauxtoshop", u"Fauxtoshop", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Fauxtoshop", None))
+        self.paintBrushButton_3.setText("")
         self.paintBrushButton_2.setText("")
-        self.paintBrushButton.setText("")
-        self.paletteButton.setText("")
-        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tab 1", None))
-        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Tab 2", None))
+        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Butts_McGoo.fsd", None))
+        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Responsible_Things.png", None))
         self.paletteButton_2.setText("")
     # retranslateUi
 

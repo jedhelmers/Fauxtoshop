@@ -94,26 +94,6 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 2)
-        self.paintBrushButton = QPushButton(self.toolbarWidget)
-        self.paintBrushButton.setObjectName(u"paintBrushButton")
-        self.paintBrushButton.setMinimumSize(QSize(32, 32))
-        self.paintBrushButton.setMaximumSize(QSize(32, 32))
-        self.paintBrushButton.setIcon(icon)
-        self.paintBrushButton.setFlat(False)
-
-        self.verticalLayout.addWidget(self.paintBrushButton)
-
-        self.paletteButton = QPushButton(self.toolbarWidget)
-        self.paletteButton.setObjectName(u"paletteButton")
-        self.paletteButton.setMinimumSize(QSize(32, 32))
-        self.paletteButton.setMaximumSize(QSize(32, 32))
-        icon1 = QIcon()
-        icon1.addFile(u":/images/images/palette.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.paletteButton.setIcon(icon1)
-        self.paletteButton.setFlat(False)
-
-        self.verticalLayout.addWidget(self.paletteButton)
-
         self.verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
@@ -142,6 +122,8 @@ class Ui_MainWindow(object):
         self.paletteButton_2.setObjectName(u"paletteButton_2")
         self.paletteButton_2.setMinimumSize(QSize(32, 32))
         self.paletteButton_2.setMaximumSize(QSize(32, 32))
+        icon1 = QIcon()
+        icon1.addFile(u":/images/images/palette.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.paletteButton_2.setIcon(icon1)
         self.paletteButton_2.setFlat(False)
 
@@ -168,6 +150,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
+        self.workspaceTabWidget.setCurrentIndex(0)
+
+
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
@@ -175,10 +160,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Fauxtoshop", None))
         self.paintBrushButton_3.setText("")
         self.paintBrushButton_2.setText("")
-        self.paintBrushButton.setText("")
-        self.paletteButton.setText("")
-        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Tab 1", None))
-        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Tab 2", None))
+        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"Butts_McGoo.fsd", None))
+        self.workspaceTabWidget.setTabText(self.workspaceTabWidget.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"Responsible_Things.png", None))
         self.paletteButton_2.setText("")
     # retranslateUi
 
