@@ -9,28 +9,42 @@ from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPush
 from styles.main import main_style
 from ui import mainwindowui
 
-def keymappings(key):
+def command_mappings(key):
+    # 16777249
     switch = {
-        73: 'eyedropper',
-        77: 'move',
-        0: 'dashed_box',
-        0: 'polygon_lasso',
-        0: 'a_pointer',
-        0: 'box',
-        66: 'brush',
-        67: 'crop',
-        0: 'eraser',
-        0: 'frame',
-        0: 'gradient',
-        0: 'pointer_finger',
-        0: 'pin',
-        80: 'pen',
-        0: 'quick_selection',
-        0: 'spot_headling',
-        83: 'stamp',
-        0: 't',
-        0: 'rotate_view',
-        0: 'zoom',
+        Qt.Key_I: 'big'
+    }
+    return switch[key] if key in switch else None
+
+def shift_mappings(key):
+    # 16777248
+    switch = {
+        Qt.Key_I: 'butts',
+    }
+    return switch[key] if key in switch else None
+
+def key_mappings(key):
+    switch = {
+        '73': 'eyedropper',
+        '86': 'move',
+        '77': 'dashed_box',
+        '76': 'polygon_lasso',
+        '65': 'a_pointer',
+        '85': 'rectangle',
+        '66': 'brush',
+        '67': 'crop',
+        '0': 'eraser',
+        '0': 'frame',
+        '0': 'gradient',
+        '0': 'pointer_finger',
+        '0': 'pin',
+        'P': 'pen',
+        '0': 'quick_selection',
+        '0': 'spot_headling',
+        'S': 'stamp',
+        '0': 't',
+        '0': 'rotate_view',
+        '73_16777248_16777249': 'zoom',
     }
     return switch[key] if key in switch else None
 
@@ -42,30 +56,43 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(main_style())
 
         self.current_tool = None
+        self.keylist = []
 
         self.render()
 
-    def keyPressEvent(self, e):
-        # print(e.key())
-        self.current_tool = keymappings(e.key())
+    def keyPressEvent(self, event):
+        self.firstrelease = True
+        astr = event.key()
+        self.keylist.append(astr)
+        
+    def keyReleaseEvent(self, event):
+        if self.firstrelease == True: 
+            self.processmultikeys(self.keylist)
 
-        if e.key() == Qt.Key_F5:
-            self.close()
+        self.firstrelease = False
 
-        button = self.ui.toolOptionsWidget.findChild(QPushButton, self.current_tool)
-        print('button', button)
-        if button is not None:
-            self.on_toolbar_icon_click(button, self.current_tool)
+        del self.keylist[-1]
 
-    def on_toolbar_icon_click(self, button, name):
-        self.refresh_toolbar_icons()
+    def processmultikeys(self, keyspressed):
+        _keyspressed = [*keyspressed]
+        _keyspressed.sort()
+        command = '_'.join([str(k) for k in _keyspressed])
+
+        print(command)
+        
+        name = key_mappings(command)
+
+        self.on_toolbar_icon_click(name)
+
+    def on_toolbar_icon_click(self, name):
+        old_button = self.findChild(QPushButton, self.current_tool)
+        button = self.findChild(QPushButton, name)
+
+        if old_button is not None:
+            old_button.setStyleSheet('QPushButton {background-color: transparent;}')
+
         self.current_tool = name
         button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
-
-    def refresh_toolbar_icons(self):
-        for widget in self.ui.toolbarWidget.children():
-            if isinstance(widget, QPushButton):
-                widget.setStyleSheet('QPushButton {background-color: transparent;}')
 
     def add_icon(self, icon_path):
         button = QPushButton(self.ui.toolOptionsWidget)
@@ -82,7 +109,7 @@ class MainWindow(QMainWindow):
         button.setText("")
 
         button.clicked.connect(
-            lambda: self.on_toolbar_icon_click(button, icon_path['name']))
+            lambda: self.on_toolbar_icon_click(icon_path['name']))
 
     def add_toolbar_icons(self):
         icons = [
@@ -90,8 +117,9 @@ class MainWindow(QMainWindow):
             {'path': u':/images/images/toolbar_dashed_box.svg', 'tooltip': 'Selection', 'name': 'dashed_box'},
             {'path': u':/images/images/toolbar_polygon_lasso.svg', 'tooltip': 'Polygon Lasso (w)', 'name': 'polygon_lasso'},
             {'path': u':/images/images/toolbar_a_pointer.svg', 'tooltip': 'Pointer', 'name': 'a_pointer'},
-            {'path': u':/images/images/toolbar_box.svg', 'tooltip': 'Box', 'name': 'box'},
+            {'path': u':/images/images/toolbar_rectangle.svg', 'tooltip': 'Rectangle', 'name': 'rectangle'},
             {'path': u':/images/images/toolbar_brush.svg', 'tooltip': 'Brush (b)', 'name': 'brush'},
+            {'path': u':/images/images/toolbar_brush_arrow.svg', 'tooltip': 'Brush Arrow', 'name': 'brush_arrow'},
             {'path': u':/images/images/toolbar_crop.svg', 'tooltip': 'Crop (c)', 'name': 'crop'},
             {'path': u':/images/images/toolbar_eraser.svg', 'tooltip': 'Eraser (e)', 'name': 'eraser'},
             {'path': u':/images/images/toolbar_eyedropper.svg', 'tooltip': 'Eyedropper (i)', 'name': 'eyedropper'},
@@ -103,7 +131,7 @@ class MainWindow(QMainWindow):
             {'path': u':/images/images/toolbar_quick_selection.svg', 'tooltip': 'quick_selection', 'name': 'quick_selection'},
             {'path': u':/images/images/toolbar_spot_headling.svg', 'tooltip': 'spot_headling', 'name': 'spot_headling'},
             {'path': u':/images/images/toolbar_stamp.svg', 'tooltip': 'Stamp (s)', 'name': 'stamp'},
-            {'path': u':/images/images/toolbar_t.svg', 'tooltip': 'Font', 'name': 't'},
+            {'path': u':/images/images/toolbar_t.svg', 'tooltip': 'Text', 'name': 't'},
             {'path': u':/images/images/toolbar_rotate_view.svg', 'tooltip': 'rotate_view', 'name': 'rotate_view'},
             {'path': u':/images/images/toolbar_zoom.svg', 'tooltip': 'Zoom (⌘ +/-)', 'name': 'zoom'},
         ]
@@ -116,7 +144,7 @@ class MainWindow(QMainWindow):
             pass
 
     def render(self):
-        self.refresh_toolbar_icons()
+        # self.refresh_toolbar_icons()
         self.add_toolbar_icons()
 
 
