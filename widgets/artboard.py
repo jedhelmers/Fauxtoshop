@@ -33,9 +33,13 @@ class ArtBoardWidget(QOpenGLWidget):
         
         self.setMaximumSize(QSize(16777215, 16777215))
 
-
     def mousePressEvent(self, event):
-        print(event.pos())
+        pos = event.pos()
+        print('PRESS', pos.x(), pos.y())
+
+    def mouseReleaseEvent(self, event):
+        pos = event.pos()
+        print('RELEASE', pos.x(), pos.y())
 
     def mouseMoveEvent(self, event):
         # print(event.pos().x(), event.pos().y())

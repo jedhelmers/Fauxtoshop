@@ -92,4 +92,8 @@ def main_style():
 
     QListWidget::item[separator="true"] { border-bottom: 1px solid pink; }
 
+    QLabel {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.3)
+    }
     """

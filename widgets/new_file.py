@@ -26,10 +26,10 @@ class NewFileWidget(QDialog):
         setup_options = setup_values()
         doc_type_len = len(setup_options)
         q_color = QColor()
-        q_color.setRed(1.0)
-        q_color.setGreen(1.0)
-        q_color.setBlue(1.0)
-        q_color.setAlpha(1.0)
+        q_color.setRedF(1.0)
+        q_color.setGreenF(1.0)
+        q_color.setBlueF(1.0)
+        q_color.setAlphaF(1.0)
         self.bg_color = q_color
 
         self.selected_option = None
@@ -42,7 +42,6 @@ class NewFileWidget(QDialog):
         self.ui.pixelAspectRatioComboBox.addItems(pixel_aspect_ratio())
 
         self.ui.colorPickerPushButton.clicked.connect(self.show_color_picker)
-
 
         self.ui.unitsHComboBox.setCurrentText('Inches')
         self.ui.unitsWComboBox.setCurrentText('Inches')

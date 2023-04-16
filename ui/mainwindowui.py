@@ -17,9 +17,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QSizePolicy,
-    QSpacerItem, QStatusBar, QTabWidget, QVBoxLayout,
-    QWidget)
+    QMenu, QMenuBar, QSizePolicy, QSpacerItem,
+    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -58,8 +57,9 @@ class Ui_MainWindow(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)
+        self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.gridLayout_2.setContentsMargins(-1, 0, -1, -1)
+        self.gridLayout_2.setContentsMargins(6, 0, 6, 0)
         self.toolOptionsGridWidget = QWidget(self.centralwidget)
         self.toolOptionsGridWidget.setObjectName(u"toolOptionsGridWidget")
         self.toolOptionsGridWidget.setMaximumSize(QSize(16777215, 50))
@@ -105,29 +105,18 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.workspaceTabWidget)
 
-        self.collapsedPanelWidget = QWidget(self.centralwidget)
-        self.collapsedPanelWidget.setObjectName(u"collapsedPanelWidget")
-        self.collapsedPanelWidget.setMinimumSize(QSize(0, 0))
-        self.verticalLayout_2 = QVBoxLayout(self.collapsedPanelWidget)
+        self.windowsWidget = QWidget(self.centralwidget)
+        self.windowsWidget.setObjectName(u"windowsWidget")
+        self.windowsWidget.setMinimumSize(QSize(0, 0))
+        self.verticalLayout_2 = QVBoxLayout(self.windowsWidget)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.paletteButton_2 = QPushButton(self.collapsedPanelWidget)
-        self.paletteButton_2.setObjectName(u"paletteButton_2")
-        self.paletteButton_2.setMinimumSize(QSize(32, 32))
-        self.paletteButton_2.setMaximumSize(QSize(32, 32))
-        icon = QIcon()
-        icon.addFile(u":/images/images/palette.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.paletteButton_2.setIcon(icon)
-        self.paletteButton_2.setFlat(False)
-
-        self.verticalLayout_2.addWidget(self.paletteButton_2)
-
         self.verticalSpacer_2 = QSpacerItem(20, 439, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_2.addItem(self.verticalSpacer_2)
 
 
-        self.horizontalLayout.addWidget(self.collapsedPanelWidget)
+        self.horizontalLayout.addWidget(self.windowsWidget)
 
 
         self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
@@ -216,7 +205,6 @@ class Ui_MainWindow(object):
         self.actionPlaceholder_7.setText(QCoreApplication.translate("MainWindow", u"Placeholder", None))
         self.actionPlaceholder_8.setText(QCoreApplication.translate("MainWindow", u"Placeholder", None))
         self.actionPlaceholder_9.setText(QCoreApplication.translate("MainWindow", u"Placeholder", None))
-        self.paletteButton_2.setText("")
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuEdit.setTitle(QCoreApplication.translate("MainWindow", u"Edit", None))
         self.menuImage.setTitle(QCoreApplication.translate("MainWindow", u"Image", None))

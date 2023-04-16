@@ -53,11 +53,16 @@ def key_mappings(key):
     }
     return switch[key] if key in switch else None
 
+
+# class MainSignaler(Qt.QObject):
+#     pass
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = mainwindowui.Ui_MainWindow()
         self.ui.setupUi(self)
+        # self.signaler = MainSignaler()
 
         self.setMouseTracking(True)
         self.setStyleSheet(main_style())

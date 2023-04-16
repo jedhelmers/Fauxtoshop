@@ -15,7 +15,19 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
     <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -131,7 +143,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="collapsedPanelWidget" native="true">
+       <widget class="QWidget" name="windowsWidget" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -151,32 +163,6 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QPushButton" name="paletteButton_2">
-           <property name="minimumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources.qrc">
-             <normaloff>:/images/images/palette.svg</normaloff>:/images/images/palette.svg</iconset>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
          <item>
           <spacer name="verticalSpacer_2">
            <property name="orientation">
