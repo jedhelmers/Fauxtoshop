@@ -91,4 +91,5 @@ def main_style():
     }
 
     QListWidget::item[separator="true"] { border-bottom: 1px solid pink; }
+
     """

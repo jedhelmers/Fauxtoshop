@@ -608,7 +608,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="colorDialogWidget" native="true">
+        <widget class="QPushButton" name="colorPickerPushButton">
          <property name="minimumSize">
           <size>
            <width>15</width>
@@ -622,7 +622,13 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background: white</string>
+          <string notr="true">background: white; border: none</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

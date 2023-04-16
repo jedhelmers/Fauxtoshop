@@ -28,4 +28,9 @@ def dialog_styles():
         background: #202020;
         padding-left: 2px;
     }
+
+    QPushButton#colorPickerPushButton {
+        border: none;
+        background-color: #ffffff;
+    }
     """

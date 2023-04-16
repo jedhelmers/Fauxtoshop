@@ -1,4 +1,5 @@
 import json
+import random
 import sys
 from pathlib import Path
 from PySide6 import QtCore, QtGui
@@ -56,14 +57,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = mainwindowui.Ui_MainWindow()
-        self.setMouseTracking(True)
         self.ui.setupUi(self)
+
+        self.setMouseTracking(True)
         self.setStyleSheet(main_style())
 
         self._current_tool = 'text'
         self.keylist = []
-
-        # self.ui.toolbarWidget.acti
 
         self.render()
         self.current_tool = 'text'
@@ -86,7 +86,7 @@ class MainWindow(QMainWindow):
         button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
         self._current_tool = tool
-        self.setup_tool_options_bar()
+        self.setup_tool_options_bar() 
 
     def setup_tool_options_bar(self):
         if self.current_tool == 'text':
@@ -95,11 +95,10 @@ class MainWindow(QMainWindow):
             self.ui.toolOptionsGridWidget.layout().addWidget(text_options_widget)
         else:
             child = self.ui.toolOptionsGridWidget.findChild(QWidget, 'text_options_widget')
-            print(child)
+
             if child is not None:
                 self.ui.toolOptionsWidget.layout().removeWidget(child)
                 child.setParent(None)
-            # widget
 
         print(self.current_tool)
 
@@ -192,7 +191,6 @@ class MainWindow(QMainWindow):
             pass
 
     def render(self):
-        # self.refresh_toolbar_icons()
         self.add_toolbar_icons()
 
 

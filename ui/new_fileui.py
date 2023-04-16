@@ -274,13 +274,14 @@ class Ui_NewFile(object):
 
         self.horizontalLayout_10.addWidget(self.backgroundContentsLineEdit)
 
-        self.colorDialogWidget = QWidget(self.layoutWidget)
-        self.colorDialogWidget.setObjectName(u"colorDialogWidget")
-        self.colorDialogWidget.setMinimumSize(QSize(15, 15))
-        self.colorDialogWidget.setMaximumSize(QSize(15, 15))
-        self.colorDialogWidget.setStyleSheet(u"background: white")
+        self.colorPickerPushButton = QPushButton(self.layoutWidget)
+        self.colorPickerPushButton.setObjectName(u"colorPickerPushButton")
+        self.colorPickerPushButton.setMinimumSize(QSize(15, 15))
+        self.colorPickerPushButton.setMaximumSize(QSize(15, 15))
+        self.colorPickerPushButton.setStyleSheet(u"background: white; border: none")
+        self.colorPickerPushButton.setFlat(False)
 
-        self.horizontalLayout_10.addWidget(self.colorDialogWidget)
+        self.horizontalLayout_10.addWidget(self.colorPickerPushButton)
 
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_10)
@@ -406,6 +407,7 @@ class Ui_NewFile(object):
         self.label_6.setText(QCoreApplication.translate("NewFile", u"Resolution:", None))
         self.label_8.setText(QCoreApplication.translate("NewFile", u"Color Mode:", None))
         self.label_10.setText(QCoreApplication.translate("NewFile", u"Background Contents:", None))
+        self.colorPickerPushButton.setText("")
         self.label.setText(QCoreApplication.translate("NewFile", u"Name:", None))
         self.okPushButton.setText(QCoreApplication.translate("NewFile", u"OK", None))
         self.cancelPushButton.setText(QCoreApplication.translate("NewFile", u"Cancel", None))

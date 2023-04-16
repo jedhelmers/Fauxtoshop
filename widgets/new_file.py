@@ -1,5 +1,6 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QDialog, QColorDialog
 
 from datas.new_file import (
     setup_values,
@@ -24,6 +25,12 @@ class NewFileWidget(QDialog):
         row_index = 0
         setup_options = setup_values()
         doc_type_len = len(setup_options)
+        q_color = QColor()
+        q_color.setRed(1.0)
+        q_color.setGreen(1.0)
+        q_color.setBlue(1.0)
+        q_color.setAlpha(1.0)
+        self.bg_color = q_color
 
         self.selected_option = None
 
@@ -33,6 +40,8 @@ class NewFileWidget(QDialog):
         self.ui.colorModeResComboBox.addItems(color_mode_res())
         self.ui.colorProfileComboBox.addItems(color_profiles())
         self.ui.pixelAspectRatioComboBox.addItems(pixel_aspect_ratio())
+
+        self.ui.colorPickerPushButton.clicked.connect(self.show_color_picker)
 
 
         self.ui.unitsHComboBox.setCurrentText('Inches')
@@ -91,6 +100,14 @@ class NewFileWidget(QDialog):
         self.ui.colorProfileComboBox.setCurrentText(obj['color_profile'])
         self.ui.pixelAspectRatioComboBox.setCurrentText(obj['pixel_aspect_ratio'])
 
+    def show_color_picker(self):
+        bg_color = QColorDialog.getColor()
+
+        if bg_color.isValid():
+            self.bg_color = bg_color
+            print('COLOR:', self.bg_color)
+            self.ui.colorPickerPushButton.setStyleSheet(f'background-color: {self.bg_color.name()}')
+
     def create_new_file(self):
         self.save(self.parent, {
             'width': self.ui.widthLineEdit.text(),
@@ -104,5 +121,6 @@ class NewFileWidget(QDialog):
             'background_contents': self.ui.backgroundContentsLineEdit.text(),
             'color_profile': self.ui.colorProfileComboBox.currentText(),
             'pixel_aspect_ratio': self.ui.pixelAspectRatioComboBox.currentText(),
+            'bg_color': self.bg_color,
             'name': self.ui.nameLineEdit.text()})
         self.close()
