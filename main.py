@@ -1,13 +1,16 @@
 import json
 import sys
 from pathlib import Path
-from PySide6 import QtCore
-from PySide6.QtCore import QSize, Qt
+from PySide6 import QtCore, QtGui
+from PySide6.QtCore import QSize, Qt, QEvent, QPoint
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton
+from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton, QWidget
 
+from functions import new_file
 from styles.main import main_style
 from ui import mainwindowui
+from widgets.new_file import NewFileWidget
+from widgets.text_options import TextOptionsWidget
 
 def command_mappings(key):
     # 16777249
@@ -42,9 +45,10 @@ def key_mappings(key):
         '0': 'quick_selection',
         '0': 'spot_headling',
         'S': 'stamp',
-        '0': 't',
+        '84': 'text',
         '0': 'rotate_view',
         '73_16777248_16777249': 'zoom',
+        '78_16777248_16777249': 'NEW_FILE'
     }
     return switch[key] if key in switch else None
 
@@ -52,13 +56,52 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = mainwindowui.Ui_MainWindow()
+        self.setMouseTracking(True)
         self.ui.setupUi(self)
         self.setStyleSheet(main_style())
 
-        self.current_tool = None
+        self._current_tool = 'text'
         self.keylist = []
 
+        # self.ui.toolbarWidget.acti
+
         self.render()
+        self.current_tool = 'text'
+
+    @property
+    def current_tool(self):
+        return self._current_tool
+    
+    @current_tool.setter
+    def current_tool(self, tool):
+        """
+        Set tool and remove button style from previously selected tool.
+        """
+        old_button = self.findChild(QPushButton, self.current_tool)
+        button = self.findChild(QPushButton, tool)
+
+        if old_button is not None:
+            old_button.setStyleSheet('QPushButton {background-color: transparent;}')
+
+        button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
+
+        self._current_tool = tool
+        self.setup_tool_options_bar()
+
+    def setup_tool_options_bar(self):
+        if self.current_tool == 'text':
+            text_options_widget = TextOptionsWidget(self.ui.toolOptionsGridWidget)
+            text_options_widget.setObjectName('text_options_widget')
+            self.ui.toolOptionsGridWidget.layout().addWidget(text_options_widget)
+        else:
+            child = self.ui.toolOptionsGridWidget.findChild(QWidget, 'text_options_widget')
+            print(child)
+            if child is not None:
+                self.ui.toolOptionsWidget.layout().removeWidget(child)
+                child.setParent(None)
+            # widget
+
+        print(self.current_tool)
 
     def keyPressEvent(self, event):
         self.firstrelease = True
@@ -71,7 +114,10 @@ class MainWindow(QMainWindow):
 
         self.firstrelease = False
 
-        del self.keylist[-1]
+        try:
+            del self.keylist[-1]
+        except:
+            pass
 
     def processmultikeys(self, keyspressed):
         _keyspressed = [*keyspressed]
@@ -79,20 +125,23 @@ class MainWindow(QMainWindow):
         command = '_'.join([str(k) for k in _keyspressed])
 
         print(command)
-        
+
         name = key_mappings(command)
 
-        self.on_toolbar_icon_click(name)
+        if name == 'NEW_FILE':
+            new_file_widget = NewFileWidget(
+                self,
+                save=new_file.new_file
+            )
+            new_file_widget.setModal(True)
+            new_file_widget.show()
+            self.keylist = []
+        else:
+            self.on_toolbar_icon_click(name)
+            self.keylist = []
 
     def on_toolbar_icon_click(self, name):
-        old_button = self.findChild(QPushButton, self.current_tool)
-        button = self.findChild(QPushButton, name)
-
-        if old_button is not None:
-            old_button.setStyleSheet('QPushButton {background-color: transparent;}')
-
         self.current_tool = name
-        button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
     def add_icon(self, icon_path):
         button = QPushButton(self.ui.toolOptionsWidget)
@@ -112,7 +161,7 @@ class MainWindow(QMainWindow):
             lambda: self.on_toolbar_icon_click(icon_path['name']))
 
     def add_toolbar_icons(self):
-        icons = [
+        toolbar_icons = [
             {'path': u':/images/images/toolbar_move.svg', 'tooltip': 'Move (space)', 'name': 'move'},
             {'path': u':/images/images/toolbar_dashed_box.svg', 'tooltip': 'Selection', 'name': 'dashed_box'},
             {'path': u':/images/images/toolbar_polygon_lasso.svg', 'tooltip': 'Polygon Lasso (w)', 'name': 'polygon_lasso'},
@@ -131,14 +180,13 @@ class MainWindow(QMainWindow):
             {'path': u':/images/images/toolbar_quick_selection.svg', 'tooltip': 'quick_selection', 'name': 'quick_selection'},
             {'path': u':/images/images/toolbar_spot_headling.svg', 'tooltip': 'spot_headling', 'name': 'spot_headling'},
             {'path': u':/images/images/toolbar_stamp.svg', 'tooltip': 'Stamp (s)', 'name': 'stamp'},
-            {'path': u':/images/images/toolbar_t.svg', 'tooltip': 'Text', 'name': 't'},
+            {'path': u':/images/images/toolbar_t.svg', 'tooltip': 'Text', 'name': 'text'},
             {'path': u':/images/images/toolbar_rotate_view.svg', 'tooltip': 'rotate_view', 'name': 'rotate_view'},
             {'path': u':/images/images/toolbar_zoom.svg', 'tooltip': 'Zoom (⌘ +/-)', 'name': 'zoom'},
         ]
 
-
         try:
-            for icon_path in icons:
+            for icon_path in toolbar_icons:
                 self.add_icon(icon_path)
         except:
             pass

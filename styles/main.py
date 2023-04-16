@@ -41,7 +41,8 @@ def main_style():
     }
 
     QComboBox::selected {
-        background-color: pink;
+        background-color: #1f62cc;
+        border-radius: 4px;
     }
 
     QWidget#toolOptionsWidget {
@@ -54,4 +55,40 @@ def main_style():
         border-radius: 2px;
         background-color: black;
     }
+
+    QWidget#verticalRulerWidget,
+    QWidget#horizontalRulerWidget {
+        background: rgba(255, 255, 255, .25);
+    }
+    
+    QOpenGLWidget {
+        background: white;
+    }
+
+    QWidget#scrollAreaWidgetContents {
+        background: #101010;
+    }
+
+    QLineEdit {
+        background: #101010;
+    }
+    
+    QComboBox {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.78);
+        background: #101010;
+    }
+
+    QLine,
+    QFrame[frameShape="4"],
+    QFrame[frameShape="5"] {
+        border-radius: 0;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    QTabBar::close-button {
+        subcontrol-position: left;
+    }
+
+    QListWidget::item[separator="true"] { border-bottom: 1px solid pink; }
     """

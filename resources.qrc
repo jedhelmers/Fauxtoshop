@@ -32,5 +32,21 @@
     <file>images/toolbar_stamp.svg</file>
     <file>images/toolbar_t.svg</file>
     <file>images/toolbar_zoom.svg</file>
+
+    <file>images/tool_options_align_left_edges.svg</file>
+    <file>images/tool_options_align_horizontal_centers.svg</file>
+    <file>images/tool_options_align_right_edges.svg</file>
+    <file>images/tool_options_distribute_vertically.svg</file>
+    <file>images/tool_options_align_top_edges.svg</file>
+    <file>images/tool_options_align_vertical_centers.svg</file>
+    <file>images/tool_options_align_bottom_edges.svg</file>
+    <file>images/tool_options_distribute_horizontally.svg</file>
+    <file>images/tool_options_set_font_size.svg</file>
+    <file>images/tool_options_create_warped_text.svg</file>
+    <file>images/tool_options_toggle_text_orientation.svg</file>
+    <file>images/tool_options_font_sharpness.svg</file>
+    <file>images/tool_options_left_align_text.svg</file>
+    <file>images/tool_options_center_text.svg</file>
+    <file>images/tool_options_right_align_text.svg</file>
   </qresource>
 </RCC>
