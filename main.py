@@ -12,6 +12,7 @@ from styles.main import main_style
 from ui import mainwindowui
 from widgets.new_file import NewFileWidget
 from widgets.text_options import TextOptionsWidget
+# from widgets.toolbar import ToolbarWidget
 
 def command_mappings(key):
     # 16777249
