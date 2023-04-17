@@ -42,6 +42,7 @@ class WorkspaceWidget(QWidget):
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
         self.zoom = 1.0
+        self.are_rulers_hidden = False
 
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
         self.y_line = QHLine(self.ui.verticalRulerWidget, thickness=2)
@@ -55,6 +56,22 @@ class WorkspaceWidget(QWidget):
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
 
         ArtBoardWidget(self.ui.workspaceBackgroundWidget, new_file_info, self.signaler)
+
+    def toggle_rulers(self):
+        if self.are_rulers_hidden:
+            self.show_rulers()
+        else:
+            self.hide_rulers()
+
+    def hide_rulers(self):
+        self.are_rulers_hidden = True
+        self.ui.horizontalRulerWidget.hide()
+        self.ui.verticalRulerWidget.hide()
+
+    def show_rulers(self):
+        self.are_rulers_hidden = False
+        self.ui.horizontalRulerWidget.show()
+        self.ui.verticalRulerWidget.show()
 
     def mouse_move_event(self, x, y):
         # print(x, y)

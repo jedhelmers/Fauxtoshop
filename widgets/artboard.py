@@ -30,7 +30,7 @@ class ArtBoardWidget(QOpenGLWidget):
                 self.file_info['units_h'],
                 float(self.file_info['height']))
         ))
-        
+
         self.setMaximumSize(QSize(16777215, 16777215))
 
     def mousePressEvent(self, event):

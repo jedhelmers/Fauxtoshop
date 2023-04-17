@@ -50,13 +50,14 @@ def key_mappings(key):
         '84': 'text',
         '0': 'rotate_view',
         '73_16777248_16777249': 'zoom',
-        '78_16777248_16777249': 'NEW_FILE'
+        '78_16777248_16777249': 'NEW_FILE',
+        '82_16777249': 'HIDE_RULERS',
     }
     return switch[key] if key in switch else None
 
 
 class MainSignaler(QtCore.QObject):
-    select_tool_options = QtCore.Signal(str)
+    select_tool = QtCore.Signal(str)
 
 
 class MainWindow(QMainWindow):
@@ -75,7 +76,7 @@ class MainWindow(QMainWindow):
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
 
-        self.signaler.select_tool_options.connect(self.select_tool_options)
+        self.signaler.select_tool.connect(self.select_tool)
 
         self.current_tool = 'text'
 
@@ -100,8 +101,7 @@ class MainWindow(QMainWindow):
         self._current_tool = tool
         self.setup_tool_options_bar()
 
-    def select_tool_options(self, tool_name):
-        print('WEE', tool_name)
+    def select_tool(self, tool_name):
         self.current_tool = tool_name
 
     def setup_tool_options_bar(self):
@@ -146,11 +146,15 @@ class MainWindow(QMainWindow):
         if name == 'NEW_FILE':
             new_file_widget = NewFileWidget(
                 self,
-                save=new_file.new_file
+                save=new_file.new_file,
             )
             new_file_widget.setModal(True)
             new_file_widget.show()
             self.keylist = []
+        elif name == 'HIDE_RULERS':
+            current_tab = self.ui.workspaceTabWidget.currentWidget()
+            current_tab.toggle_rulers()
+            print(current_tab)
         else:
             self.on_toolbar_icon_click(name)
             self.keylist = []

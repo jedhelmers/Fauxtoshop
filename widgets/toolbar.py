@@ -8,46 +8,6 @@ from ui import toolbarui
 from widgets.new_file import NewFileWidget
 from widgets.text_options import TextOptionsWidget
 
-def command_mappings(key):
-    # 16777249
-    switch = {
-        Qt.Key_I: 'big'
-    }
-    return switch[key] if key in switch else None
-
-def shift_mappings(key):
-    # 16777248
-    switch = {
-        Qt.Key_I: 'butts',
-    }
-    return switch[key] if key in switch else None
-
-def key_mappings(key):
-    switch = {
-        '73': 'eyedropper',
-        '86': 'move',
-        '77': 'dashed_box',
-        '76': 'polygon_lasso',
-        '65': 'a_pointer',
-        '85': 'rectangle',
-        '66': 'brush',
-        '67': 'crop',
-        '0': 'eraser',
-        '0': 'frame',
-        '0': 'gradient',
-        '0': 'pointer_finger',
-        '0': 'pin',
-        'P': 'pen',
-        '0': 'quick_selection',
-        '0': 'spot_headling',
-        'S': 'stamp',
-        '84': 'text',
-        '0': 'rotate_view',
-        '73_16777248_16777249': 'zoom',
-        '78_16777248_16777249': 'NEW_FILE'
-    }
-    return switch[key] if key in switch else None
-
 
 class ToolbarWidget(QWidget):
     def __init__(self, signaler):
@@ -58,10 +18,9 @@ class ToolbarWidget(QWidget):
         self.signaler = signaler
 
         self._current_tool = 'text'
-        self.keylist = []
+        self.current_tool = 'text'
 
         self.render()
-        self.current_tool = 'text'
 
     @property
     def current_tool(self):
@@ -82,18 +41,13 @@ class ToolbarWidget(QWidget):
             button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
         self._current_tool = tool
-        self.setup_tool_options_bar()
-
-    def setup_tool_options_bar(self):
-        self.signaler.select_tool_options.emit(self.current_tool)
-
-    def keyPressEvent(self, event):
-        self.firstrelease = True
-        astr = event.key()
-        self.keylist.append(astr)
+        self.select_tool()
 
     def on_toolbar_icon_click(self, name):
         self.current_tool = name
+
+    def select_tool(self):
+        self.signaler.select_tool.emit(self.current_tool)
 
     def add_icon(self, icon_path):
         button = QPushButton(self.ui.toolbarWidget)

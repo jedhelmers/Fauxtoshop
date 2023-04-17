@@ -66,7 +66,7 @@ class NewFileWidget(QDialog):
     @property
     def selected_option(self):
         return self._selected_option
-    
+
     @selected_option.setter
     def selected_option(self, option):
 
