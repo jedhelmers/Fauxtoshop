@@ -27,15 +27,15 @@ class Ui_Form(object):
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.frame = QFrame(Form)
-        self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
-        self.verticalLayout = QVBoxLayout(self.frame)
+        self.windowsFrame = QFrame(Form)
+        self.windowsFrame.setObjectName(u"windowsFrame")
+        self.windowsFrame.setFrameShape(QFrame.StyledPanel)
+        self.windowsFrame.setFrameShadow(QFrame.Raised)
+        self.verticalLayout = QVBoxLayout(self.windowsFrame)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.widget = QWidget(self.frame)
+        self.widget = QWidget(self.windowsFrame)
         self.widget.setObjectName(u"widget")
         self.widget.setMaximumSize(QSize(16777215, 16777215))
         self.gridLayout_2 = QGridLayout(self.widget)
@@ -52,7 +52,7 @@ class Ui_Form(object):
 
         self.verticalLayout.addWidget(self.widget)
 
-        self.buttonLocationWidget = QWidget(self.frame)
+        self.buttonLocationWidget = QWidget(self.windowsFrame)
         self.buttonLocationWidget.setObjectName(u"buttonLocationWidget")
 
         self.verticalLayout.addWidget(self.buttonLocationWidget)
@@ -62,7 +62,7 @@ class Ui_Form(object):
         self.verticalLayout.addItem(self.verticalSpacer)
 
 
-        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.windowsFrame, 0, 0, 1, 1)
 
 
         self.retranslateUi(Form)

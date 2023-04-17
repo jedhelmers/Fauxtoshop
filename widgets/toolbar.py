@@ -14,7 +14,6 @@ class ToolbarWidget(QWidget):
         super().__init__()
         self.ui = toolbarui.Ui_Toolbar()
         self.ui.setupUi(self)
-        self.setMouseTracking(True)
         self.signaler = signaler
 
         self._current_tool = 'text'

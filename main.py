@@ -13,6 +13,7 @@ from ui import mainwindowui
 from widgets.new_file import NewFileWidget
 from widgets.text_options import TextOptionsWidget
 from widgets.toolbar import ToolbarWidget
+from widgets.window import WindowsWidget
 
 def command_mappings(key):
     # 16777249
@@ -75,6 +76,9 @@ class MainWindow(QMainWindow):
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
+
+        windows = WindowsWidget(signaler=self.signaler)
+        self.ui.windowsWidget.layout().addWidget(windows)
 
         self.signaler.select_tool.connect(self.select_tool)
 
@@ -154,7 +158,6 @@ class MainWindow(QMainWindow):
         elif name == 'HIDE_RULERS':
             current_tab = self.ui.workspaceTabWidget.currentWidget()
             current_tab.toggle_rulers()
-            print(current_tab)
         else:
             self.on_toolbar_icon_click(name)
             self.keylist = []

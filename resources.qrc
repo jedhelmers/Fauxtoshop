@@ -48,5 +48,22 @@
     <file>images/tool_options_left_align_text.svg</file>
     <file>images/tool_options_center_text.svg</file>
     <file>images/tool_options_right_align_text.svg</file>
+
+    <file>images/window_actions.svg</file>
+    <file>images/window_adjustments.svg</file>
+    <file>images/window_brush_settings.svg</file>
+    <file>images/window_brushes.svg</file>
+    <file>images/window_channels.svg</file>
+    <file>images/window_characters.svg</file>
+    <file>images/window_comments.svg</file>
+    <file>images/window_gradients.svg</file>
+    <file>images/window_history.svg</file>
+    <file>images/window_layers.svg</file>
+    <file>images/window_libraries.svg</file>
+    <file>images/window_paragraph.svg</file>
+    <file>images/window_paths.svg</file>
+    <file>images/window_patterns.svg</file>
+    <file>images/window_properties.svg</file>
+    <file>images/window_swatches.svg</file>
   </qresource>
 </RCC>
