@@ -14,6 +14,7 @@ from widgets.new_file import NewFileWidget
 from widgets.text_options import TextOptionsWidget
 from widgets.toolbar import ToolbarWidget
 from widgets.window import WindowsWidget
+from widgets.window_flyout_panel import WindowFlyoutPanelWidget
 
 def command_mappings(key):
     # 16777249
@@ -59,6 +60,7 @@ def key_mappings(key):
 
 class MainSignaler(QtCore.QObject):
     select_tool = QtCore.Signal(str)
+    show_window_flyout_panel = QtCore.Signal(dict)
 
 
 class MainWindow(QMainWindow):
@@ -81,7 +83,9 @@ class MainWindow(QMainWindow):
         self.ui.windowsWidget.layout().addWidget(windows)
 
         self.signaler.select_tool.connect(self.select_tool)
-
+        self.signaler.show_window_flyout_panel.connect(self.show_window_flyout_panel)
+        self.windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='')
+        self.windowFlyoutPanelWidget.hide()
         self.current_tool = 'text'
 
     @property
@@ -104,6 +108,14 @@ class MainWindow(QMainWindow):
 
         self._current_tool = tool
         self.setup_tool_options_bar()
+
+    def show_window_flyout_panel(self, window=None):
+        # print('POS', window)
+        if window:
+            print('POS', window)
+            # windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='')
+            self.windowFlyoutPanelWidget.move(window['x'], window['y'])
+            self.windowFlyoutPanelWidget.show()
 
     def select_tool(self, tool_name):
         self.current_tool = tool_name

@@ -2,7 +2,7 @@ def window_panel_style():
     return """
     QFrame {
         border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 4px;
+        border-radius: 2px;
     }
 
     QFrame * QPushButton {

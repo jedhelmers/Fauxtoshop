@@ -19,6 +19,7 @@ class WindowsWidget(QWidget):
         super().__init__()
         self.ui = windowsui.Ui_Windows()
         self.ui.setupUi(self)
+        self.signaler = signaler
 
         self.current_window = None
 
@@ -34,18 +35,23 @@ class WindowsWidget(QWidget):
         icon.addFile(icon_data['path'], QSize(), QIcon.Normal, QIcon.Off)
         button.setIcon(icon)
         button.setFlat(False)
-        # window_panel.ui.windowsFrame.layout().insertWidget(self.ui.verticalLayout.count() - 1, button)
-        # window_panel.ui.buttonLocationWidget.layout().addWidget(button)
         window_panel.ui.widget.layout().addWidget(button)
-        # window_panel.layout().addWidget(button)
-        # self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
         button.setText("")
 
         button.clicked.connect(
-            lambda: self.on_window_select(icon_data['name']))
+            lambda: self.on_window_select(button, icon_data['name']))
 
-    def on_window_select(self, name):
+    def on_window_select(self, button, name):
         self.current_window = name
+        x = self.y()
+        y = self.y()
+        print(x, y, button.x(), button.y())
+        window = {
+            'name': self.current_window,
+            'x': 100,
+            'y': 200
+        }
+        self.signaler.show_window_flyout_panel.emit(window)
 
     def add_window_icons(self):
         window_icons = [
