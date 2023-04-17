@@ -23,7 +23,6 @@ class WindowsWidget(QWidget):
         icon.addFile(icon_path['path'], QSize(), QIcon.Normal, QIcon.Off)
         button.setIcon(icon)
         button.setFlat(False)
-        self.ui.verticalLayout.addWidget(button)
         self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
         button.setText("")
 
