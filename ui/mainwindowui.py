@@ -59,7 +59,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2 = QGridLayout(self.centralwidget)
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.gridLayout_2.setContentsMargins(6, 0, 6, 0)
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.toolOptionsGridWidget = QWidget(self.centralwidget)
         self.toolOptionsGridWidget.setObjectName(u"toolOptionsGridWidget")
         self.toolOptionsGridWidget.setMaximumSize(QSize(16777215, 50))
@@ -86,12 +86,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.toolbarWidget = QWidget(self.centralwidget)
         self.toolbarWidget.setObjectName(u"toolbarWidget")
-        self.toolbarWidget.setMinimumSize(QSize(40, 0))
+        self.toolbarWidget.setMinimumSize(QSize(0, 0))
         self.toolbarWidget.setMaximumSize(QSize(40, 16777215))
         self.verticalLayout = QVBoxLayout(self.toolbarWidget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 2)
+        self.verticalLayout.setContentsMargins(4, 0, 0, 2)
 
         self.horizontalLayout.addWidget(self.toolbarWidget)
 
@@ -105,6 +105,7 @@ class Ui_MainWindow(object):
         self.windowsWidget.setObjectName(u"windowsWidget")
         self.windowsWidget.setMinimumSize(QSize(0, 0))
         self.verticalLayout_2 = QVBoxLayout(self.windowsWidget)
+        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
 

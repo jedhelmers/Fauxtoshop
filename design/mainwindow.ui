@@ -16,13 +16,13 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <property name="leftMargin">
-     <number>6</number>
+     <number>0</number>
     </property>
     <property name="topMargin">
      <number>0</number>
     </property>
     <property name="rightMargin">
-     <number>6</number>
+     <number>0</number>
     </property>
     <property name="bottomMargin">
      <number>0</number>
@@ -90,7 +90,7 @@
        <widget class="QWidget" name="toolbarWidget" native="true">
         <property name="minimumSize">
          <size>
-          <width>40</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -105,7 +105,7 @@
           <number>0</number>
          </property>
          <property name="leftMargin">
-          <number>0</number>
+          <number>4</number>
          </property>
          <property name="topMargin">
           <number>0</number>
@@ -138,6 +138,9 @@
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>

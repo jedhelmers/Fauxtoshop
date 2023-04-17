@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGridLayout, QSizePolicy, QSpacerItem,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QGridLayout, QSizePolicy, QVBoxLayout,
+    QWidget)
 
 class Ui_Windows(object):
     def setupUi(self, Windows):
@@ -35,11 +35,7 @@ class Ui_Windows(object):
         self.verticalLayout = QVBoxLayout(self.windowsWidget)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 2)
-        self.verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.verticalLayout.addItem(self.verticalSpacer)
-
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
 
         self.gridLayout.addWidget(self.windowsWidget, 0, 0, 1, 1)
 

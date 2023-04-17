@@ -3,7 +3,16 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon
 
+from styles.window_panel import window_panel_style
 from ui import windowsui
+from ui import window_panelui
+
+
+class WindowPanelWidget(QWidget):
+    def __init__(self, name, signaler=None):
+        super().__init__()
+        self.ui = window_panelui.Ui_PanelWidget()
+        self.ui.setupUi(self)
 
 class WindowsWidget(QWidget):
     def __init__(self, signaler):
@@ -11,53 +20,92 @@ class WindowsWidget(QWidget):
         self.ui = windowsui.Ui_Windows()
         self.ui.setupUi(self)
 
-        self.add_toolbar_icons()
+        self.current_window = None
 
-    def add_icon(self, icon_path):
+        self.add_window_icons()
+
+    def add_icon(self, icon_data, window_panel):
         button = QPushButton(self.ui.windowsWidget)
-        button.setObjectName(icon_path['name'])
+        button.setObjectName(icon_data['name'])
         button.setMinimumSize(QSize(32, 32))
         button.setMaximumSize(QSize(32, 32))
-        button.setToolTip(icon_path['tooltip'])
+        button.setToolTip(icon_data['tooltip'])
         icon = QIcon()
-        icon.addFile(icon_path['path'], QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(icon_data['path'], QSize(), QIcon.Normal, QIcon.Off)
         button.setIcon(icon)
         button.setFlat(False)
-        self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
+        # window_panel.ui.windowsFrame.layout().insertWidget(self.ui.verticalLayout.count() - 1, button)
+        # window_panel.ui.buttonLocationWidget.layout().addWidget(button)
+        window_panel.ui.widget.layout().addWidget(button)
+        # window_panel.layout().addWidget(button)
+        # self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
         button.setText("")
 
         button.clicked.connect(
-            lambda: self.on_toolbar_icon_click(icon_path['name']))
+            lambda: self.on_window_select(icon_data['name']))
 
-    def on_toolbar_icon_click(self, name):
-        self.current_tool = name
+    def on_window_select(self, name):
+        self.current_window = name
 
-    def add_toolbar_icons(self):
-        toolbar_icons = [
-            {'tooltip': 'actions', 'name': 'Actions', 'path': u':/images/images/window_actions.svg'},
-            {'tooltip': 'adjustments', 'name': 'Adjustments', 'path': u':/images/images/window_adjustments.svg'},
-            {'tooltip': 'brush settings', 'name': 'Brush Settings', 'path': u':/images/images/window_brush_settings.svg'},
-            {'tooltip': 'brushes', 'name': 'Brushes', 'path': u':/images/images/window_brushes.svg'},
-            {'tooltip': 'channels', 'name': 'Channels', 'path': u':/images/images/window_channels.svg'},
-            {'tooltip': 'characters', 'name': 'Characters', 'path': u':/images/images/window_characters.svg'},
-            {'tooltip': 'comments', 'name': 'Comments', 'path': u':/images/images/window_comments.svg'},
-            {'tooltip': 'gradients', 'name': 'Gradients', 'path': u':/images/images/window_gradients.svg'},
-            {'tooltip': 'history', 'name': 'History', 'path': u':/images/images/window_history.svg'},
-            {'tooltip': 'layers', 'name': 'Layers', 'path': u':/images/images/window_layers.svg'},
-            {'tooltip': 'libraries', 'name': 'Libraries', 'path': u':/images/images/window_libraries.svg'},
-            {'tooltip': 'paragraph', 'name': 'Paragraph', 'path': u':/images/images/window_paragraph.svg'},
-            {'tooltip': 'paths', 'name': 'Paths', 'path': u':/images/images/window_paths.svg'},
-            {'tooltip': 'patterns', 'name': 'Patterns', 'path': u':/images/images/window_patterns.svg'},
-            {'tooltip': 'properties', 'name': 'Properties', 'path': u':/images/images/window_properties.svg'},
-            {'tooltip': 'swatches', 'name': 'Swatches', 'path': u':/images/images/window_swatches.svg'},
+    def add_window_icons(self):
+        window_icons = [
+            {
+                'chunk': '',
+                'items': [
+                    {'tooltip': 'actions', 'name': 'Actions', 'path': u':/images/images/window_actions.svg'},
+                    {'tooltip': 'adjustments', 'name': 'Adjustments', 'path': u':/images/images/window_adjustments.svg'},
+                    {'tooltip': 'brush settings', 'name': 'Brush Settings', 'path': u':/images/images/window_brush_settings.svg'},
+                    {'tooltip': 'brushes', 'name': 'Brushes', 'path': u':/images/images/window_brushes.svg'},
+                ]
+            },
+            {
+                'chunk': '',
+                'items': [
+                    {'tooltip': 'channels', 'name': 'Channels', 'path': u':/images/images/window_channels.svg'},
+                    {'tooltip': 'characters', 'name': 'Characters', 'path': u':/images/images/window_characters.svg'},
+                    {'tooltip': 'comments', 'name': 'Comments', 'path': u':/images/images/window_comments.svg'},
+                    {'tooltip': 'gradients', 'name': 'Gradients', 'path': u':/images/images/window_gradients.svg'},
+                ]
+            },
+            {
+                'chunk': '',
+                'items': [
+                    {'tooltip': 'history', 'name': 'History', 'path': u':/images/images/window_history.svg'},
+                    {'tooltip': 'layers', 'name': 'Layers', 'path': u':/images/images/window_layers.svg'},
+                    {'tooltip': 'libraries', 'name': 'Libraries', 'path': u':/images/images/window_libraries.svg'},
+                    {'tooltip': 'paragraph', 'name': 'Paragraph', 'path': u':/images/images/window_paragraph.svg'},
+                    {'tooltip': 'paths', 'name': 'Paths', 'path': u':/images/images/window_paths.svg'},
+                ]
+            },
+            {
+                'chunk': '',
+                'items': [
+                    {'tooltip': 'swatches', 'name': 'Swatches', 'path': u':/images/images/window_swatches.svg'},
+                ]
+            },
+            {
+                'chunk': '',
+                'items': [
+                    {'tooltip': 'patterns', 'name': 'Patterns', 'path': u':/images/images/window_patterns.svg'},
+                    {'tooltip': 'properties', 'name': 'Properties', 'path': u':/images/images/window_properties.svg'},
+                ]
+            }
+
         ]
 
         try:
-            for icon_path in toolbar_icons:
-                self.add_icon(icon_path)
+            for window_data in window_icons:
+                window_panel = WindowPanelWidget(name=window_data['chunk'])
+                window_panel.setStyleSheet(window_panel_style())
+
+                for item in window_data['items']:
+                    self.add_icon(item, window_panel)
+
+                self.ui.windowsWidget.layout().addWidget(window_panel)
 
             verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
-            self.ui.windowsWidget.layout().addWidget(verticalSpacer)
+            self.ui.windowsWidget.layout().addItem(verticalSpacer)
+
         except Exception as e:
             print(e)
             pass
