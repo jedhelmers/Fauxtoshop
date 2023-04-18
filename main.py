@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
 
         self._current_tool = 'text'
         self.keylist = []
+        self.show_window_flyout = False
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
@@ -110,12 +111,16 @@ class MainWindow(QMainWindow):
         self.setup_tool_options_bar()
 
     def show_window_flyout_panel(self, window=None):
-        # print('POS', window)
-        if window:
-            print('POS', window)
-            # windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='')
-            self.windowFlyoutPanelWidget.move(window['x'], window['y'])
+        if not self.show_window_flyout and window:
+            x = window['pos'].x() - self.pos().x()
+            y = window['pos'].y() - self.pos().y()
+            flyout_width = self.windowFlyoutPanelWidget.width()
+            self.windowFlyoutPanelWidget.move(x - flyout_width - 4, y - 36)
             self.windowFlyoutPanelWidget.show()
+        else:
+            self.windowFlyoutPanelWidget.hide()
+
+        self.show_window_flyout = not self.show_window_flyout
 
     def select_tool(self, tool_name):
         self.current_tool = tool_name

@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, QPoint
 from PySide6.QtWidgets import QWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon
 
@@ -42,14 +42,17 @@ class WindowsWidget(QWidget):
             lambda: self.on_window_select(button, icon_data['name']))
 
     def on_window_select(self, button, name):
+        p = QPoint()
         self.current_window = name
         x = self.y()
         y = self.y()
-        print(x, y, button.x(), button.y())
+        # print(self.width())
+        # pos = self.mapFrom(self.parent(), p)
+        pos = button.mapToGlobal(p)
+        # print(pos, button.x(), button.y())
         window = {
             'name': self.current_window,
-            'x': 100,
-            'y': 200
+            'pos': pos
         }
         self.signaler.show_window_flyout_panel.emit(window)
 
