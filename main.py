@@ -11,7 +11,8 @@ from functions import new_file
 from styles.main import main_style
 from ui import mainwindowui
 from widgets.new_file import NewFileWidget
-from widgets.text_options import TextOptionsWidget
+import widgets.tools as Tools
+from widgets.tools.text_options import TextOptionsWidget
 from widgets.toolbar import ToolbarWidget
 from widgets.window import WindowsWidget
 from widgets.window_flyout_panel import WindowFlyoutPanelWidget
@@ -56,6 +57,30 @@ def key_mappings(key):
         '82_16777249': 'HIDE_RULERS',
     }
     return switch[key] if key in switch else None
+
+def tooloptions_mappings(tool_name):
+    switch = {
+        'text': Tools.TextOptionsWidget,
+        'eyedropper': Tools.EyedropperOptionsWidget,
+        'move': Tools.MoveOptionsWidget,
+        'dashed_box': Tools.DashedBoxOptionsWidget,
+        'polygon_lasso': Tools.PolygonLassoOptionsWidget,
+        'a_pointer': Tools.APointerOptionsWidget,
+        'rectangle': Tools.RectangleOptionsWidget,
+        'brush': Tools.BrushArrowOptionsWidget,
+        'crop': Tools.CropOptionsWidget,
+        'eraser': Tools.EraserOptionsWidget,
+        'frame': Tools.FrameOptionsWidget,
+        'gradient': Tools.GradientOptionsWidget,
+        'pointer_finger': Tools.PointerFingerOptionsWidget,
+        'pin': Tools.PinOptionsWidget,
+        'pen': Tools.PenOptionsWidget,
+        'quick_selection': Tools.QuickSelectionOptionsWidget,
+        'spot_headling': Tools.SpotHeadlingOptionsWidget,
+        'stamp': Tools.StampOptionsWidget,
+        'rotate_view': Tools.RotateViewOptionsWidget,
+    }
+    switch[tool_name] if tool_name in switch else None
 
 
 class MainSignaler(QtCore.QObject):
@@ -126,10 +151,16 @@ class MainWindow(QMainWindow):
         self.current_tool = tool_name
 
     def setup_tool_options_bar(self):
-        if self.current_tool == 'text':
-            text_options_widget = TextOptionsWidget(self.ui.toolOptionsGridWidget)
-            text_options_widget.setObjectName('text_options_widget')
-            self.ui.toolOptionsGridWidget.layout().addWidget(text_options_widget)
+        if self.current_tool:
+            mapped_tool = tooloptions_mappings(self.current_tool)
+            print(mapped_tool)
+            if mapped_tool:
+                widget = mapped_tool(self.ui.toolOptionsGridWidget)
+                widget.setObjectName(f'{self.current_tool}_widget')
+                self.ui.toolOptionsGridWidget.layout().addWidget(widget)
+                # text_options_widget = TextOptionsWidget(self.ui.toolOptionsGridWidget)
+                # text_options_widget.setObjectName('text_options_widget')
+                # self.ui.toolOptionsGridWidget.layout().addWidget(text_options_widget)
         else:
             child = self.ui.toolOptionsGridWidget.findChild(QWidget, 'text_options_widget')
 

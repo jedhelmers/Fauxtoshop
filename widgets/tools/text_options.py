@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget
 
-from ui import text_optionsui
+from ui.tools import text_optionsui
 
 
 class TextOptionsWidget(QWidget):

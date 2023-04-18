@@ -6,7 +6,7 @@ from PySide6.QtGui import QIcon
 from functions import new_file
 from ui import toolbarui
 from widgets.new_file import NewFileWidget
-from widgets.text_options import TextOptionsWidget
+from widgets.tools.text_options import TextOptionsWidget
 
 
 class ToolbarWidget(QWidget):

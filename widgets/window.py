@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QPoint
-from PySide6.QtWidgets import QWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QWidget, QMainWindow, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon
 
 from styles.window_panel import window_panel_style
@@ -13,6 +13,8 @@ class WindowPanelWidget(QWidget):
         super().__init__()
         self.ui = window_panelui.Ui_PanelWidget()
         self.ui.setupUi(self)
+        # self.setFloating(False)
+
 
 class WindowsWidget(QWidget):
     def __init__(self, signaler):
@@ -23,10 +25,14 @@ class WindowsWidget(QWidget):
 
         self.current_window = None
 
+        # Disable tabbing
+        # self.setDockOptions(QMainWindow.AllowNestedDocks)
+
+
         self.add_window_icons()
 
     def add_icon(self, icon_data, window_panel):
-        button = QPushButton(self.ui.windowsWidget)
+        button = QPushButton()
         button.setObjectName(icon_data['name'])
         button.setMinimumSize(QSize(32, 32))
         button.setMaximumSize(QSize(32, 32))
@@ -111,9 +117,9 @@ class WindowsWidget(QWidget):
                     self.add_icon(item, window_panel)
 
                 self.ui.windowsWidget.layout().addWidget(window_panel)
-
             verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
             self.ui.windowsWidget.layout().addItem(verticalSpacer)
+            # self.addDockWidget(Qt.RightDockWidgetArea, self.ui.windowsWidget)
 
         except Exception as e:
             print(e)
