@@ -145,6 +145,7 @@ class MainWindow(QMainWindow):
             self.windowFlyoutPanelWidget.move(x - flyout_width - 4, y - 30)
             self.windowFlyoutPanelWidget.show()
             self.current_window = window
+            self.windowFlyoutPanelWidget = self.current_window
         else:
             self.windowFlyoutPanelWidget.hide()
             self.current_window = None
@@ -153,7 +154,7 @@ class MainWindow(QMainWindow):
         self.current_tool = tool_name
 
     def setup_tool_options_bar(self):
-        if self.current_tool:            
+        if self.current_tool:
             mapped_tool = tooloptions_mappings(self.current_tool)
 
             if self.current_options_widget:

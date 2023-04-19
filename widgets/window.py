@@ -85,6 +85,8 @@ class WindowsWidget(QWidget):
             'panel_contents': panel_contents
         }
 
+        print('window', window['panel_contents'])
+
         self.signaler.show_window_flyout_panel.emit(window)
 
     def add_window_icons(self):

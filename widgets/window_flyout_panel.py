@@ -10,7 +10,7 @@ class WindowFlyoutPanelWidget(QWidget):
         self.ui.setupUi(self)
 
         self.current_window = window
-        print(self.current_window)
+        print('WEE', self.current_window)
 
         self.ui.windowPanelTabWidget.setStyleSheet("""
         QTabBar::tab {
@@ -32,3 +32,16 @@ class WindowFlyoutPanelWidget(QWidget):
                 self.ui.windowPanelTabWidget.addTab(widget, w['name'])
 
         self.setStyleSheet('background: rgba(255, 255, 255, 0.1)')
+
+    @property
+    def current_window(self):
+        return self._current_window
+
+    @current_window.setter
+    def current_window(self, current_window):
+        self._current_window = current_window
+        if self.current_window and 'panel_contents' in self.current_window:
+            for w in self.current_window['panel_contents']:
+                print(w)
+                widget = QWidget()
+                self.ui.windowPanelTabWidget.addTab(widget, w['name'])

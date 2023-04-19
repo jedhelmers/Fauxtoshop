@@ -43,7 +43,10 @@ class WorkspaceWidget(QWidget):
         self.new_file_info = new_file_info
         self.zoom = 1.0
         self.are_rulers_hidden = False
+        self.dimensions = [30, 30]
+        self.dimensions_offset = [2, 2]
 
+        # Mouse tracking lines.
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
         self.y_line = QHLine(self.ui.verticalRulerWidget, thickness=2)
         self.x_line.setStyleSheet('border-color: rgba(255, 255, 255, 0.75)')
@@ -55,7 +58,9 @@ class WorkspaceWidget(QWidget):
         self.signaler.mouseMove.connect(self.mouse_move_event)
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
 
-        ArtBoardWidget(self.ui.workspaceBackgroundWidget, new_file_info, self.signaler)
+        self.ui.scrollArea.setWidgetResizable(True)
+
+        ArtBoardWidget(self.ui.workspaceBackgroundWidget, new_file_info, self.dimensions_offset, self.signaler)
 
     def toggle_rulers(self):
         if self.are_rulers_hidden:
@@ -79,8 +84,9 @@ class WorkspaceWidget(QWidget):
         self.x_line.move(x, 0)
 
     def draw_h_ruler(self):
-        for i in range(20):
-            self.draw_h_unit(i, i * 40)
+        for i in range(self.dimensions[0]):
+            # print(i)
+            self.draw_h_unit(i - self.dimensions_offset[0], i * 40)
 
     def draw_h_unit(self, index, h_offset=0):
         label = QLabel(self.ui.horizontalRulerWidget)
@@ -92,8 +98,8 @@ class WorkspaceWidget(QWidget):
             line.move(i * (10 * self.zoom) + h_offset, v_offset)
 
     def draw_v_ruler(self):
-        for i in range(20):
-            self.draw_v_unit(i, i * 40)
+        for i in range(self.dimensions[1]):
+            self.draw_v_unit(i - self.dimensions_offset[1], i * 40)
 
     def draw_v_unit(self, index, v_offset=0):
         label = QLabel(self.ui.verticalRulerWidget)

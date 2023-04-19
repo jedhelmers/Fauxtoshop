@@ -49,6 +49,10 @@ def main_style():
         border-bottom: 1px solid rgba(0, 0, 0, .5);
     }
 
+    QWidget#informationBarWidget {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
     QToolTip {
         padding: 0px 2px;
         border: 1px solid rgba(255, 255, 255, .15);

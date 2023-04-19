@@ -13,7 +13,7 @@ def conversion(unit, value):
     return value
 
 class ArtBoardWidget(QOpenGLWidget):
-    def __init__(self, parent, file_info, signaler):
+    def __init__(self, parent, file_info, offsets, signaler):
         super().__init__(parent)
         self.setMouseTracking(True)
 
@@ -21,8 +21,8 @@ class ArtBoardWidget(QOpenGLWidget):
         self.file_info = file_info
         self.setObjectName(file_info['name'])
         self.setGeometry(QRect(
-            0,
-            0,
+            offsets[0] * 40,
+            offsets[1] * 40,
             conversion(
                 self.file_info['units_w'],
                 float(self.file_info['width'])),
