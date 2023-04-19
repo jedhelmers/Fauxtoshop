@@ -5,7 +5,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton, QWidget
+from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout
 
 from functions import new_file
 from styles.main import main_style
@@ -80,7 +80,7 @@ def tooloptions_mappings(tool_name):
         'stamp': Tools.StampOptionsWidget,
         'rotate_view': Tools.RotateViewOptionsWidget,
     }
-    switch[tool_name] if tool_name in switch else None
+    return switch[tool_name] if tool_name in switch else None
 
 
 class MainSignaler(QtCore.QObject):
@@ -100,7 +100,8 @@ class MainWindow(QMainWindow):
 
         self._current_tool = 'text'
         self.keylist = []
-        self.show_window_flyout = False
+        self.current_window = None
+        self.current_options_widget = None
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
@@ -136,39 +137,33 @@ class MainWindow(QMainWindow):
         self.setup_tool_options_bar()
 
     def show_window_flyout_panel(self, window=None):
-        if not self.show_window_flyout and window:
+
+        if window and self.current_window != window['name']:
             x = window['pos'].x() - self.pos().x()
             y = window['pos'].y() - self.pos().y()
             flyout_width = self.windowFlyoutPanelWidget.width()
-            self.windowFlyoutPanelWidget.move(x - flyout_width - 4, y - 36)
+            self.windowFlyoutPanelWidget.move(x - flyout_width - 4, y - 30)
             self.windowFlyoutPanelWidget.show()
+            self.current_window = window['name']
         else:
             self.windowFlyoutPanelWidget.hide()
-
-        self.show_window_flyout = not self.show_window_flyout
+            self.current_window = None
 
     def select_tool(self, tool_name):
         self.current_tool = tool_name
 
     def setup_tool_options_bar(self):
-        if self.current_tool:
+        if self.current_tool:            
             mapped_tool = tooloptions_mappings(self.current_tool)
-            print(mapped_tool)
+
+            if self.current_options_widget:
+                self.ui.toolOptionsGridWidget.layout().removeWidget(self.current_options_widget)
+                self.current_options_widget.setParent(None)
+
             if mapped_tool:
-                widget = mapped_tool(self.ui.toolOptionsGridWidget)
-                widget.setObjectName(f'{self.current_tool}_widget')
-                self.ui.toolOptionsGridWidget.layout().addWidget(widget)
-                # text_options_widget = TextOptionsWidget(self.ui.toolOptionsGridWidget)
-                # text_options_widget.setObjectName('text_options_widget')
-                # self.ui.toolOptionsGridWidget.layout().addWidget(text_options_widget)
-        else:
-            child = self.ui.toolOptionsGridWidget.findChild(QWidget, 'text_options_widget')
-
-            if child is not None:
-                self.ui.toolOptionsWidget.layout().removeWidget(child)
-                child.setParent(None)
-
-        print(self.current_tool)
+                self.current_options_widget = mapped_tool(self.ui.toolOptionsGridWidget)
+                self.current_options_widget.setObjectName(f'{self.current_tool}_widget')
+                self.ui.toolOptionsGridWidget.layout().addWidget(self.current_options_widget)
 
     def keyPressEvent(self, event):
         self.firstrelease = True
