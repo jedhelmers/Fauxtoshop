@@ -10,6 +10,18 @@
     <height>44</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>38</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>44</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -59,7 +71,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources.qrc">
+         <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/toolbar_t.svg</normaloff>:/images/images/toolbar_t.svg</iconset>
         </property>
         <property name="flat">
@@ -98,7 +110,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources.qrc">
+         <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/tool_options_toggle_text_orientation.svg</normaloff>:/images/images/tool_options_toggle_text_orientation.svg</iconset>
         </property>
         <property name="flat">
@@ -177,7 +189,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources.qrc">
+         <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/tool_options_set_font_size.svg</normaloff>:/images/images/tool_options_set_font_size.svg</iconset>
         </property>
         <property name="flat">
@@ -218,7 +230,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources.qrc">
+         <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/tool_options_font_sharpness.svg</normaloff>:/images/images/tool_options_font_sharpness.svg</iconset>
         </property>
         <property name="flat">
@@ -271,7 +283,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../resources.qrc">
+           <iconset resource="../../resources.qrc">
             <normaloff>:/images/images/tool_options_left_align_text.svg</normaloff>:/images/images/tool_options_left_align_text.svg</iconset>
           </property>
           <property name="flat">
@@ -297,7 +309,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../resources.qrc">
+           <iconset resource="../../resources.qrc">
             <normaloff>:/images/images/tool_options_center_text.svg</normaloff>:/images/images/tool_options_center_text.svg</iconset>
           </property>
           <property name="flat">
@@ -323,7 +335,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../resources.qrc">
+           <iconset resource="../../resources.qrc">
             <normaloff>:/images/images/tool_options_right_align_text.svg</normaloff>:/images/images/tool_options_right_align_text.svg</iconset>
           </property>
           <property name="flat">
@@ -396,7 +408,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources.qrc">
+         <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/tool_options_create_warped_text.svg</normaloff>:/images/images/tool_options_create_warped_text.svg</iconset>
         </property>
         <property name="flat">

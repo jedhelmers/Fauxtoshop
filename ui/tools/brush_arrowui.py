@@ -22,7 +22,9 @@ class Ui_BrushArrowOptions(object):
     def setupUi(self, BrushArrowOptions):
         if not BrushArrowOptions.objectName():
             BrushArrowOptions.setObjectName(u"BrushArrowOptions")
-        BrushArrowOptions.resize(873, 44)
+        BrushArrowOptions.resize(873, 38)
+        BrushArrowOptions.setMinimumSize(QSize(0, 38))
+        BrushArrowOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(BrushArrowOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

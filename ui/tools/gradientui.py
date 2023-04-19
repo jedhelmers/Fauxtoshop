@@ -22,7 +22,9 @@ class Ui_GradientOptions(object):
     def setupUi(self, GradientOptions):
         if not GradientOptions.objectName():
             GradientOptions.setObjectName(u"GradientOptions")
-        GradientOptions.resize(873, 44)
+        GradientOptions.resize(873, 38)
+        GradientOptions.setMinimumSize(QSize(0, 38))
+        GradientOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(GradientOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

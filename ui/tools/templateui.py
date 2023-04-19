@@ -22,7 +22,9 @@ class Ui_UI_NAMEOptions(object):
     def setupUi(self, UI_NAMEOptions):
         if not UI_NAMEOptions.objectName():
             UI_NAMEOptions.setObjectName(u"UI_NAMEOptions")
-        UI_NAMEOptions.resize(873, 44)
+        UI_NAMEOptions.resize(873, 38)
+        UI_NAMEOptions.setMinimumSize(QSize(0, 38))
+        UI_NAMEOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(UI_NAMEOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

@@ -22,7 +22,9 @@ class Ui_PolygonLassoOptions(object):
     def setupUi(self, PolygonLassoOptions):
         if not PolygonLassoOptions.objectName():
             PolygonLassoOptions.setObjectName(u"PolygonLassoOptions")
-        PolygonLassoOptions.resize(873, 44)
+        PolygonLassoOptions.resize(873, 38)
+        PolygonLassoOptions.setMinimumSize(QSize(0, 38))
+        PolygonLassoOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(PolygonLassoOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

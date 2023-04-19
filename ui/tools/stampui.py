@@ -22,7 +22,9 @@ class Ui_StampOptions(object):
     def setupUi(self, StampOptions):
         if not StampOptions.objectName():
             StampOptions.setObjectName(u"StampOptions")
-        StampOptions.resize(873, 44)
+        StampOptions.resize(873, 38)
+        StampOptions.setMinimumSize(QSize(0, 38))
+        StampOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(StampOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

@@ -22,7 +22,9 @@ class Ui_DashedBoxOptions(object):
     def setupUi(self, DashedBoxOptions):
         if not DashedBoxOptions.objectName():
             DashedBoxOptions.setObjectName(u"DashedBoxOptions")
-        DashedBoxOptions.resize(873, 44)
+        DashedBoxOptions.resize(873, 38)
+        DashedBoxOptions.setMinimumSize(QSize(0, 38))
+        DashedBoxOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(DashedBoxOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

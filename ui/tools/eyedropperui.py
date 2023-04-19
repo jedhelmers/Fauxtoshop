@@ -22,7 +22,9 @@ class Ui_EyedropperOptions(object):
     def setupUi(self, EyedropperOptions):
         if not EyedropperOptions.objectName():
             EyedropperOptions.setObjectName(u"EyedropperOptions")
-        EyedropperOptions.resize(873, 44)
+        EyedropperOptions.resize(873, 38)
+        EyedropperOptions.setMinimumSize(QSize(0, 38))
+        EyedropperOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(EyedropperOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

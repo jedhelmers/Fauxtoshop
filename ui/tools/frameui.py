@@ -22,7 +22,9 @@ class Ui_FrameOptions(object):
     def setupUi(self, FrameOptions):
         if not FrameOptions.objectName():
             FrameOptions.setObjectName(u"FrameOptions")
-        FrameOptions.resize(873, 44)
+        FrameOptions.resize(873, 38)
+        FrameOptions.setMinimumSize(QSize(0, 38))
+        FrameOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(FrameOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

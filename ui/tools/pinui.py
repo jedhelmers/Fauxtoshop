@@ -22,7 +22,9 @@ class Ui_PinOptions(object):
     def setupUi(self, PinOptions):
         if not PinOptions.objectName():
             PinOptions.setObjectName(u"PinOptions")
-        PinOptions.resize(873, 44)
+        PinOptions.resize(873, 38)
+        PinOptions.setMinimumSize(QSize(0, 38))
+        PinOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(PinOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

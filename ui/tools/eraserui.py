@@ -22,7 +22,9 @@ class Ui_EraserOptions(object):
     def setupUi(self, EraserOptions):
         if not EraserOptions.objectName():
             EraserOptions.setObjectName(u"EraserOptions")
-        EraserOptions.resize(873, 44)
+        EraserOptions.resize(873, 38)
+        EraserOptions.setMinimumSize(QSize(0, 38))
+        EraserOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(EraserOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

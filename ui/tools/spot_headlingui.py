@@ -22,7 +22,9 @@ class Ui_SpotHeadlingOptions(object):
     def setupUi(self, SpotHeadlingOptions):
         if not SpotHeadlingOptions.objectName():
             SpotHeadlingOptions.setObjectName(u"SpotHeadlingOptions")
-        SpotHeadlingOptions.resize(873, 44)
+        SpotHeadlingOptions.resize(873, 38)
+        SpotHeadlingOptions.setMinimumSize(QSize(0, 38))
+        SpotHeadlingOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(SpotHeadlingOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

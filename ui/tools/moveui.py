@@ -22,7 +22,9 @@ class Ui_MoveOptions(object):
     def setupUi(self, MoveOptions):
         if not MoveOptions.objectName():
             MoveOptions.setObjectName(u"MoveOptions")
-        MoveOptions.resize(873, 44)
+        MoveOptions.resize(873, 38)
+        MoveOptions.setMinimumSize(QSize(0, 38))
+        MoveOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(MoveOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

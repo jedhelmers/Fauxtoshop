@@ -22,7 +22,9 @@ class Ui_BrushOptions(object):
     def setupUi(self, BrushOptions):
         if not BrushOptions.objectName():
             BrushOptions.setObjectName(u"BrushOptions")
-        BrushOptions.resize(873, 44)
+        BrushOptions.resize(873, 38)
+        BrushOptions.setMinimumSize(QSize(0, 38))
+        BrushOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(BrushOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

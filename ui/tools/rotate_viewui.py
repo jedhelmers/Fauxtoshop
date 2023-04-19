@@ -22,7 +22,9 @@ class Ui_RotateViewOptions(object):
     def setupUi(self, RotateViewOptions):
         if not RotateViewOptions.objectName():
             RotateViewOptions.setObjectName(u"RotateViewOptions")
-        RotateViewOptions.resize(873, 44)
+        RotateViewOptions.resize(873, 38)
+        RotateViewOptions.setMinimumSize(QSize(0, 38))
+        RotateViewOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(RotateViewOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

@@ -22,7 +22,9 @@ class Ui_RectangleOptions(object):
     def setupUi(self, RectangleOptions):
         if not RectangleOptions.objectName():
             RectangleOptions.setObjectName(u"RectangleOptions")
-        RectangleOptions.resize(873, 44)
+        RectangleOptions.resize(873, 38)
+        RectangleOptions.setMinimumSize(QSize(0, 38))
+        RectangleOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(RectangleOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

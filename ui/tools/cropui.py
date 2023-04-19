@@ -22,7 +22,9 @@ class Ui_CropOptions(object):
     def setupUi(self, CropOptions):
         if not CropOptions.objectName():
             CropOptions.setObjectName(u"CropOptions")
-        CropOptions.resize(873, 44)
+        CropOptions.resize(873, 38)
+        CropOptions.setMinimumSize(QSize(0, 38))
+        CropOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(CropOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

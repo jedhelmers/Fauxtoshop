@@ -22,7 +22,9 @@ class Ui_ZoomOptions(object):
     def setupUi(self, ZoomOptions):
         if not ZoomOptions.objectName():
             ZoomOptions.setObjectName(u"ZoomOptions")
-        ZoomOptions.resize(873, 44)
+        ZoomOptions.resize(873, 38)
+        ZoomOptions.setMinimumSize(QSize(0, 38))
+        ZoomOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(ZoomOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

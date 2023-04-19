@@ -22,7 +22,9 @@ class Ui_PenOptions(object):
     def setupUi(self, PenOptions):
         if not PenOptions.objectName():
             PenOptions.setObjectName(u"PenOptions")
-        PenOptions.resize(873, 44)
+        PenOptions.resize(873, 38)
+        PenOptions.setMinimumSize(QSize(0, 38))
+        PenOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(PenOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

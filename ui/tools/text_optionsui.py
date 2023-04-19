@@ -25,6 +25,8 @@ class Ui_TextOptions(object):
         if not TextOptions.objectName():
             TextOptions.setObjectName(u"TextOptions")
         TextOptions.resize(873, 44)
+        TextOptions.setMinimumSize(QSize(0, 38))
+        TextOptions.setMaximumSize(QSize(16777215, 44))
         self.gridLayout = QGridLayout(TextOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

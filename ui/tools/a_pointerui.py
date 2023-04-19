@@ -22,7 +22,9 @@ class Ui_APointerOptions(object):
     def setupUi(self, APointerOptions):
         if not APointerOptions.objectName():
             APointerOptions.setObjectName(u"APointerOptions")
-        APointerOptions.resize(873, 44)
+        APointerOptions.resize(873, 38)
+        APointerOptions.setMinimumSize(QSize(0, 38))
+        APointerOptions.setMaximumSize(QSize(16777215, 38))
         self.gridLayout = QGridLayout(APointerOptions)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
