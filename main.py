@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
 
         self.signaler.select_tool.connect(self.select_tool)
         self.signaler.show_window_flyout_panel.connect(self.show_window_flyout_panel)
-        self.windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='')
+        self.windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='', windows=[1, 2, 3, 4, 5])
         self.windowFlyoutPanelWidget.hide()
         self.current_tool = 'text'
 
