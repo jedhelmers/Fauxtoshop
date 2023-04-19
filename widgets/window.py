@@ -22,6 +22,7 @@ class WindowsWidget(QWidget):
         self.ui = windowsui.Ui_Windows()
         self.ui.setupUi(self)
         self.signaler = signaler
+        self.window_icons = []
 
         self.current_window = None
 
@@ -56,14 +57,38 @@ class WindowsWidget(QWidget):
         # pos = self.mapFrom(self.parent(), p)
         pos = button.mapToGlobal(p)
         # print(pos, button.x(), button.y())
+
+        panel_contents = []
+
+        temp = []
+        for window_data in self.window_icons:
+            # TODO: filter
+            should_break = False
+            for index, item in enumerate(window_data['items']):
+                if index == 0:
+                    temp = []
+
+                if item['name'] == name:
+                    should_break = True
+
+                temp.append(item)
+                # print(index, temp)
+
+            if should_break:
+                break
+
+            panel_contents = temp
+
         window = {
             'name': self.current_window,
-            'pos': pos
+            'pos': pos,
+            'panel_contents': panel_contents
         }
+
         self.signaler.show_window_flyout_panel.emit(window)
 
     def add_window_icons(self):
-        window_icons = [
+        self.window_icons = [
             {
                 'chunk': '',
                 'items': [
@@ -109,7 +134,7 @@ class WindowsWidget(QWidget):
         ]
 
         try:
-            for window_data in window_icons:
+            for window_data in self.window_icons:
                 window_panel = WindowPanelWidget(name=window_data['chunk'])
                 window_panel.setStyleSheet(window_panel_style())
 
