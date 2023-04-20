@@ -1,4 +1,6 @@
+import os
 from PySide6 import QtGui
+from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtCore import QSize, Qt, QRect, QPoint, QCoreApplication
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6 import QtOpenGL
@@ -20,7 +22,24 @@ class ArtBoardWidget(QOpenGLWidget):
         self.signaler = signaler
         self.file_info = file_info
         self.setObjectName(file_info['name'])
-    
+
+        # path = './images/broom.svg'
+
+        # x = QSvgRenderer(path)
+        # image = QtGui.QPixmap()
+        # image.fill(Qt.transparent)
+        # painter = QtGui.QPainter()
+        # painter.begin(image)
+        # x.render(painter)
+        # painter.end()
+        # print('X', image)
+
+        # icon = QtGui.QIcon(path).pixmap(QSize())
+        # print('icon', icon)
+        # cursor = QtGui.QCursor(image)
+        # print('cursor', cursor)
+        # self.setCursor(cursor)
+
         self.setGeometry(QRect(0, 0, self.settings['absolute_dimensions'][0], self.settings['absolute_dimensions'][1]))
 
         self.setMaximumSize(QSize(16777215, 16777215))
