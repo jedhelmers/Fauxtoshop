@@ -2,4 +2,4 @@ Fauxtoshop
 .DS_Store
 ui/__pycache__
 widgets/__pycache__/
-ui/**.*.*
+ui/*
