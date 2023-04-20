@@ -7,6 +7,7 @@ from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout
 
+from datas.misc import get_windows
 from functions import new_file
 from styles.main import main_style
 from ui import mainwindowui
@@ -14,8 +15,8 @@ from widgets.new_file import NewFileWidget
 import widgets.tools as Tools
 from widgets.tools.text_options import TextOptionsWidget
 from widgets.toolbar import ToolbarWidget
-from widgets.window import WindowsWidget
-from widgets.window_flyout_panel import WindowFlyoutPanelWidget
+from widgets.windowbar import WindowsWidget
+from widgets.window_panel import WindowPanelWidget
 
 def command_mappings(key):
     # 16777249
@@ -85,7 +86,8 @@ def tooloptions_mappings(tool_name):
 
 class MainSignaler(QtCore.QObject):
     select_tool = QtCore.Signal(str)
-    show_window_flyout_panel = QtCore.Signal(dict)
+    show_window_panel = QtCore.Signal(dict)
+    select_window = QtCore.Signal(str)
 
 
 class MainWindow(QMainWindow):
@@ -98,8 +100,9 @@ class MainWindow(QMainWindow):
         self.setMouseTracking(True)
         self.setStyleSheet(main_style())
 
-        self._current_tool = 'text'
+        self._current_tool = 'brush'
         self.keylist = []
+        self.windows = get_windows()
         self.current_window = None
         self.current_options_widget = None
 
@@ -110,10 +113,12 @@ class MainWindow(QMainWindow):
         self.ui.windowsWidget.layout().addWidget(windows)
 
         self.signaler.select_tool.connect(self.select_tool)
-        self.signaler.show_window_flyout_panel.connect(self.show_window_flyout_panel)
-        self.windowFlyoutPanelWidget = WindowFlyoutPanelWidget(parent=self, name='', window=self.current_window)
-        self.windowFlyoutPanelWidget.hide()
-        self.current_tool = 'text'
+        self.signaler.show_window_panel.connect(self.show_window_panel)
+        self.signaler.select_window.connect(self.select_window)
+
+        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        self.WindowPanelWidget.hide()
+        self.current_tool = 'brush'
 
     @property
     def current_tool(self):
@@ -136,19 +141,22 @@ class MainWindow(QMainWindow):
         self._current_tool = tool
         self.setup_tool_options_bar()
 
-    def show_window_flyout_panel(self, window=None):
-        # print(window)
-        if window and self.current_window and self.current_window['name'] != window['name']:
+    def select_window(self, str):
+        print(str)
+
+    def show_window_panel(self, window=None):
+        if window and (self.current_window is None or self.current_window['name'] != window['name']):
+            self.current_window = window
+            self.WindowPanelWidget.current_window = self.current_window
+            self.WindowPanelWidget.show()
             x = window['pos'].x() - self.pos().x()
             y = window['pos'].y() - self.pos().y()
-            flyout_width = self.windowFlyoutPanelWidget.width()
-            self.windowFlyoutPanelWidget.move(x - flyout_width - 4, y - 30)
-            self.windowFlyoutPanelWidget.show()
-            self.current_window = window
-            self.windowFlyoutPanelWidget = self.current_window
+            flyout_width = self.WindowPanelWidget.width()
+            self.WindowPanelWidget.move(x - flyout_width - 4, y - 30)
         else:
-            self.windowFlyoutPanelWidget.hide()
+            self.WindowPanelWidget.hide()
             self.current_window = None
+
 
     def select_tool(self, tool_name):
         self.current_tool = tool_name

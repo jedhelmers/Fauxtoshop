@@ -7,9 +7,9 @@ def setup_values():
             {
                 'label': 'Default Fauxtoshop Size',
                 'values': {
-                    'width': '7',
+                    'width': '1',
                     'units_w': 'Inches',
-                    'height': '5',
+                    'height': '1',
                     'units_h': 'Inches',
                     'color_mode': 'RGB Color',
                     'units_c': '8 bit',
@@ -28,9 +28,9 @@ def setup_values():
         {
             'label': 'Sketchbook Illustration',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -49,9 +49,9 @@ def setup_values():
         {
             'label': 'U.S. Paper',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -65,9 +65,9 @@ def setup_values():
         {
             'label': 'International Paper',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -81,9 +81,9 @@ def setup_values():
         {
             'label': 'Photo',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -102,9 +102,9 @@ def setup_values():
         {
             'label': 'Web',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -118,9 +118,9 @@ def setup_values():
         {
             'label': 'Mobile App Design',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -134,9 +134,9 @@ def setup_values():
         {
             'label': 'Film & Video',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -150,9 +150,9 @@ def setup_values():
         {
             'label': 'Iconography',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -166,9 +166,9 @@ def setup_values():
         {
             'label': 'Art & Illustration',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -187,9 +187,9 @@ def setup_values():
         {
             'label': 'Artboard',
             'values': {
-                'width': '7',
+                'width': '1',
                 'units_w': 'Inches',
-                'height': '5',
+                'height': '1',
                 'units_h': 'Inches',
                 'color_mode': 'RGB Color',
                 'units_c': '8 bit',
@@ -235,5 +235,5 @@ def color_profiles():
 
 def pixel_aspect_ratio():
     return [
-        'Square Pixels'
+        'Square'
     ]

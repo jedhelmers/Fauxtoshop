@@ -9,11 +9,51 @@ from ui import window_panelui
 
 
 class WindowPanelWidget(QWidget):
-    def __init__(self, name, signaler=None):
+    def __init__(self, window_data, index, window_icons, signaler=None):
         super().__init__()
         self.ui = window_panelui.Ui_PanelWidget()
         self.ui.setupUi(self)
+        self.window_data = window_data
+        self.signaler = signaler
+        self.window_icons = []
         # self.setFloating(False)
+
+        for item in self.window_data['items']:
+            self.add_icon(item, index)
+
+    def add_icon(self, icon_data, index):
+        print(icon_data)
+        button = QPushButton()
+        button.setObjectName(icon_data['name'])
+        button.setMinimumSize(QSize(32, 32))
+        button.setMaximumSize(QSize(32, 32))
+        button.setToolTip(icon_data['tooltip'])
+        icon = QIcon()
+        icon.addFile(icon_data['path'], QSize(), QIcon.Normal, QIcon.Off)
+        button.setIcon(icon)
+        button.setFlat(False)
+        self.ui.widget.layout().addWidget(button)
+        button.setText("")
+
+        button.clicked.connect(
+            lambda: self.on_window_select(button, icon_data['name'], index))
+        
+    def on_window_select(self, button, name, window_index):
+        p = QPoint()
+        self.current_window = name
+        x = self.y()
+        y = self.y()
+        pos = button.mapToGlobal(p)
+
+        window = {
+            'name': self.current_window,
+            'pos': pos,
+        }
+
+        self.signaler.show_window_panel.emit(window)
+
+class WindowSignaler(QtCore.QObject):
+    select_window = QtCore.Signal(str)
 
 
 class WindowsWidget(QWidget):
@@ -22,17 +62,21 @@ class WindowsWidget(QWidget):
         self.ui = windowsui.Ui_Windows()
         self.ui.setupUi(self)
         self.signaler = signaler
+        self.window_signaler = WindowSignaler()
         self.window_icons = []
 
         self.current_window = None
 
         # Disable tabbing
         # self.setDockOptions(QMainWindow.AllowNestedDocks)
-
+        self.window_signaler.select_window.connect(self.select_window)
 
         self.add_window_icons()
 
-    def add_icon(self, icon_data, window_panel):
+    def select_window(self, str):
+        pass
+
+    def add_icon(self, icon_data, window_panel, window_index):
         button = QPushButton()
         button.setObjectName(icon_data['name'])
         button.setMinimumSize(QSize(32, 32))
@@ -46,9 +90,9 @@ class WindowsWidget(QWidget):
         button.setText("")
 
         button.clicked.connect(
-            lambda: self.on_window_select(button, icon_data['name']))
+            lambda: self.on_window_select(button, icon_data['name'], window_index))
 
-    def on_window_select(self, button, name):
+    def on_window_select(self, button, name, window_index):
         p = QPoint()
         self.current_window = name
         x = self.y()
@@ -56,38 +100,16 @@ class WindowsWidget(QWidget):
         # print(self.width())
         # pos = self.mapFrom(self.parent(), p)
         pos = button.mapToGlobal(p)
-        # print(pos, button.x(), button.y())
-
-        panel_contents = []
-
-        temp = []
-        for window_data in self.window_icons:
-            # TODO: filter
-            should_break = False
-            for index, item in enumerate(window_data['items']):
-                if index == 0:
-                    temp = []
-
-                if item['name'] == name:
-                    should_break = True
-
-                temp.append(item)
-                # print(index, temp)
-
-            if should_break:
-                break
-
-            panel_contents = temp
 
         window = {
             'name': self.current_window,
             'pos': pos,
-            'panel_contents': panel_contents
+            'panel_contents': self.window_icons[window_index]
         }
 
-        print('window', window['panel_contents'])
+        # print('window', window['panel_contents'])
 
-        self.signaler.show_window_flyout_panel.emit(window)
+        self.signaler.show_window_panel.emit(window)
 
     def add_window_icons(self):
         self.window_icons = [
@@ -136,12 +158,14 @@ class WindowsWidget(QWidget):
         ]
 
         try:
-            for window_data in self.window_icons:
-                window_panel = WindowPanelWidget(name=window_data['chunk'])
+            for window_index, window_data in enumerate(self.window_icons):
+                window_panel = WindowPanelWidget(
+                    window_data,
+                    window_index,
+                    self.window_icons,
+                    self.signaler
+                )
                 window_panel.setStyleSheet(window_panel_style())
-
-                for item in window_data['items']:
-                    self.add_icon(item, window_panel)
 
                 self.ui.windowsWidget.layout().addWidget(window_panel)
             verticalSpacer = QSpacerItem(20, 425, QSizePolicy.Minimum, QSizePolicy.Expanding)
