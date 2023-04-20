@@ -1,5 +1,9 @@
 Fauxtoshop
 .DS_Store
 ui/__pycache__
+ui/tools/__pycache__
 widgets/__pycache__/
-ui/*
+widgets/tools/__pycache__/
+
+styles/__pycache__
+functions/__pycache__
