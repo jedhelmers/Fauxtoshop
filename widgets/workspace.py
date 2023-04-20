@@ -3,6 +3,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QFrame, QLabel
 
 from ui import workspaceui
+from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
 
 inch_ticks = [
@@ -43,8 +44,15 @@ class WorkspaceWidget(QWidget):
         self.new_file_info = new_file_info
         self.zoom = 1.0
         self.are_rulers_hidden = False
-        self.dimensions = [30, 30]
-        self.dimensions_offset = [2, 2]
+        self.ruler_dimensions = None
+        self.settings = load_settings()
+        self.absolute_dimentions = []
+
+        self.offset = unit_conversion(
+            self.settings['document_units'],
+            self.settings['workspace_spillover'])
+
+        print('SETTINGS', self.settings)
 
         # Mouse tracking lines.
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
@@ -52,15 +60,41 @@ class WorkspaceWidget(QWidget):
         self.x_line.setStyleSheet('border-color: rgba(255, 255, 255, 0.75)')
         self.y_line.setStyleSheet('border-color: rgba(255, 255, 255, 0.75)')
 
-        self.draw_v_ruler()
-        self.draw_h_ruler()
-
         self.signaler.mouseMove.connect(self.mouse_move_event)
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
 
         self.ui.scrollArea.setWidgetResizable(True)
 
-        ArtBoardWidget(self.ui.workspaceBackgroundWidget, new_file_info, self.dimensions_offset, self.signaler)
+        self.width = unit_conversion(
+            self.new_file_info['units_w'],
+            float(self.new_file_info['width'])) + self.offset
+        self.height = unit_conversion(
+            self.new_file_info['units_h'],
+            float(self.new_file_info['height'])) + self.offset
+        
+
+        self.absolute_dimentions = [
+            self.width,
+            self.height
+        ]
+
+        self.settings['absolute_dimensions'] = self.absolute_dimentions
+
+        self.ruler_dimensions = [
+            pixel_to_inch(self.width + self.offset),
+            pixel_to_inch(self.height + self.offset)
+        ]
+
+        self.draw_v_ruler()
+        self.draw_h_ruler()
+
+        print(self.ruler_dimensions)
+
+        ArtBoardWidget(
+            self.ui.workspaceBackgroundWidget,
+            new_file_info,
+            self.settings,
+            self.signaler)
 
     def toggle_rulers(self):
         if self.are_rulers_hidden:
@@ -84,22 +118,24 @@ class WorkspaceWidget(QWidget):
         self.x_line.move(x, 0)
 
     def draw_h_ruler(self):
-        for i in range(self.dimensions[0]):
+        # print(self.offset)
+        for i in range(self.ruler_dimensions[0]):
             # print(i)
-            self.draw_h_unit(i - self.dimensions_offset[0], i * 40)
+            self.draw_h_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
 
     def draw_h_unit(self, index, h_offset=0):
         label = QLabel(self.ui.horizontalRulerWidget)
         label.setText(str(index))
         label.move(h_offset + 4, -6)
+        # sub_division_width = 96 / 4
 
         for i, v_offset in enumerate(inch_ticks):
             line = QVLine(self.ui.horizontalRulerWidget, 20 - v_offset)
             line.move(i * (10 * self.zoom) + h_offset, v_offset)
 
     def draw_v_ruler(self):
-        for i in range(self.dimensions[1]):
-            self.draw_v_unit(i - self.dimensions_offset[1], i * 40)
+        for i in range(self.ruler_dimensions[1]):
+            self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
 
     def draw_v_unit(self, index, v_offset=0):
         label = QLabel(self.ui.verticalRulerWidget)

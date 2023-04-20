@@ -13,3 +13,15 @@ def window_panel_style():
         margin-bottom: 2px;
     }
     """
+
+def flyout_panel():
+    return """
+        QTabBar::tab {
+            padding: 4px 4px;
+            min-width: 80px;
+        }
+        QTabWidget::tab-bar {
+            left: 0;
+            bottom: 0px;
+        }
+        """

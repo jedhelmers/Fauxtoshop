@@ -3,33 +3,25 @@ from PySide6.QtCore import QSize, Qt, QRect, QPoint, QCoreApplication
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6 import QtOpenGL
 
-def conversion(unit, value):
-    if unit == 'Inches':
-        return 96 * value
-    elif unit == 'Pixels':
-        return value
-    elif unit == 'Picas':
-        return value / 0.062499992175197
-    return value
+from utils import unit_conversion
+
 
 class ArtBoardWidget(QOpenGLWidget):
-    def __init__(self, parent, file_info, offsets, signaler):
+    def __init__(
+            self,
+            parent,
+            file_info,
+            settings,
+            signaler):
         super().__init__(parent)
         self.setMouseTracking(True)
 
+        self.settings = settings
         self.signaler = signaler
         self.file_info = file_info
         self.setObjectName(file_info['name'])
-        self.setGeometry(QRect(
-            offsets[0] * 40,
-            offsets[1] * 40,
-            conversion(
-                self.file_info['units_w'],
-                float(self.file_info['width'])),
-            conversion(
-                self.file_info['units_h'],
-                float(self.file_info['height']))
-        ))
+    
+        self.setGeometry(QRect(0, 0, self.settings['absolute_dimensions'][0], self.settings['absolute_dimensions'][1]))
 
         self.setMaximumSize(QSize(16777215, 16777215))
 
@@ -42,7 +34,6 @@ class ArtBoardWidget(QOpenGLWidget):
         print('RELEASE', pos.x(), pos.y())
 
     def mouseMoveEvent(self, event):
-        # print(event.pos().x(), event.pos().y())
         self.signaler.mouseMove.emit(event.pos().x(), event.pos().y())
         pass
 
@@ -54,5 +45,7 @@ class ArtBoardWidget(QOpenGLWidget):
             a = self.file_info['bg_color'].alphaF()
 
         self.context().functions().glClearColor(r, g, b, a)
+        self.context().functions()
+
 
 
