@@ -52,8 +52,6 @@ class WorkspaceWidget(QWidget):
             self.settings['document_units'],
             self.settings['workspace_spillover'])
 
-        print('SETTINGS', self.settings)
-
         # Mouse tracking lines.
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
         self.y_line = QHLine(self.ui.verticalRulerWidget, thickness=2)
@@ -67,27 +65,30 @@ class WorkspaceWidget(QWidget):
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
-            float(self.new_file_info['width'])) + self.offset
+            float(self.new_file_info['width']))
         self.height = unit_conversion(
             self.new_file_info['units_h'],
-            float(self.new_file_info['height'])) + self.offset
+            float(self.new_file_info['height']))
 
         self.absolute_dimentions = [
-            self.width + self.offset,
-            self.height + self.offset
+            self.width + self.offset + self.offset,
+            self.height + self.offset + self.offset
         ]
+
+        self.settings['offset_dimensions'] = [self.offset, self.offset]
+        self.settings['document_dimensions'] = [self.width, self.height]
 
         self.settings['absolute_dimensions'] = self.absolute_dimentions
 
         self.ruler_dimensions = [
-            pixel_to_inch(self.width + self.offset),
-            pixel_to_inch(self.height + self.offset)
+            pixel_to_inch(self.absolute_dimentions[0]),
+            pixel_to_inch(self.absolute_dimentions[1])
         ]
+
+        print('SETTINGS', self.settings)
 
         self.draw_v_ruler()
         self.draw_h_ruler()
-
-        print(self.ruler_dimensions)
 
         ArtBoardWidget(
             self.ui.workspaceBackgroundWidget,
@@ -112,14 +113,11 @@ class WorkspaceWidget(QWidget):
         self.ui.verticalRulerWidget.show()
 
     def mouse_move_event(self, x, y):
-        # print(x, y)
         self.y_line.move(0, y)
         self.x_line.move(x, 0)
 
     def draw_h_ruler(self):
-        # print(self.offset)
         for i in range(self.ruler_dimensions[0]):
-            # print(i)
             self.draw_h_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
 
     def draw_h_unit(self, index, h_offset=0):

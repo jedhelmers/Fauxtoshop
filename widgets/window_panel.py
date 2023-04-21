@@ -11,7 +11,7 @@ class WindowPanelWidget(QWidget):
         self.ui.setupUi(self)
 
         self.ui.windowPanelTabWidget.setStyleSheet(flyout_panel())
-       
+
         for i in range(4):
             widget = QWidget()
             self.ui.windowPanelTabWidget.addTab(widget, str(i))

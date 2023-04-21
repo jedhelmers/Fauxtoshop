@@ -22,7 +22,7 @@ class WindowPanelWidget(QWidget):
             self.add_icon(item, index)
 
     def add_icon(self, icon_data, index):
-        print(icon_data)
+        # print(icon_data)
         button = QPushButton()
         button.setObjectName(icon_data['name'])
         button.setMinimumSize(QSize(32, 32))

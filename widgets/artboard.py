@@ -40,6 +40,8 @@ class ArtBoardWidget(QOpenGLWidget):
         # print('cursor', cursor)
         # self.setCursor(cursor)
 
+        print(self.settings)
+
         self.setGeometry(QRect(
             0,
             0,
@@ -67,8 +69,17 @@ class ArtBoardWidget(QOpenGLWidget):
             b = self.file_info['bg_color'].blueF()
             a = self.file_info['bg_color'].alphaF()
 
+        print(self.settings['offset_dimensions'][0],
+                    self.settings['offset_dimensions'][1],
+                    self.settings['document_dimensions'][0],
+                    self.settings['document_dimensions'][1])
         self.context().functions().glClearColor(r, g, b, a)
-        self.context().functions()
+        self.context().functions().glEnable(int('0x0C11', 16))
+        self.context().functions().glScissor(
+            self.settings['offset_dimensions'][0] * 2,
+            self.settings['offset_dimensions'][1] * 2,
+            self.settings['document_dimensions'][0] * 2,
+            self.settings['document_dimensions'][1] * 2)
 
 
 
