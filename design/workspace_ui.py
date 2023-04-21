@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QScrollArea,
-    QSizePolicy, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QGridLayout, QHBoxLayout,
+    QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 
 class Ui_Workspace(object):
     def setupUi(self, Workspace):
@@ -115,6 +115,15 @@ class Ui_Workspace(object):
         self.informationBarWidget.setObjectName(u"informationBarWidget")
         self.informationBarWidget.setMinimumSize(QSize(0, 20))
         self.informationBarWidget.setMaximumSize(QSize(16777215, 20))
+        self.zoomComboBox = QComboBox(self.informationBarWidget)
+        self.zoomComboBox.addItem("")
+        self.zoomComboBox.addItem("")
+        self.zoomComboBox.addItem("")
+        self.zoomComboBox.addItem("")
+        self.zoomComboBox.addItem("")
+        self.zoomComboBox.setObjectName(u"zoomComboBox")
+        self.zoomComboBox.setGeometry(QRect(30, 0, 104, 26))
+        self.zoomComboBox.setEditable(True)
 
         self.verticalLayout_3.addWidget(self.informationBarWidget)
 
@@ -129,5 +138,11 @@ class Ui_Workspace(object):
 
     def retranslateUi(self, Workspace):
         Workspace.setWindowTitle(QCoreApplication.translate("Workspace", u"Form", None))
+        self.zoomComboBox.setItemText(0, QCoreApplication.translate("Workspace", u"10.00", None))
+        self.zoomComboBox.setItemText(1, QCoreApplication.translate("Workspace", u"25.00", None))
+        self.zoomComboBox.setItemText(2, QCoreApplication.translate("Workspace", u"50.00", None))
+        self.zoomComboBox.setItemText(3, QCoreApplication.translate("Workspace", u"100.00", None))
+        self.zoomComboBox.setItemText(4, QCoreApplication.translate("Workspace", u"200.00", None))
+
     # retranslateUi
 

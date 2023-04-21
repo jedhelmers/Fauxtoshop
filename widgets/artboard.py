@@ -69,10 +69,6 @@ class ArtBoardWidget(QOpenGLWidget):
             b = self.file_info['bg_color'].blueF()
             a = self.file_info['bg_color'].alphaF()
 
-        print(self.settings['offset_dimensions'][0],
-                    self.settings['offset_dimensions'][1],
-                    self.settings['document_dimensions'][0],
-                    self.settings['document_dimensions'][1])
         self.context().functions().glClearColor(r, g, b, a)
         self.context().functions().glEnable(int('0x0C11', 16))
         self.context().functions().glScissor(
@@ -81,5 +77,7 @@ class ArtBoardWidget(QOpenGLWidget):
             self.settings['document_dimensions'][0] * 2,
             self.settings['document_dimensions'][1] * 2)
 
+        self.context().functions().glClear(int('0x00004000', 16))
 
+        # self.context().functions()
 

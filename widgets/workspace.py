@@ -40,9 +40,10 @@ class WorkspaceWidget(QWidget):
         super().__init__(parent)
         self.ui = workspaceui.Ui_Workspace()
         self.ui.setupUi(self)
+
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
-        self.zoom = 1.0
+        self._zoom = 1.0
         self.are_rulers_hidden = False
         self.ruler_dimensions = None
         self.settings = load_settings()
@@ -96,6 +97,23 @@ class WorkspaceWidget(QWidget):
             self.settings,
             self.signaler)
 
+        self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
+
+    @property
+    def zoom(self):
+        return self._zoom
+
+    @zoom.setter
+    def zoom(self, zoom):
+        self._zoom = zoom
+        self.draw_v_ruler()
+        self.draw_h_ruler()
+        print('WOOO')
+
+    def change_zoom_factor(self):
+        self.zoom = float(self.ui.zoomComboBox.currentText())
+
+
     def toggle_rulers(self):
         if self.are_rulers_hidden:
             self.show_rulers()
@@ -118,7 +136,7 @@ class WorkspaceWidget(QWidget):
 
     def draw_h_ruler(self):
         for i in range(self.ruler_dimensions[0]):
-            self.draw_h_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
+            self.draw_h_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i) * self.zoom)
 
     def draw_h_unit(self, index, h_offset=0):
         label = QLabel(self.ui.horizontalRulerWidget)
@@ -131,8 +149,16 @@ class WorkspaceWidget(QWidget):
             line.move((i + 1) * (tick_width * self.zoom) + h_offset, v_offset)
 
     def draw_v_ruler(self):
+        ruler_group = range(self.ui.verticalRulerWidget.layout().count())
+        for widget_index in reversed(ruler_group):
+            widget = self.ui.verticalRulerWidget.layout().itemAt(
+                widget_index).widget()
+            if widget:
+                widget.setParent(None)
+            print(type(widget))
+
         for i in range(self.ruler_dimensions[1]):
-            self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
+            self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i) * self.zoom)
 
     def draw_v_unit(self, index, v_offset=0):
         label = QLabel(self.ui.verticalRulerWidget)
