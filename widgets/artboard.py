@@ -40,7 +40,11 @@ class ArtBoardWidget(QOpenGLWidget):
         # print('cursor', cursor)
         # self.setCursor(cursor)
 
-        self.setGeometry(QRect(0, 0, self.settings['absolute_dimensions'][0], self.settings['absolute_dimensions'][1]))
+        self.setGeometry(QRect(
+            0,
+            0,
+            self.settings['absolute_dimensions'][0],
+            self.settings['absolute_dimensions'][1]))
 
         self.setMaximumSize(QSize(16777215, 16777215))
 

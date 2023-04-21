@@ -7,7 +7,7 @@ from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
 
 inch_ticks = [
-    0, 16, 14, 16
+    16, 14, 16, 0
 ]
 
 
@@ -71,11 +71,10 @@ class WorkspaceWidget(QWidget):
         self.height = unit_conversion(
             self.new_file_info['units_h'],
             float(self.new_file_info['height'])) + self.offset
-        
 
         self.absolute_dimentions = [
-            self.width,
-            self.height
+            self.width + self.offset,
+            self.height + self.offset
         ]
 
         self.settings['absolute_dimensions'] = self.absolute_dimentions
@@ -127,11 +126,11 @@ class WorkspaceWidget(QWidget):
         label = QLabel(self.ui.horizontalRulerWidget)
         label.setText(str(index))
         label.move(h_offset + 4, -6)
-        # sub_division_width = 96 / 4
+        tick_width = 94 / len(inch_ticks)
 
         for i, v_offset in enumerate(inch_ticks):
             line = QVLine(self.ui.horizontalRulerWidget, 20 - v_offset)
-            line.move(i * (10 * self.zoom) + h_offset, v_offset)
+            line.move((i + 1) * (tick_width * self.zoom) + h_offset, v_offset)
 
     def draw_v_ruler(self):
         for i in range(self.ruler_dimensions[1]):
@@ -141,8 +140,9 @@ class WorkspaceWidget(QWidget):
         label = QLabel(self.ui.verticalRulerWidget)
         label.setText(str(index))
         label.move(4, v_offset - 6)
+        tick_height = 94 / len(inch_ticks)
 
         for i, h_offset in enumerate(inch_ticks):
             line = QHLine(self.ui.verticalRulerWidget, 20 - h_offset)
-            line.move(h_offset, i * (10 * self.zoom) + v_offset)
+            line.move(h_offset, (i + 1) * (tick_height * self.zoom) + v_offset)
 
