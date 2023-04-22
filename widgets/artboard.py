@@ -1,3 +1,4 @@
+import json
 import os
 from PySide6 import QtGui
 from PySide6.QtSvg import QSvgRenderer
@@ -7,6 +8,7 @@ from PySide6 import QtOpenGL
 
 from utils import unit_conversion
 
+artboard_json_path = './datas/artboard.json'
 
 class ArtBoardWidget(QOpenGLWidget):
     def __init__(
@@ -22,6 +24,10 @@ class ArtBoardWidget(QOpenGLWidget):
         self.signaler = signaler
         self.file_info = file_info
         self.setObjectName(file_info['name'])
+        self.local_settings = {}
+
+        self.get_settings()
+
 
         # path = './images/broom.svg'
 
@@ -49,6 +55,13 @@ class ArtBoardWidget(QOpenGLWidget):
             self.settings['absolute_dimensions'][1]))
 
         self.setMaximumSize(QSize(16777215, 16777215))
+        # self.initializeGL()
+
+    def get_settings(self):
+        if os.path.exists(artboard_json_path):
+            f = open(artboard_json_path, 'r')
+            self.local_settings = json.load(f)
+            f.close()
 
     def mousePressEvent(self, event):
         pos = event.pos()
@@ -78,6 +91,5 @@ class ArtBoardWidget(QOpenGLWidget):
             self.settings['document_dimensions'][1] * 2)
 
         self.context().functions().glClear(int('0x00004000', 16))
-
         # self.context().functions()
 

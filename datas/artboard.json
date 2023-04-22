@@ -1,0 +1,19 @@
+{
+    "brush_settings": {
+        "brush": "blur",
+        "hardness": "0.75",
+        "brush_size": 20,
+        "colors": [
+            "#000000", "#FFFFFF"
+        ]
+    },
+    "text_settings": {
+        "font": "Arial",
+        "style": "Regular",
+        "size": 14,
+        "colors": [
+            "#000000", "#FFFFFF"
+        ],
+        "alignment": "alignLeft"
+    }
+}

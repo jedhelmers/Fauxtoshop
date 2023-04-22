@@ -141,8 +141,16 @@ class MainWindow(QMainWindow):
         self._current_tool = tool
         self.setup_tool_options_bar()
 
+    def resizeEvent(self, event):
+        self.adjust_window_panel_pos(event.size() - event.oldSize())
+
     def select_window(self, str):
         print(str)
+
+    def adjust_window_panel_pos(self, e):
+        x = self.WindowPanelWidget.x() + e.width()
+        y = self.WindowPanelWidget.y()
+        self.WindowPanelWidget.move(x, y)
 
     def show_window_panel(self, window=None):
         if window and (self.current_window is None or self.current_window['name'] != window['name']):

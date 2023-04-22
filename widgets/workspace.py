@@ -107,9 +107,11 @@ class WorkspaceWidget(QWidget):
         self.draw_v_ruler()
         self.draw_h_ruler()
 
+    # def resizeEvent(self, event):
+    #     print(event)
+
     def change_zoom_factor(self):
         self.zoom = float(self.ui.zoomComboBox.currentText())
-
 
     def toggle_rulers(self):
         if self.are_rulers_hidden:
@@ -154,7 +156,7 @@ class WorkspaceWidget(QWidget):
                 widget.setParent(None)
 
         for i in range(self.ruler_dimensions[1]):
-            print(self.zoom, type(self.zoom))
+            # print(self.zoom, type(self.zoom))
             self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
 
     def draw_v_unit(self, index, v_offset=0):

@@ -71,9 +71,9 @@ class NewFileWidget(QDialog):
     def selected_option(self, option):
 
         obj = {
-            'width': '1',
+            'width': '2',
             'units_w': 'Inches',
-            'height': '1',
+            'height': '2',
             'units_h': 'Inches',
             'color_mode': 'RGB Color',
             'units_c': '8 bit',
