@@ -10,6 +10,20 @@ from utils import unit_conversion
 
 artboard_json_path = './datas/artboard.json'
 
+
+class ActiveTool():
+    def __init__(self):
+        self._current_tool = 'brush'
+
+    @property
+    def current_tool(self):
+        return self._current_tool
+    
+    @current_tool.setter
+    def current_tool(self, tool):
+        self.current_tool = tool
+
+
 class ArtBoardWidget(QOpenGLWidget):
     def __init__(
             self,
