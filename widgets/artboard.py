@@ -20,6 +20,8 @@ class ArtBoardWidget(QOpenGLWidget):
         super().__init__(parent)
         self.setMouseTracking(True)
 
+        self.setAutoFillBackground(False)
+
         self.settings = settings
         self.signaler = signaler
         self.file_info = file_info
@@ -55,7 +57,6 @@ class ArtBoardWidget(QOpenGLWidget):
             self.settings['absolute_dimensions'][1]))
 
         self.setMaximumSize(QSize(16777215, 16777215))
-        # self.initializeGL()
 
     def get_settings(self):
         if os.path.exists(artboard_json_path):
