@@ -98,6 +98,15 @@ class Ui_Workspace(object):
 
         self.workspaceBackgroundWidget = QWidget(self.scrollAreaWidgetContents)
         self.workspaceBackgroundWidget.setObjectName(u"workspaceBackgroundWidget")
+        self.gridLayout_4 = QGridLayout(self.workspaceBackgroundWidget)
+        self.gridLayout_4.setSpacing(0)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+
+        self.gridLayout_4.addLayout(self.gridLayout_3, 0, 0, 1, 1)
+
 
         self.verticalLayout.addWidget(self.workspaceBackgroundWidget)
 

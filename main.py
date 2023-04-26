@@ -165,7 +165,6 @@ class MainWindow(QMainWindow):
             self.WindowPanelWidget.hide()
             self.current_window = None
 
-
     def select_tool(self, tool_name):
         self.current_tool = tool_name
 

@@ -1,10 +1,23 @@
+import json
+import os
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPoint
 from PySide6.QtWidgets import QWidget, QFrame, QLabel
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
+from PySide6 import QtOpenGL
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtOpenGL import *
+from OpenGL import GL
+
+from tool import Tool
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
+
+toolsettings_json_path = './datas/toolsettings.json'
 
 inch_ticks = [
     16, 14, 16, 0
@@ -31,8 +44,57 @@ class QVLine(QFrame):
         self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
 
 
+# class GLWidget(QOpenGLWidget):
+#     def __init__(self, helper, parent = None):
+#         # QOpenGLWidget.__init__(self)
+#         QOpenGLWidget.__init__(self, QOpenGLBuffer(), parent)
+
+#         self.helper = helper
+#         self.elapsed = 0
+#         self.setFixedSize(600, 600)
+
+#         # self.context().functions().glEnable(int('0x0C11', 16))
+#         # self.context().functions().glScissor(
+#         # self.settings['offset_dimensions'][0] * 2,
+#         # self.settings['offset_dimensions'][1] * 2,
+#         # self.settings['document_dimensions'][0] * 2,
+#         # self.settings['document_dimensions'][1] * 2)
+        
+
+#     def animate(self):
+#         self.elapsed = (self.elapsed + self.sender().interval()) % 1000
+#         self.repaint()
+
+#     def paintEvent(self, event):
+#         painter = QtGui.QPainter()
+#         painter.begin(self)
+#         self.helper.paint(painter, event, self.elapsed)
+#         painter.end()
+
+
+class Widget(QWidget):
+    def __init__(self, helper, parent = None):
+        QWidget.__init__(self, parent)
+
+        self.helper = helper
+        self.elapsed = 0
+        self.setFixedSize(600, 600)
+
+    def animate(self):
+        self.elapsed = (self.elapsed + self.sender().interval()) % 1000
+        self.repaint()
+
+    def paintEvent(self, event):
+        painter = QPainter()
+        painter.begin(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        self.helper.paint(painter, event, self.elapsed)
+        painter.end()
+
+
 class WorkspaceSignaler(QtCore.QObject):
     mouseMove = QtCore.Signal(int, int)
+    remove_layer = QtCore.Signal(int)
 
 
 class WorkspaceWidget(QWidget):
@@ -40,6 +102,10 @@ class WorkspaceWidget(QWidget):
         super().__init__(parent)
         self.ui = workspaceui.Ui_Workspace()
         self.ui.setupUi(self)
+        self.setMouseTracking(True)
+
+        self.tool_settings = {}
+        self.get_tool_settings()
 
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
@@ -48,6 +114,8 @@ class WorkspaceWidget(QWidget):
         self.ruler_dimensions = None
         self.settings = load_settings()
         self.absolute_dimentions = []
+        self.artboards = []
+        self.active_artboard = 0
 
         self.offset = unit_conversion(
             self.settings['document_units'],
@@ -61,7 +129,6 @@ class WorkspaceWidget(QWidget):
 
         self.signaler.mouseMove.connect(self.mouse_move_event)
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
-
         self.ui.scrollArea.setWidgetResizable(True)
 
         self.width = unit_conversion(
@@ -75,10 +142,8 @@ class WorkspaceWidget(QWidget):
             self.width + self.offset + self.offset,
             self.height + self.offset + self.offset
         ]
-
         self.settings['offset_dimensions'] = [self.offset, self.offset]
         self.settings['document_dimensions'] = [self.width, self.height]
-
         self.settings['absolute_dimensions'] = self.absolute_dimentions
 
         self.ruler_dimensions = [
@@ -86,16 +151,44 @@ class WorkspaceWidget(QWidget):
             pixel_to_inch(self.absolute_dimentions[1])
         ]
 
-        print('SETTINGS', self.settings)
-
-        ArtBoardWidget(
+        artboard = ArtBoardWidget(
             self.ui.workspaceBackgroundWidget,
             new_file_info,
             self.settings,
             self.signaler)
+        self.artboards.append(artboard)
+        # self.ui.workspaceBackgroundWidget
+
+        painter = QPainter(self.ui.workspaceBackgroundWidget)
+        painter.begin(self.ui.workspaceBackgroundWidget)
+        widget = QWidget()
+        image = QPixmap("images/smithers.jpg")
+        # painter.drawPixmap(QPoint(10, 10), image)
+        painter.end()
+
+        label = QLabel()
+        label.setPixmap(image)
+
+        print(image)
+        # widget.setStyleSheet('background: white;')
+        # widget.setMinimumWidth(300)
+        # widget.setMinimumHeight(300)
+
+        self.ui.gridLayout_3.addWidget(label)
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(100.0))
+
+        self.signaler.remove_layer.connect(self.remove_layer)
+
+        self.tool = Tool(self.tool_settings)
+
+        # native = Widget(self.tool, self.ui.workspaceBackgroundWidget)
+        # openGL = GLWidget(self.tool, self)
+        # nativeLabel = QLabel(self.tr("Native"))
+        # nativeLabel.setAlignment(Qt.AlignHCenter)
+        # openGLLabel = QLabel(self.tr("OpenGL"))
+        # openGLLabel.setAlignment(Qt.AlignHCenter)
 
     @property
     def zoom(self):
@@ -107,8 +200,21 @@ class WorkspaceWidget(QWidget):
         self.draw_v_ruler()
         self.draw_h_ruler()
 
-    # def resizeEvent(self, event):
-    #     print(event)
+    def get_tool_settings(self):
+        if os.path.exists(toolsettings_json_path):
+            f = open(toolsettings_json_path, 'r')
+            self.tool_settings = json.load(f)
+            f.close()
+
+    def remove_layer(self, index):
+        self.artboards.pop(index)
+
+    def move_layer(self, from_index, to_index):
+        if to_index > from_index:
+            to_index -= 1
+
+        artboard = self.artboards.pop(from_index)
+        self.artboards.insert(to_index, artboard)
 
     def change_zoom_factor(self):
         self.zoom = float(self.ui.zoomComboBox.currentText())
