@@ -15,16 +15,27 @@ class Layer:
         'chidren',
     ]
 
-    def __init__(self):
-        self.index: int = 0
-        self.color: str = None
-        self.name: str = 'Layer'
-        self.alpha_lock: bool = False
-        self.lock: bool = False
-        self.show: bool = True
-        self.image: QImage
-        self.mode: str = 'Normal'
-        self.chidren: list = []
+    def __init__(
+            self,
+            index=0,
+            color=None,
+            name='Layer',
+            alpha_lock=False,
+            lock=False,
+            show=True,
+            image=None,
+            mode='Normal',
+            chidren=None,
+            ):
+        self.index = index
+        self.color = color
+        self.name = name
+        self.alpha_lock = alpha_lock
+        self.lock = lock
+        self.show = show
+        self.image = image
+        self.mode = mode
+        self.chidren = chidren
 
 def mode_mappings(mode):
     switch = {

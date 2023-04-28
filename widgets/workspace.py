@@ -10,7 +10,6 @@ from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtOpenGL import *
-from OpenGL import GL
 
 from datatypes.layer import Layer, mode_mappings
 from tool import Tool
@@ -131,43 +130,41 @@ class WorkspaceWidget(QWidget):
         #     self.signaler)
         # self.artboards.append(artboard)
 
-        image = QPixmap("images/test_blue.jpg")
-        image2 = QPixmap("images/test_green.jpg")
-        image3 = QPixmap("images/test_pink.jpg")
 
-        # mode = mode_mappings('Lighten')
+        # Define layers with a default background layer
+        self.layers = [
+            Layer(
+                name="Background",
+                lock=True,
+                image=QPixmap("images/test_blue.jpg"),
+            )]
+        self.layers.append(
+            Layer(
+                image=QPixmap("images/test_green.jpg"),
+                mode='Difference'
+            )
+        )
+        self.layers.append(
+            Layer(
+                image=QPixmap("images/test_pink.jpg"),
+                mode='Multiply'
+            )
+        )
 
-        # resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
-        # painter = QPainter(resultImage)
-        # painter.setCompositionMode(QPainter.CompositionMode_Source)
-        # painter.fillRect(resultImage.rect(), Qt.transparent)
-        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-        # painter.drawPixmap(0, 0, image)
-        # painter.setCompositionMode(mode)
-        # painter.drawPixmap(0, 0, image2)
-        # painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        # painter.fillRect(resultImage.rect(), Qt.white)
-        # painter.end()
 
-        # resultImagePx = QPixmap(image.size()).fromImage(resultImage, Qt.ColorOnly)
-
-
-        layer = Layer()
-        layer.image = image2
-        layer.mode = 'Difference'
-
-        layer2 = Layer()
-        layer2.image = image3
-        layer2.mode = 'Multiply'
-
-        res = self.def_add_image(image, layer2)
-        res = self.def_add_image(res, layer)
+        # res = self.def_add_image(image, layer2)
+        # res = self.def_add_image(res, layer)
         # res = self.def_add_image(res, layer2)
+        # print('\nWEE!', self.layers[0])
+        # res = self.def_add_image(self.layers[0].image, self.layers[2])
+        # res = self.def_add_image(res, self.layers[1])
+        # res = self.def_add_image(res, self.layers[2])
 
 
         try:
             label = QLabel()
-            label.setPixmap(res)
+            label.setPixmap(self.render_layers())
+            # label.setPixmap(res)
         except Exception as e:
             print(e)
 
@@ -193,6 +190,13 @@ class WorkspaceWidget(QWidget):
         self._zoom = zoom
         self.draw_v_ruler()
         self.draw_h_ruler()
+
+    def render_layers(self):
+        composite = self.layers[0].image
+        for i in reversed(range(1, len(self.layers))):
+            composite = self.def_add_image(composite, self.layers[i])
+
+        return composite
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
