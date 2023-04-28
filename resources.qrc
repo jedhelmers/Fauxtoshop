@@ -67,5 +67,6 @@
     <file>images/window_swatches.svg</file>
 
     <file>images/smithers.jpg</file>
+    <file>images/example.png</file>
   </qresource>
 </RCC>

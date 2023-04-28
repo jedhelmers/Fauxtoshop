@@ -44,34 +44,6 @@ class QVLine(QFrame):
         self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
 
 
-# class GLWidget(QOpenGLWidget):
-#     def __init__(self, helper, parent = None):
-#         # QOpenGLWidget.__init__(self)
-#         QOpenGLWidget.__init__(self, QOpenGLBuffer(), parent)
-
-#         self.helper = helper
-#         self.elapsed = 0
-#         self.setFixedSize(600, 600)
-
-#         # self.context().functions().glEnable(int('0x0C11', 16))
-#         # self.context().functions().glScissor(
-#         # self.settings['offset_dimensions'][0] * 2,
-#         # self.settings['offset_dimensions'][1] * 2,
-#         # self.settings['document_dimensions'][0] * 2,
-#         # self.settings['document_dimensions'][1] * 2)
-        
-
-#     def animate(self):
-#         self.elapsed = (self.elapsed + self.sender().interval()) % 1000
-#         self.repaint()
-
-#     def paintEvent(self, event):
-#         painter = QtGui.QPainter()
-#         painter.begin(self)
-#         self.helper.paint(painter, event, self.elapsed)
-#         painter.end()
-
-
 class Widget(QWidget):
     def __init__(self, helper, parent = None):
         QWidget.__init__(self, parent)
@@ -159,20 +131,44 @@ class WorkspaceWidget(QWidget):
         self.artboards.append(artboard)
         # self.ui.workspaceBackgroundWidget
 
-        painter = QPainter(self.ui.workspaceBackgroundWidget)
-        painter.begin(self.ui.workspaceBackgroundWidget)
+        # painter = QPainter(self.ui.workspaceBackgroundWidget)
+        # painter.begin(self.ui.workspaceBackgroundWidget)
         widget = QWidget()
         image = QPixmap("images/smithers.jpg")
-        # painter.drawPixmap(QPoint(10, 10), image)
+        image2 = QPixmap("images/example.png")
+        # result = QPixmap(image2.size())
+        # painter.drawPixmap(QPoint(10, 10), result)
+        # painter.end()
+
+
+        mode = QPainter.CompositionMode.CompositionMode_Multiply
+
+        resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, image)
+        painter.setCompositionMode(mode)
+        painter.drawPixmap(0, 0, image2)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
         painter.end()
 
         label = QLabel()
-        label.setPixmap(image)
+        resultImagePx = QPixmap(image.size()).fromImage(resultImage, Qt.ColorOnly)
 
-        print(image)
-        # widget.setStyleSheet('background: white;')
-        # widget.setMinimumWidth(300)
-        # widget.setMinimumHeight(300)
+        try:
+            label.setPixmap(resultImagePx)
+        except Exception as e:
+            print(e)
+
+
+
+
+
+
+
 
         self.ui.gridLayout_3.addWidget(label)
 
