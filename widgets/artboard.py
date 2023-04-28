@@ -20,7 +20,7 @@ class ActiveTool():
     @property
     def current_tool(self):
         return self._current_tool
-    
+
     @current_tool.setter
     def current_tool(self, tool):
         self.current_tool = tool

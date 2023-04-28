@@ -131,6 +131,11 @@ class WorkspaceWidget(QWidget):
         # self.artboards.append(artboard)
 
 
+        # TODO: Move rule logic to Workspace.
+        # TODO: Move mouse tracking to Workspace.
+        # TODO: Move Tool to Workspace.
+        # TODO: Move Zoom to Workspace.
+        # TODO: Add all layers and layer rendering to Artboard.
         # Define layers with a default background layer
         self.layers = [
             Layer(
@@ -151,20 +156,11 @@ class WorkspaceWidget(QWidget):
             )
         )
 
-
-        # res = self.def_add_image(image, layer2)
-        # res = self.def_add_image(res, layer)
-        # res = self.def_add_image(res, layer2)
-        # print('\nWEE!', self.layers[0])
-        # res = self.def_add_image(self.layers[0].image, self.layers[2])
-        # res = self.def_add_image(res, self.layers[1])
-        # res = self.def_add_image(res, self.layers[2])
-
-
         try:
             label = QLabel()
-            label.setPixmap(self.render_layers())
-            # label.setPixmap(res)
+            res = self.render_layers()
+            res = res.scaledToWidth(400)
+            label.setPixmap(res)
         except Exception as e:
             print(e)
 
