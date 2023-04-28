@@ -22,11 +22,11 @@ class Ui_Workspace(object):
     def setupUi(self, Workspace):
         if not Workspace.objectName():
             Workspace.setObjectName(u"Workspace")
-        Workspace.resize(627, 459)
-        self.gridLayout_2 = QGridLayout(Workspace)
-        self.gridLayout_2.setSpacing(0)
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        Workspace.resize(694, 487)
+        self.horizontalLayout_4 = QHBoxLayout(Workspace)
+        self.horizontalLayout_4.setSpacing(0)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -137,7 +137,18 @@ class Ui_Workspace(object):
         self.verticalLayout_3.addWidget(self.informationBarWidget)
 
 
-        self.gridLayout_2.addLayout(self.verticalLayout_3, 0, 0, 1, 1)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_3)
+
+        self.windowsWidget = QWidget(Workspace)
+        self.windowsWidget.setObjectName(u"windowsWidget")
+        self.windowsWidget.setMinimumSize(QSize(40, 0))
+        self.windowsWidget.setMaximumSize(QSize(10, 16777215))
+        self.verticalLayout_6 = QVBoxLayout(self.windowsWidget)
+        self.verticalLayout_6.setSpacing(0)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+
+        self.horizontalLayout_4.addWidget(self.windowsWidget)
 
 
         self.retranslateUi(Workspace)

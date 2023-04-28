@@ -109,8 +109,8 @@ class MainWindow(QMainWindow):
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
 
-        windows = WindowsWidget(signaler=self.signaler)
-        self.ui.windowsWidget.layout().addWidget(windows)
+        # windows = WindowsWidget(signaler=self.signaler)
+        # self.ui.windowsWidget.layout().addWidget(windows)
 
         self.signaler.select_tool.connect(self.select_tool)
         self.signaler.show_window_panel.connect(self.show_window_panel)
@@ -144,8 +144,13 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         self.adjust_window_panel_pos(event.size() - event.oldSize())
 
-    def select_window(self, str):
-        print(str)
+    def render_layers_panel(self, layers):
+        print(layers)
+
+    def select_window(self, window):
+        print(window)
+        if window['name'] == 'Layers':
+            self.render_layers_panel(None)
 
     def adjust_window_panel_pos(self, e):
         x = self.WindowPanelWidget.x() + e.width()
@@ -161,6 +166,7 @@ class MainWindow(QMainWindow):
             y = window['pos'].y() - self.pos().y()
             flyout_width = self.WindowPanelWidget.width()
             self.WindowPanelWidget.move(x - flyout_width - 4, y - 30)
+            self.select_window(window)
         else:
             self.WindowPanelWidget.hide()
             self.current_window = None

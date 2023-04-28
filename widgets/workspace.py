@@ -16,6 +16,8 @@ from tool import Tool
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
+from widgets.window_panel import WindowPanelWidget
+from widgets.windowbar import WindowsWidget
 
 toolsettings_json_path = './datas/toolsettings.json'
 
@@ -67,6 +69,7 @@ class Widget(QWidget):
 class WorkspaceSignaler(QtCore.QObject):
     mouseMove = QtCore.Signal(int, int)
     remove_layer = QtCore.Signal(int)
+    show_window_panel = QtCore.Signal(dict)
 
 
 class WorkspaceWidget(QWidget):
@@ -78,6 +81,7 @@ class WorkspaceWidget(QWidget):
 
         self.tool_settings = {}
         self.get_tool_settings()
+        self.parent = parent
 
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
@@ -88,6 +92,7 @@ class WorkspaceWidget(QWidget):
         self.absolute_dimentions = []
         self.artboards = []
         self.active_artboard = 0
+        self.current_window = None
 
         self.offset = unit_conversion(
             self.settings['document_units'],
@@ -102,6 +107,10 @@ class WorkspaceWidget(QWidget):
         self.signaler.mouseMove.connect(self.mouse_move_event)
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
         self.ui.scrollArea.setWidgetResizable(True)
+
+        windows = WindowsWidget(signaler=self.signaler)
+        self.ui.windowsWidget.layout().addWidget(windows)
+        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -135,6 +144,7 @@ class WorkspaceWidget(QWidget):
         # TODO: Move mouse tracking to Workspace.
         # TODO: Move Tool to Workspace.
         # TODO: Move Zoom to Workspace.
+        # TODO: Move all Window code to Workspace.
         # TODO: Add all layers and layer rendering to Artboard.
         # Define layers with a default background layer
         self.layers = [
@@ -159,7 +169,7 @@ class WorkspaceWidget(QWidget):
         try:
             label = QLabel()
             res = self.render_layers()
-            res = res.scaledToWidth(400)
+            res = res.scaledToWidth(600)
             label.setPixmap(res)
         except Exception as e:
             print(e)
@@ -173,9 +183,9 @@ class WorkspaceWidget(QWidget):
         self.ui.zoomComboBox.setCurrentText(str(100.0))
 
         self.signaler.remove_layer.connect(self.remove_layer)
+        self.signaler.show_window_panel.connect(self.show_window_panel)
 
         self.tool = Tool(self.tool_settings)
-
 
     @property
     def zoom(self):
@@ -286,3 +296,26 @@ class WorkspaceWidget(QWidget):
             line = QHLine(self.ui.verticalRulerWidget, 20 - h_offset)
             line.move(h_offset, ((i + 1) * tick_height + v_offset) * (self.zoom/100.0))
 
+    def select_window(self, window):
+        print(window)
+        if window['name'] == 'Layers':
+            self.render_layers_panel(None)
+
+    def adjust_window_panel_pos(self, e):
+        x = self.WindowPanelWidget.x() + e.width()
+        y = self.WindowPanelWidget.y()
+        self.WindowPanelWidget.move(x, y)
+
+    def show_window_panel(self, window=None):
+        if window and (self.current_window is None or self.current_window['name'] != window['name']):
+            self.current_window = window
+            self.WindowPanelWidget.current_window = self.current_window
+            self.WindowPanelWidget.show()
+            x = window['pos'].x() - self.pos().x()
+            y = window['pos'].y() - self.pos().y()
+            flyout_width = self.WindowPanelWidget.width()
+            self.WindowPanelWidget.move(x - flyout_width - 4, y - 30)
+            self.select_window(window)
+        else:
+            self.WindowPanelWidget.hide()
+            self.current_window = None
