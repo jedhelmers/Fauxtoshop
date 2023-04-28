@@ -68,5 +68,9 @@
 
     <file>images/smithers.jpg</file>
     <file>images/example.png</file>
+
+    <file>images/teset_blue.jpg</file>
+    <file>images/teset_pink.jpg</file>
+    <file>images/teset_green.jpg</file>
   </qresource>
 </RCC>

@@ -12,6 +12,7 @@ from PySide6.QtGui import *
 from PySide6.QtOpenGL import *
 from OpenGL import GL
 
+from datatypes.layer import Layer, mode_mappings
 from tool import Tool
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
@@ -123,49 +124,52 @@ class WorkspaceWidget(QWidget):
             pixel_to_inch(self.absolute_dimentions[1])
         ]
 
-        artboard = ArtBoardWidget(
-            self.ui.workspaceBackgroundWidget,
-            new_file_info,
-            self.settings,
-            self.signaler)
-        self.artboards.append(artboard)
-        # self.ui.workspaceBackgroundWidget
+        # artboard = ArtBoardWidget(
+        #     self.ui.workspaceBackgroundWidget,
+        #     new_file_info,
+        #     self.settings,
+        #     self.signaler)
+        # self.artboards.append(artboard)
 
-        # painter = QPainter(self.ui.workspaceBackgroundWidget)
-        # painter.begin(self.ui.workspaceBackgroundWidget)
-        widget = QWidget()
-        image = QPixmap("images/smithers.jpg")
-        image2 = QPixmap("images/example.png")
-        # result = QPixmap(image2.size())
-        # painter.drawPixmap(QPoint(10, 10), result)
+        image = QPixmap("images/test_blue.jpg")
+        image2 = QPixmap("images/test_green.jpg")
+        image3 = QPixmap("images/test_pink.jpg")
+
+        # mode = mode_mappings('Lighten')
+
+        # resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
+        # painter = QPainter(resultImage)
+        # painter.setCompositionMode(QPainter.CompositionMode_Source)
+        # painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        # painter.drawPixmap(0, 0, image)
+        # painter.setCompositionMode(mode)
+        # painter.drawPixmap(0, 0, image2)
+        # painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        # painter.fillRect(resultImage.rect(), Qt.white)
         # painter.end()
 
+        # resultImagePx = QPixmap(image.size()).fromImage(resultImage, Qt.ColorOnly)
 
-        mode = QPainter.CompositionMode.CompositionMode_Multiply
 
-        resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, image)
-        painter.setCompositionMode(mode)
-        painter.drawPixmap(0, 0, image2)
-        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.white)
-        painter.end()
+        layer = Layer()
+        layer.image = image2
+        layer.mode = 'Difference'
 
-        label = QLabel()
-        resultImagePx = QPixmap(image.size()).fromImage(resultImage, Qt.ColorOnly)
+        layer2 = Layer()
+        layer2.image = image3
+        layer2.mode = 'Multiply'
+
+        res = self.def_add_image(image, layer2)
+        res = self.def_add_image(res, layer)
+        # res = self.def_add_image(res, layer2)
+
 
         try:
-            label.setPixmap(resultImagePx)
+            label = QLabel()
+            label.setPixmap(res)
         except Exception as e:
             print(e)
-
-
-
-
 
 
 
@@ -179,12 +183,6 @@ class WorkspaceWidget(QWidget):
 
         self.tool = Tool(self.tool_settings)
 
-        # native = Widget(self.tool, self.ui.workspaceBackgroundWidget)
-        # openGL = GLWidget(self.tool, self)
-        # nativeLabel = QLabel(self.tr("Native"))
-        # nativeLabel.setAlignment(Qt.AlignHCenter)
-        # openGLLabel = QLabel(self.tr("OpenGL"))
-        # openGLLabel.setAlignment(Qt.AlignHCenter)
 
     @property
     def zoom(self):
@@ -195,6 +193,23 @@ class WorkspaceWidget(QWidget):
         self._zoom = zoom
         self.draw_v_ruler()
         self.draw_h_ruler()
+
+    def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
+        mode = mode_mappings(layer.mode)
+
+        resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, base_image)
+        painter.setCompositionMode(mode)
+        painter.drawPixmap(0, 0, layer.image)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.end()
+
+        return QPixmap(base_image.size()).fromImage(resultImage, Qt.ColorOnly)
 
     def get_tool_settings(self):
         if os.path.exists(toolsettings_json_path):
