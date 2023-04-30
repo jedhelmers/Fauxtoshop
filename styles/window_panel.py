@@ -24,4 +24,16 @@ def flyout_panel():
             left: 0;
             bottom: 0px;
         }
+        QLabel,
+        QWidget[objectName^=layout] {
+            background: transparent;
+        }
+        QPushButton {
+            background: transparent;
+            border-radius: 0px;
+        }
+        QPushButton::hover,
+        QPushButton::pressed {
+            background: rgba(0, 0, 0, .2);
+        }
         """

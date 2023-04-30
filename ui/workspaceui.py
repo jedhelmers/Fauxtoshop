@@ -139,17 +139,6 @@ class Ui_Workspace(object):
 
         self.horizontalLayout_4.addLayout(self.verticalLayout_3)
 
-        self.windowsWidget = QWidget(Workspace)
-        self.windowsWidget.setObjectName(u"windowsWidget")
-        self.windowsWidget.setMinimumSize(QSize(40, 0))
-        self.windowsWidget.setMaximumSize(QSize(10, 16777215))
-        self.verticalLayout_6 = QVBoxLayout(self.windowsWidget)
-        self.verticalLayout_6.setSpacing(0)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
-
-        self.horizontalLayout_4.addWidget(self.windowsWidget)
-
 
         self.retranslateUi(Workspace)
 

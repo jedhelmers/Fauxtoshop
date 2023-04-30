@@ -3,7 +3,7 @@ import random
 import sys
 from pathlib import Path
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject
+from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout
 
@@ -17,6 +17,9 @@ from widgets.tools.text_options import TextOptionsWidget
 from widgets.toolbar import ToolbarWidget
 from widgets.windowbar import WindowsWidget
 from widgets.window_panel import WindowPanelWidget
+from widgets.workspace import WorkspaceWidget
+from widgets.windows.layers import LayersWindowWidget
+
 
 def command_mappings(key):
     # 16777249
@@ -105,20 +108,26 @@ class MainWindow(QMainWindow):
         self.windows = get_windows()
         self.current_window = None
         self.current_options_widget = None
+        self.tab_index = 0
+        self.tabs = []
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
 
-        # windows = WindowsWidget(signaler=self.signaler)
-        # self.ui.windowsWidget.layout().addWidget(windows)
+        windows = WindowsWidget(signaler=self.signaler)
+        self.ui.windowsWidget.layout().addWidget(windows)
 
         self.signaler.select_tool.connect(self.select_tool)
         self.signaler.show_window_panel.connect(self.show_window_panel)
         self.signaler.select_window.connect(self.select_window)
 
-        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        self.setup_windows()
+
+        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=self.windows)
         self.WindowPanelWidget.hide()
         self.current_tool = 'brush'
+        # self.current_window = 'Layers'
+
 
     @property
     def current_tool(self):
@@ -141,8 +150,12 @@ class MainWindow(QMainWindow):
         self._current_tool = tool
         self.setup_tool_options_bar()
 
+    def setup_windows(self):
+        self.windows['Layers'] = LayersWindowWidget()
+            
     def resizeEvent(self, event):
         self.adjust_window_panel_pos(event.size() - event.oldSize())
+        # self.WindowPanelWidget.set_position(event.size() - event.oldSize())
 
     def render_layers_panel(self, layers):
         print(layers)
@@ -160,6 +173,7 @@ class MainWindow(QMainWindow):
     def show_window_panel(self, window=None):
         if window and (self.current_window is None or self.current_window['name'] != window['name']):
             self.current_window = window
+            print(self.current_window)
             self.WindowPanelWidget.current_window = self.current_window
             self.WindowPanelWidget.show()
             x = window['pos'].x() - self.pos().x()
@@ -203,6 +217,21 @@ class MainWindow(QMainWindow):
         except:
             pass
 
+    def new_file(self, new_file_info):
+        tab = WorkspaceWidget(self, new_file_info)
+        self.tabs.append(tab)
+
+        self.ui.workspaceTabWidget.addTab(tab, "")
+        self.ui.workspaceTabWidget.setTabText(
+            self.ui.workspaceTabWidget.indexOf(tab),
+            QCoreApplication.translate(
+                "MainWindow",
+                new_file_info['name'], None))
+
+        self.tab_index = len(self.tabs)
+        # print(self.tab_index)
+        self.ui.workspaceTabWidget.setCurrentWidget(tab)
+
     def processmultikeys(self, keyspressed):
         _keyspressed = [*keyspressed]
         _keyspressed.sort()
@@ -215,7 +244,7 @@ class MainWindow(QMainWindow):
         if name == 'NEW_FILE':
             new_file_widget = NewFileWidget(
                 self,
-                save=new_file.new_file,
+                save=self.new_file,
             )
             new_file_widget.setModal(True)
             new_file_widget.show()

@@ -104,11 +104,11 @@ class NewFileWidget(QDialog):
 
         if bg_color.isValid():
             self.bg_color = bg_color
-            print('COLOR:', self.bg_color)
+            # print('COLOR:', self.bg_color)
             self.ui.colorPickerPushButton.setStyleSheet(f'background-color: {self.bg_color.name()}')
 
     def create_new_file(self):
-        self.save(self.parent, {
+        self.save({
             'width': self.ui.widthLineEdit.text(),
             'units_w': self.ui.unitsWComboBox.currentText(),
             'height': self.ui.heightLineEdit.text(),

@@ -66,11 +66,31 @@
     <file>images/window_properties.svg</file>
     <file>images/window_swatches.svg</file>
 
+    <file>images/window_lock_position.svg</file>
+    <file>images/window_prevent_auto_nesting.svg</file>
+    <file>images/window_partial_lock.svg</file>
+    <file>images/window_lock.svg</file>
+    <file>images/window_filter_for_pixel.svg</file>
+    <file>images/window_filter_for_shape.svg</file>
+    <file>images/window_filter_for_adjustment.svg</file>
+    <file>images/window_filter_for_text.svg</file>
+    <file>images/window_filter_for_smart_object.svg</file>
+    <file>images/window_alpha_lock.svg</file>
+    <file>images/window_create_adjustment_layer.svg</file>
+    <file>images/window_pixel_lock.svg</file>
+    <file>images/window_layer_style.svg</file>
+    <file>images/window_add_mask.svg</file>
+    <file>images/window_add_group.svg</file>
+    <file>images/window_link.svg</file>
+    <file>images/window_add_layer.svg</file>
+    <file>images/window_delete_layer.svg</file>
+
     <file>images/smithers.jpg</file>
     <file>images/example.png</file>
 
-    <file>images/teset_blue.jpg</file>
-    <file>images/teset_pink.jpg</file>
-    <file>images/teset_green.jpg</file>
+    <file>images/test_blue.jpg</file>
+    <file>images/test_pink.jpg</file>
+    <file>images/test_green.jpg</file>
+    <file>images/example.jpg</file>
   </qresource>
 </RCC>

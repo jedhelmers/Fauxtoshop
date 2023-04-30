@@ -108,9 +108,9 @@ class WorkspaceWidget(QWidget):
         self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
         self.ui.scrollArea.setWidgetResizable(True)
 
-        windows = WindowsWidget(signaler=self.signaler)
-        self.ui.windowsWidget.layout().addWidget(windows)
-        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        # windows = WindowsWidget(signaler=self.signaler)
+        # self.ui.windowsWidget.layout().addWidget(windows)
+        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -147,24 +147,52 @@ class WorkspaceWidget(QWidget):
         # TODO: Move all Window code to Workspace.
         # TODO: Add all layers and layer rendering to Artboard.
         # Define layers with a default background layer
-        self.layers = [
-            Layer(
-                name="Background",
-                lock=True,
-                image=QPixmap("images/test_blue.jpg"),
-            )]
-        self.layers.append(
-            Layer(
-                image=QPixmap("images/test_green.jpg"),
-                mode='Difference'
-            )
-        )
+        self.layers = []
+
         self.layers.append(
             Layer(
                 image=QPixmap("images/test_pink.jpg"),
-                mode='Multiply'
+                mode='Normal',
+                name="Background",
             )
         )
+
+        self.layers.append(
+            Layer(
+                image=QPixmap(self.layers[0].image.size()),
+                name="Group 1",
+                children=[
+                    Layer(
+                        image=QPixmap(self.layers[0].image.size()),
+                        mode="Multiply",
+                        children=[
+                            Layer(
+                                image=QPixmap("images/test_green.jpg"),
+                                mode='Normal'
+                            ),
+                        ]
+                    ),
+                    # Layer(
+                    #     image=QPixmap("images/test_green.jpg"),
+                    #     mode='Multiply'
+                    # ),
+                    Layer(
+                        image=QPixmap("images/example.jpg"),
+                        mode='Normal'
+                    ),
+                ],
+                mode="HardLight"
+            )
+        )
+
+        self.layers.append(
+            Layer(
+                lock=True,
+                image=QPixmap("images/test_blue.jpg"),
+                mode='Difference'
+            )
+        )
+        
 
         try:
             label = QLabel()
@@ -199,10 +227,26 @@ class WorkspaceWidget(QWidget):
 
     def render_layers(self):
         composite = self.layers[0].image
-        for i in reversed(range(1, len(self.layers))):
+
+        for i in range(len(self.layers)):
+            child_count = len(self.layers[i].children)
+
+            if child_count > 0:
+                group_composite = self.layers[i].children[0].image
+
+                if child_count > 1:
+                    for j in (range(child_count)):
+                        print(i, j, self.layers[i].children[j].name)
+                        group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
+
+                self.layers[i].image = group_composite
+                
             composite = self.def_add_image(composite, self.layers[i])
 
         return composite
+
+    def test(self, layer):
+        print(layer.children)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
@@ -276,7 +320,8 @@ class WorkspaceWidget(QWidget):
 
     def draw_v_ruler(self):
         ruler_group = range(self.ui.verticalRulerWidget.layout().count())
-        for widget_index in reversed(ruler_group):
+
+        for widget_index in ruler_group:
             widget = self.ui.verticalRulerWidget.layout().itemAt(
                 widget_index).widget()
             if widget:
