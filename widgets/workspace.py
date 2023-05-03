@@ -209,8 +209,8 @@ class WorkspaceWidget(QWidget):
             print(e)
 
     def on_click(self):
-        # self.layers[1].scale = [2.0, 1.0]
-        self.layers[1].position = [self.layers[1].position[0] - 10, 0]
+        self.layers[1].scale = [self.layers[1].scale[0] + 0.01, self.layers[1].scale[1] + 0.01]
+        # self.layers[1].position = [self.layers[1].position[0] - 10, 0]
         # print('SLICK!')
         print(self.layers[1].position)
         self.layers[1].image = self.move_scale(self.layers[1])
