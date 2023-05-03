@@ -13,7 +13,7 @@ class WindowPanelWidget(QWidget):
 
         self.windows = windows
         self.ui.windowPanelTabWidget.setStyleSheet(flyout_panel())
-        self.setMaximumWidth(260)
+        self.setMaximumWidth(240)
 
         self.current_window = 'Layers'
 
