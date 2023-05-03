@@ -12,6 +12,8 @@ class Layer:
         'lock',
         'show',
         'image',
+        'position',
+        'scale',
         'mode',
         'mode_percent',
         'children',
@@ -26,6 +28,8 @@ class Layer:
             lock=False,
             show=True,
             image=None,
+            position=[0.0, 0.0], # QPoint
+            scale=[1.0, 1.0], # qreal? Double I think.
             mode='Normal',
             mode_percent=1.0,
             children=[],
@@ -37,6 +41,8 @@ class Layer:
         self.lock = lock
         self.show = show
         self.image = image
+        self.position = position
+        self.scale = scale
         self.mode = mode
         self.mode_percent = mode_percent
         self.children = children

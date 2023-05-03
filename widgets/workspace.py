@@ -111,6 +111,16 @@ class WorkspaceWidget(QWidget):
         # windows = WindowsWidget(signaler=self.signaler)
         # self.ui.windowsWidget.layout().addWidget(windows)
         # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        windows = WindowsWidget(signaler=self.signaler)
+        self.ui.windowsWidget.layout().addWidget(windows)
+        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        self.label = QLabel()
+        self.ui.gridLayout_3.addWidget(self.label)
+        self.current_layer_index = 2
+        self.down_mouse_pos = [None, None]
+        self.up_mouse_pos = [None, None]
+        self.base_width = 600
+        self.base_zoom = 2.0
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -201,14 +211,12 @@ class WorkspaceWidget(QWidget):
             label.setPixmap(res)
         except Exception as e:
             print(e)
+        self.render()
 
-
-
-
-        self.ui.gridLayout_3.addWidget(label)
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(100.0))
+        self.ui.zoomComboBox.currentTextChanged.connect(self._zooms)
 
         self.signaler.remove_layer.connect(self.remove_layer)
         self.signaler.show_window_panel.connect(self.show_window_panel)
@@ -224,6 +232,56 @@ class WorkspaceWidget(QWidget):
         self._zoom = zoom
         self.draw_v_ruler()
         self.draw_h_ruler()
+        self.render()
+
+    # def mouseMoveEvent(self, event):
+    #     # layer = self.layers[self.current_layer_index]
+    #     self.move(event)
+    #     self.render()
+
+    def _zooms(self, val):
+        self.base_zoom = float("".join(list(filter(str.isdigit, val)))) / 10000.0
+        self.zoom = self.base_zoom
+        print(val, self.base_zoom)
+
+    def mouseReleaseEvent(self, event):
+        # layer = self.layers[self.current_layer_index]
+        self.up_mouse_pos = [event.x(), event.y()]
+        self.move(event)
+        self.render()
+        self.down_mouse_pos = [None, None]
+
+    def mousePressEvent(self, event):
+        # print(event)
+        # self.on_click()
+        # layer = self.layers[self.current_layer_index]
+        # self.move(layer, event)
+        self.up_mouse_pos = [None, None]
+        self.down_mouse_pos = [event.x(), event.y()]
+        pass
+
+
+    def render(self):
+        try:
+            self.label.clear()
+            res = self.render_layers()
+            res = res.scaledToWidth(self.base_zoom * self.base_width)
+            self.label.setPixmap(res)
+            # self.ui.gridLayout_3.addWidget(self.label)
+        except Exception as e:
+            print(e)
+
+    def on_click(self):
+        # self.layers[self.current_layer_index].scale = [self.layers[self.current_layer_index].scale[0] + 0.01, self.layers[self.current_layer_index].scale[1] + 0.01]
+        # self.layers[self.current_layer_index].scale = [2.0, 2.0]
+        # self.layers[self.current_layer_index].position = [self.layers[self.current_layer_index].position[0] - 10, 0]
+        # print('SLICK!')
+        # print(self.layers[self.current_layer_index].position)
+        # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
+        # self.current_layer_index += 1
+        # self.current_layer_index = (self.current_layer_index + 1) % (len(self.layers))
+        # print(self.current_layer_index)
+        self.render()
 
     def render_layers(self):
         composite = self.layers[0].image
@@ -248,13 +306,40 @@ class WorkspaceWidget(QWidget):
     def test(self, layer):
         print(layer.children)
 
+    def scale(self, layer, event):
+        pass
+
+    def move(self, event):
+        dx = self.up_mouse_pos[0] - self.down_mouse_pos[0]
+        dy = self.up_mouse_pos[1] - self.down_mouse_pos[1]
+
+        self.layers[self.current_layer_index].position = [dx, dy]
+        self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
+
+    def change_mode(self, layer, mode):
+        layer.mode = mode
+        pass
+
+    def update_layer(self, layer) -> QPixmap:
+        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.scale(*layer.scale)
+        painter.translate(*layer.position)
+        painter.drawPixmap(0, 0, layer.image)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.end()
+        return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
+
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
+
+        # layer.image = self.update_layer(layer)
 
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
+
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
         painter.setCompositionMode(mode)
