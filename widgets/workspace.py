@@ -113,7 +113,7 @@ class WorkspaceWidget(QWidget):
         self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
-        self.current_layer_index = 0
+        self.current_layer_index = 2
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -190,9 +190,23 @@ class WorkspaceWidget(QWidget):
         self.draw_v_ruler()
         self.draw_h_ruler()
 
+    # def mouseMoveEvent(self, event):
+    #     # layer = self.layers[self.current_layer_index]
+    #     self.move(event)
+    #     self.render()
+
+    def mouseReleaseEvent(self, event):
+        # layer = self.layers[self.current_layer_index]
+        self.move(event)
+        self.render()
+
     def mousePressEvent(self, event):
         # print(event)
-        self.on_click()
+        # self.on_click()
+        # layer = self.layers[self.current_layer_index]
+        # self.move(layer, event)
+        pass
+
 
     def render(self):
         try:
@@ -205,15 +219,15 @@ class WorkspaceWidget(QWidget):
             print(e)
 
     def on_click(self):
-        self.layers[self.current_layer_index].scale = [self.layers[self.current_layer_index].scale[0] + 0.01, self.layers[self.current_layer_index].scale[1] + 0.01]
+        # self.layers[self.current_layer_index].scale = [self.layers[self.current_layer_index].scale[0] + 0.01, self.layers[self.current_layer_index].scale[1] + 0.01]
         # self.layers[self.current_layer_index].scale = [2.0, 2.0]
         # self.layers[self.current_layer_index].position = [self.layers[self.current_layer_index].position[0] - 10, 0]
         # print('SLICK!')
         # print(self.layers[self.current_layer_index].position)
-        # self.layers[self.current_layer_index].image = self.move_scale(self.layers[self.current_layer_index])
+        # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
         # self.current_layer_index += 1
-        self.current_layer_index = (self.current_layer_index + 1) % (len(self.layers))
-        print(self.current_layer_index)
+        # self.current_layer_index = (self.current_layer_index + 1) % (len(self.layers))
+        # print(self.current_layer_index)
         self.render()
 
     def render_layers(self):
@@ -224,7 +238,19 @@ class WorkspaceWidget(QWidget):
         return composite
 
 
-    def move_scale(self, layer) -> QPixmap:
+    def scale(self, layer, event):
+        pass
+
+    def move(self, event):
+        # self.layers[self.current_layer_index]
+        # print(event.x(), event.y())
+        self.layers[self.current_layer_index].position = [float(event.x()), float(event.y())]
+
+    def change_mode(self, layer, mode):
+        layer.mode = mode
+        pass
+
+    def update_layer(self, layer) -> QPixmap:
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.scale(*layer.scale)
@@ -237,7 +263,7 @@ class WorkspaceWidget(QWidget):
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
 
-        layer.image = self.move_scale(layer)
+        layer.image = self.update_layer(layer)
 
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
