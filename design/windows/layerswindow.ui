@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
+    <width>313</width>
     <height>273</height>
    </rect>
   </property>
@@ -17,6 +17,9 @@
    <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>-1</number>
+   </property>
    <property name="leftMargin">
     <number>2</number>
    </property>
@@ -27,7 +30,7 @@
     <number>2</number>
    </property>
    <property name="bottomMargin">
-    <number>8</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QWidget" name="layout" native="true">
@@ -42,13 +45,13 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <item>
        <widget class="QComboBox" name="kindComboBox">
@@ -90,6 +93,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_filter_for_pixel.svg</normaloff>:/images/images/window_filter_for_pixel.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -108,6 +121,16 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_filter_for_adjustment.svg</normaloff>:/images/images/window_filter_for_adjustment.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -128,6 +151,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_filter_for_text.svg</normaloff>:/images/images/window_filter_for_text.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -146,6 +179,16 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_filter_for_shape.svg</normaloff>:/images/images/window_filter_for_shape.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -166,6 +209,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_filter_for_smart_object.svg</normaloff>:/images/images/window_filter_for_smart_object.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
      </layout>
@@ -184,70 +237,38 @@
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <item>
        <widget class="QComboBox" name="modeComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
-          <width>120</width>
+          <width>16777215</width>
           <height>18</height>
          </size>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_4">
-        <property name="maximumSize">
-         <size>
-          <width>40</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="opacityComboBox_2">
-        <property name="maximumSize">
-         <size>
-          <width>50</width>
-          <height>18</height>
-         </size>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
       <item>
        <widget class="QLabel" name="label_3">
+        <property name="minimumSize">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>40</width>
@@ -266,6 +287,12 @@
       </item>
       <item>
        <widget class="QComboBox" name="opacityComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>50</width>
@@ -290,22 +317,28 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <property name="spacing">
-       <number>-1</number>
+       <number>0</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <item>
        <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>27</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>28</width>
@@ -339,6 +372,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_alpha_lock.svg</normaloff>:/images/images/window_alpha_lock.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -357,6 +400,16 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_pixel_lock.svg</normaloff>:/images/images/window_pixel_lock.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -377,6 +430,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_lock_position.svg</normaloff>:/images/images/window_lock_position.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -395,6 +458,16 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_prevent_auto_nesting.svg</normaloff>:/images/images/window_prevent_auto_nesting.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -415,6 +488,16 @@
         <property name="text">
          <string/>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources.qrc">
+          <normaloff>:/images/images/window_lock.svg</normaloff>:/images/images/window_lock.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -432,6 +515,12 @@
       </item>
       <item>
        <widget class="QLabel" name="label_2">
+        <property name="minimumSize">
+         <size>
+          <width>17</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>20</width>
@@ -450,6 +539,12 @@
       </item>
       <item>
        <widget class="QComboBox" name="fillComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
           <width>50</width>
@@ -474,8 +569,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>327</width>
-        <height>137</height>
+        <width>307</width>
+        <height>145</height>
        </rect>
       </property>
      </widget>
@@ -486,33 +581,49 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>24</height>
+       <height>26</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>20</height>
+       <height>26</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="leftMargin">
        <number>10</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="rightMargin">
        <number>10</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="linkPushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>24</width>
@@ -532,8 +643,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_link.svg</normaloff>:/images/images/window_link.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -558,8 +675,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_layer_style.svg</normaloff>:/images/images/window_layer_style.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -584,8 +707,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_add_mask.svg</normaloff>:/images/images/window_add_mask.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -610,8 +739,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_create_adjustment_layer.svg</normaloff>:/images/images/window_create_adjustment_layer.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -636,8 +771,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_add_group.svg</normaloff>:/images/images/window_add_group.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -662,8 +803,14 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_add_layer.svg</normaloff>:/images/images/window_add_layer.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -688,10 +835,29 @@
          <iconset resource="../../resources.qrc">
           <normaloff>:/images/images/window_delete_layer.svg</normaloff>:/images/images/window_delete_layer.svg</iconset>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
         <property name="flat">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

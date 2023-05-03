@@ -24,17 +24,20 @@ class Ui_LayersWindow(object):
     def setupUi(self, LayersWindow):
         if not LayersWindow.objectName():
             LayersWindow.setObjectName(u"LayersWindow")
-        LayersWindow.resize(333, 273)
+        LayersWindow.resize(313, 273)
         LayersWindow.setStyleSheet(u"")
         self.verticalLayout = QVBoxLayout(LayersWindow)
+#ifndef Q_OS_MAC
+        self.verticalLayout.setSpacing(-1)
+#endif
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(2, 2, 2, 8)
+        self.verticalLayout.setContentsMargins(2, 2, 2, 0)
         self.layout = QWidget(LayersWindow)
         self.layout.setObjectName(u"layout")
         self.layout.setMaximumSize(QSize(16777215, 20))
         self.horizontalLayout_2 = QHBoxLayout(self.layout)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setContentsMargins(0, 2, 0, 2)
         self.kindComboBox = QComboBox(self.layout)
         self.kindComboBox.setObjectName(u"kindComboBox")
         self.kindComboBox.setMaximumSize(QSize(100, 18))
@@ -49,6 +52,10 @@ class Ui_LayersWindow(object):
         self.pixelFilterLayersPushButton.setObjectName(u"pixelFilterLayersPushButton")
         self.pixelFilterLayersPushButton.setMinimumSize(QSize(20, 20))
         self.pixelFilterLayersPushButton.setMaximumSize(QSize(20, 20))
+        icon = QIcon()
+        icon.addFile(u":/images/images/window_filter_for_pixel.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.pixelFilterLayersPushButton.setIcon(icon)
+        self.pixelFilterLayersPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_2.addWidget(self.pixelFilterLayersPushButton)
 
@@ -56,6 +63,10 @@ class Ui_LayersWindow(object):
         self.filterForAdjustmentLayersPushButton.setObjectName(u"filterForAdjustmentLayersPushButton")
         self.filterForAdjustmentLayersPushButton.setMinimumSize(QSize(20, 20))
         self.filterForAdjustmentLayersPushButton.setMaximumSize(QSize(20, 20))
+        icon1 = QIcon()
+        icon1.addFile(u":/images/images/window_filter_for_adjustment.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.filterForAdjustmentLayersPushButton.setIcon(icon1)
+        self.filterForAdjustmentLayersPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_2.addWidget(self.filterForAdjustmentLayersPushButton)
 
@@ -63,6 +74,10 @@ class Ui_LayersWindow(object):
         self.filterForTypeLayersPushButton.setObjectName(u"filterForTypeLayersPushButton")
         self.filterForTypeLayersPushButton.setMinimumSize(QSize(20, 20))
         self.filterForTypeLayersPushButton.setMaximumSize(QSize(20, 20))
+        icon2 = QIcon()
+        icon2.addFile(u":/images/images/window_filter_for_text.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.filterForTypeLayersPushButton.setIcon(icon2)
+        self.filterForTypeLayersPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_2.addWidget(self.filterForTypeLayersPushButton)
 
@@ -70,6 +85,10 @@ class Ui_LayersWindow(object):
         self.filterForShapesLayersPushButton.setObjectName(u"filterForShapesLayersPushButton")
         self.filterForShapesLayersPushButton.setMinimumSize(QSize(20, 20))
         self.filterForShapesLayersPushButton.setMaximumSize(QSize(20, 20))
+        icon3 = QIcon()
+        icon3.addFile(u":/images/images/window_filter_for_shape.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.filterForShapesLayersPushButton.setIcon(icon3)
+        self.filterForShapesLayersPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_2.addWidget(self.filterForShapesLayersPushButton)
 
@@ -77,6 +96,10 @@ class Ui_LayersWindow(object):
         self.filterForSmartObjectsPushButton.setObjectName(u"filterForSmartObjectsPushButton")
         self.filterForSmartObjectsPushButton.setMinimumSize(QSize(20, 20))
         self.filterForSmartObjectsPushButton.setMaximumSize(QSize(20, 20))
+        icon4 = QIcon()
+        icon4.addFile(u":/images/images/window_filter_for_smart_object.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.filterForSmartObjectsPushButton.setIcon(icon4)
+        self.filterForSmartObjectsPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_2.addWidget(self.filterForSmartObjectsPushButton)
 
@@ -88,42 +111,27 @@ class Ui_LayersWindow(object):
         self.layout_2.setMaximumSize(QSize(16777215, 20))
         self.horizontalLayout_4 = QHBoxLayout(self.layout_2)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_4.setContentsMargins(0, 2, 0, 2)
         self.modeComboBox = QComboBox(self.layout_2)
         self.modeComboBox.setObjectName(u"modeComboBox")
-        self.modeComboBox.setMaximumSize(QSize(120, 18))
+        self.modeComboBox.setMinimumSize(QSize(110, 0))
+        self.modeComboBox.setMaximumSize(QSize(16777215, 18))
 
         self.horizontalLayout_4.addWidget(self.modeComboBox)
 
-        self.label_4 = QLabel(self.layout_2)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setMaximumSize(QSize(40, 16777215))
-        font = QFont()
-        font.setPointSize(10)
-        self.label_4.setFont(font)
-
-        self.horizontalLayout_4.addWidget(self.label_4)
-
-        self.opacityComboBox_2 = QComboBox(self.layout_2)
-        self.opacityComboBox_2.setObjectName(u"opacityComboBox_2")
-        self.opacityComboBox_2.setMaximumSize(QSize(50, 18))
-        self.opacityComboBox_2.setEditable(True)
-
-        self.horizontalLayout_4.addWidget(self.opacityComboBox_2)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer)
-
         self.label_3 = QLabel(self.layout_2)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setMinimumSize(QSize(40, 0))
         self.label_3.setMaximumSize(QSize(40, 16777215))
+        font = QFont()
+        font.setPointSize(10)
         self.label_3.setFont(font)
 
         self.horizontalLayout_4.addWidget(self.label_3)
 
         self.opacityComboBox = QComboBox(self.layout_2)
         self.opacityComboBox.setObjectName(u"opacityComboBox")
+        self.opacityComboBox.setMinimumSize(QSize(50, 0))
         self.opacityComboBox.setMaximumSize(QSize(50, 18))
         self.opacityComboBox.setEditable(True)
 
@@ -136,13 +144,12 @@ class Ui_LayersWindow(object):
         self.layout_4.setObjectName(u"layout_4")
         self.layout_4.setMaximumSize(QSize(16777215, 20))
         self.horizontalLayout_3 = QHBoxLayout(self.layout_4)
-#ifndef Q_OS_MAC
-        self.horizontalLayout_3.setSpacing(-1)
-#endif
+        self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_3.setContentsMargins(0, 2, 0, 2)
         self.label = QLabel(self.layout_4)
         self.label.setObjectName(u"label")
+        self.label.setMinimumSize(QSize(27, 0))
         self.label.setMaximumSize(QSize(28, 16777215))
         self.label.setFont(font)
 
@@ -152,6 +159,10 @@ class Ui_LayersWindow(object):
         self.alphaLockPushButton.setObjectName(u"alphaLockPushButton")
         self.alphaLockPushButton.setMinimumSize(QSize(20, 20))
         self.alphaLockPushButton.setMaximumSize(QSize(20, 20))
+        icon5 = QIcon()
+        icon5.addFile(u":/images/images/window_alpha_lock.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.alphaLockPushButton.setIcon(icon5)
+        self.alphaLockPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_3.addWidget(self.alphaLockPushButton)
 
@@ -159,6 +170,10 @@ class Ui_LayersWindow(object):
         self.pixelLockPushButton.setObjectName(u"pixelLockPushButton")
         self.pixelLockPushButton.setMinimumSize(QSize(20, 20))
         self.pixelLockPushButton.setMaximumSize(QSize(20, 20))
+        icon6 = QIcon()
+        icon6.addFile(u":/images/images/window_pixel_lock.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.pixelLockPushButton.setIcon(icon6)
+        self.pixelLockPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_3.addWidget(self.pixelLockPushButton)
 
@@ -166,6 +181,10 @@ class Ui_LayersWindow(object):
         self.moveLockPushButton.setObjectName(u"moveLockPushButton")
         self.moveLockPushButton.setMinimumSize(QSize(20, 20))
         self.moveLockPushButton.setMaximumSize(QSize(20, 20))
+        icon7 = QIcon()
+        icon7.addFile(u":/images/images/window_lock_position.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.moveLockPushButton.setIcon(icon7)
+        self.moveLockPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_3.addWidget(self.moveLockPushButton)
 
@@ -173,6 +192,10 @@ class Ui_LayersWindow(object):
         self.autoNestLockPushButton.setObjectName(u"autoNestLockPushButton")
         self.autoNestLockPushButton.setMinimumSize(QSize(20, 20))
         self.autoNestLockPushButton.setMaximumSize(QSize(20, 20))
+        icon8 = QIcon()
+        icon8.addFile(u":/images/images/window_prevent_auto_nesting.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.autoNestLockPushButton.setIcon(icon8)
+        self.autoNestLockPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_3.addWidget(self.autoNestLockPushButton)
 
@@ -180,6 +203,10 @@ class Ui_LayersWindow(object):
         self.layerLockPushButton.setObjectName(u"layerLockPushButton")
         self.layerLockPushButton.setMinimumSize(QSize(20, 20))
         self.layerLockPushButton.setMaximumSize(QSize(20, 20))
+        icon9 = QIcon()
+        icon9.addFile(u":/images/images/window_lock.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.layerLockPushButton.setIcon(icon9)
+        self.layerLockPushButton.setIconSize(QSize(14, 14))
 
         self.horizontalLayout_3.addWidget(self.layerLockPushButton)
 
@@ -189,6 +216,7 @@ class Ui_LayersWindow(object):
 
         self.label_2 = QLabel(self.layout_4)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setMinimumSize(QSize(17, 0))
         self.label_2.setMaximumSize(QSize(20, 16777215))
         self.label_2.setFont(font)
 
@@ -196,6 +224,7 @@ class Ui_LayersWindow(object):
 
         self.fillComboBox = QComboBox(self.layout_4)
         self.fillComboBox.setObjectName(u"fillComboBox")
+        self.fillComboBox.setMinimumSize(QSize(50, 0))
         self.fillComboBox.setMaximumSize(QSize(50, 18))
         self.fillComboBox.setEditable(True)
 
@@ -209,38 +238,45 @@ class Ui_LayersWindow(object):
         self.layerScrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 327, 137))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 307, 145))
         self.layerScrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout.addWidget(self.layerScrollArea)
 
         self.layout_3 = QWidget(LayersWindow)
         self.layout_3.setObjectName(u"layout_3")
-        self.layout_3.setMinimumSize(QSize(0, 24))
-        self.layout_3.setMaximumSize(QSize(16777215, 20))
+        self.layout_3.setMinimumSize(QSize(0, 26))
+        self.layout_3.setMaximumSize(QSize(16777215, 26))
         self.horizontalLayout = QHBoxLayout(self.layout_3)
-        self.horizontalLayout.setSpacing(0)
+        self.horizontalLayout.setSpacing(2)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(10, 0, 10, 0)
-        self.pushButton = QPushButton(self.layout_3)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setMinimumSize(QSize(24, 24))
-        self.pushButton.setMaximumSize(QSize(20, 20))
-        icon = QIcon()
-        icon.addFile(u":/images/images/window_link.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.pushButton.setIcon(icon)
-        self.pushButton.setFlat(True)
+        self.horizontalLayout.setContentsMargins(10, 2, 10, 2)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.horizontalLayout.addItem(self.horizontalSpacer_4)
+
+        self.linkPushButton = QPushButton(self.layout_3)
+        self.linkPushButton.setObjectName(u"linkPushButton")
+        self.linkPushButton.setEnabled(False)
+        self.linkPushButton.setMinimumSize(QSize(24, 24))
+        self.linkPushButton.setMaximumSize(QSize(20, 20))
+        icon10 = QIcon()
+        icon10.addFile(u":/images/images/window_link.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.linkPushButton.setIcon(icon10)
+        self.linkPushButton.setIconSize(QSize(14, 14))
+        self.linkPushButton.setFlat(False)
+
+        self.horizontalLayout.addWidget(self.linkPushButton)
 
         self.addLayerStylePushButton = QPushButton(self.layout_3)
         self.addLayerStylePushButton.setObjectName(u"addLayerStylePushButton")
         self.addLayerStylePushButton.setMinimumSize(QSize(24, 24))
         self.addLayerStylePushButton.setMaximumSize(QSize(20, 20))
-        icon1 = QIcon()
-        icon1.addFile(u":/images/images/window_layer_style.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.addLayerStylePushButton.setIcon(icon1)
-        self.addLayerStylePushButton.setFlat(True)
+        icon11 = QIcon()
+        icon11.addFile(u":/images/images/window_layer_style.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.addLayerStylePushButton.setIcon(icon11)
+        self.addLayerStylePushButton.setIconSize(QSize(14, 14))
+        self.addLayerStylePushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.addLayerStylePushButton)
 
@@ -248,10 +284,11 @@ class Ui_LayersWindow(object):
         self.newLayerMaskPushButton.setObjectName(u"newLayerMaskPushButton")
         self.newLayerMaskPushButton.setMinimumSize(QSize(24, 24))
         self.newLayerMaskPushButton.setMaximumSize(QSize(20, 20))
-        icon2 = QIcon()
-        icon2.addFile(u":/images/images/window_add_mask.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.newLayerMaskPushButton.setIcon(icon2)
-        self.newLayerMaskPushButton.setFlat(True)
+        icon12 = QIcon()
+        icon12.addFile(u":/images/images/window_add_mask.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.newLayerMaskPushButton.setIcon(icon12)
+        self.newLayerMaskPushButton.setIconSize(QSize(14, 14))
+        self.newLayerMaskPushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.newLayerMaskPushButton)
 
@@ -259,10 +296,11 @@ class Ui_LayersWindow(object):
         self.newFillOrAdjustmentLayerPushButton.setObjectName(u"newFillOrAdjustmentLayerPushButton")
         self.newFillOrAdjustmentLayerPushButton.setMinimumSize(QSize(24, 24))
         self.newFillOrAdjustmentLayerPushButton.setMaximumSize(QSize(20, 20))
-        icon3 = QIcon()
-        icon3.addFile(u":/images/images/window_create_adjustment_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.newFillOrAdjustmentLayerPushButton.setIcon(icon3)
-        self.newFillOrAdjustmentLayerPushButton.setFlat(True)
+        icon13 = QIcon()
+        icon13.addFile(u":/images/images/window_create_adjustment_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.newFillOrAdjustmentLayerPushButton.setIcon(icon13)
+        self.newFillOrAdjustmentLayerPushButton.setIconSize(QSize(14, 14))
+        self.newFillOrAdjustmentLayerPushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.newFillOrAdjustmentLayerPushButton)
 
@@ -270,10 +308,11 @@ class Ui_LayersWindow(object):
         self.newGroupPushButton.setObjectName(u"newGroupPushButton")
         self.newGroupPushButton.setMinimumSize(QSize(24, 24))
         self.newGroupPushButton.setMaximumSize(QSize(20, 20))
-        icon4 = QIcon()
-        icon4.addFile(u":/images/images/window_add_group.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.newGroupPushButton.setIcon(icon4)
-        self.newGroupPushButton.setFlat(True)
+        icon14 = QIcon()
+        icon14.addFile(u":/images/images/window_add_group.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.newGroupPushButton.setIcon(icon14)
+        self.newGroupPushButton.setIconSize(QSize(14, 14))
+        self.newGroupPushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.newGroupPushButton)
 
@@ -281,10 +320,11 @@ class Ui_LayersWindow(object):
         self.newLayerPushButton.setObjectName(u"newLayerPushButton")
         self.newLayerPushButton.setMinimumSize(QSize(24, 24))
         self.newLayerPushButton.setMaximumSize(QSize(20, 20))
-        icon5 = QIcon()
-        icon5.addFile(u":/images/images/window_add_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.newLayerPushButton.setIcon(icon5)
-        self.newLayerPushButton.setFlat(True)
+        icon15 = QIcon()
+        icon15.addFile(u":/images/images/window_add_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.newLayerPushButton.setIcon(icon15)
+        self.newLayerPushButton.setIconSize(QSize(14, 14))
+        self.newLayerPushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.newLayerPushButton)
 
@@ -292,12 +332,17 @@ class Ui_LayersWindow(object):
         self.deleteLayerPushButton.setObjectName(u"deleteLayerPushButton")
         self.deleteLayerPushButton.setMinimumSize(QSize(24, 24))
         self.deleteLayerPushButton.setMaximumSize(QSize(20, 20))
-        icon6 = QIcon()
-        icon6.addFile(u":/images/images/window_delete_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
-        self.deleteLayerPushButton.setIcon(icon6)
-        self.deleteLayerPushButton.setFlat(True)
+        icon16 = QIcon()
+        icon16.addFile(u":/images/images/window_delete_layer.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.deleteLayerPushButton.setIcon(icon16)
+        self.deleteLayerPushButton.setIconSize(QSize(14, 14))
+        self.deleteLayerPushButton.setFlat(False)
 
         self.horizontalLayout.addWidget(self.deleteLayerPushButton)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer_5)
 
 
         self.verticalLayout.addWidget(self.layout_3)
@@ -315,7 +360,6 @@ class Ui_LayersWindow(object):
         self.filterForTypeLayersPushButton.setText("")
         self.filterForShapesLayersPushButton.setText("")
         self.filterForSmartObjectsPushButton.setText("")
-        self.label_4.setText(QCoreApplication.translate("LayersWindow", u"Mode:", None))
         self.label_3.setText(QCoreApplication.translate("LayersWindow", u"Opacity:", None))
         self.label.setText(QCoreApplication.translate("LayersWindow", u"Lock:", None))
         self.alphaLockPushButton.setText("")
@@ -324,7 +368,7 @@ class Ui_LayersWindow(object):
         self.autoNestLockPushButton.setText("")
         self.layerLockPushButton.setText("")
         self.label_2.setText(QCoreApplication.translate("LayersWindow", u"Fill:", None))
-        self.pushButton.setText("")
+        self.linkPushButton.setText("")
         self.addLayerStylePushButton.setText("")
         self.newLayerMaskPushButton.setText("")
         self.newFillOrAdjustmentLayerPushButton.setText("")
