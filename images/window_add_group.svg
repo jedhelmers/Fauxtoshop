@@ -5,8 +5,14 @@
       .cls-1 {
         fill: #fff;
       }
+
+      .cls-2 {
+        opacity: .8;
+      }
     </style>
   </defs>
-  <rect class="cls-1" x="6.16" y="130.46" width="498.07" height="330.17" rx="29.17" ry="29.17"/>
-  <rect class="cls-1" x="6.16" y="50.15" width="242.87" height="35.92" rx="17.96" ry="17.96"/>
+  <g class="cls-2">
+    <rect class="cls-1" x="6.16" y="130.46" width="498.07" height="330.17" rx="29.17" ry="29.17"/>
+    <rect class="cls-1" x="6.16" y="50.15" width="242.87" height="35.92" rx="17.96" ry="17.96"/>
+  </g>
 </svg>
