@@ -111,6 +111,9 @@ class WorkspaceWidget(QWidget):
         windows = WindowsWidget(signaler=self.signaler)
         self.ui.windowsWidget.layout().addWidget(windows)
         self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        self.label = QLabel()
+        self.ui.gridLayout_3.addWidget(self.label)
+        self.current_layer_index = 0
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -193,27 +196,24 @@ class WorkspaceWidget(QWidget):
 
     def render(self):
         try:
-            try:
-                widget = self.ui.gridLayout_3.findChild(QLabel)
-                print('WIDGET', widget)
-                self.ui.gridLayout_3.removeWidget(widget)
-            except:
-                pass
-            label = QLabel()
-            label.objectName = "CANVAS"
+            self.label.clear()
             res = self.render_layers()
             res = res.scaledToWidth(600)
-            label.setPixmap(res)
-            self.ui.gridLayout_3.addWidget(label)
+            self.label.setPixmap(res)
+            # self.ui.gridLayout_3.addWidget(self.label)
         except Exception as e:
             print(e)
 
     def on_click(self):
-        self.layers[1].scale = [self.layers[1].scale[0] + 0.01, self.layers[1].scale[1] + 0.01]
-        # self.layers[1].position = [self.layers[1].position[0] - 10, 0]
+        self.layers[self.current_layer_index].scale = [self.layers[self.current_layer_index].scale[0] + 0.01, self.layers[self.current_layer_index].scale[1] + 0.01]
+        # self.layers[self.current_layer_index].scale = [2.0, 2.0]
+        # self.layers[self.current_layer_index].position = [self.layers[self.current_layer_index].position[0] - 10, 0]
         # print('SLICK!')
-        print(self.layers[1].position)
-        self.layers[1].image = self.move_scale(self.layers[1])
+        # print(self.layers[self.current_layer_index].position)
+        # self.layers[self.current_layer_index].image = self.move_scale(self.layers[self.current_layer_index])
+        # self.current_layer_index += 1
+        self.current_layer_index = (self.current_layer_index + 1) % (len(self.layers))
+        print(self.current_layer_index)
         self.render()
 
     def render_layers(self):
@@ -236,6 +236,8 @@ class WorkspaceWidget(QWidget):
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
+
+        layer.image = self.move_scale(layer)
 
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
