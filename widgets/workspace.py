@@ -114,6 +114,10 @@ class WorkspaceWidget(QWidget):
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
         self.current_layer_index = 2
+        self.down_mouse_pos = [None, None]
+        self.up_mouse_pos = [None, None]
+        self.base_width = 600
+        self.base_zoom = 2.0
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -174,6 +178,7 @@ class WorkspaceWidget(QWidget):
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(100.0))
+        self.ui.zoomComboBox.currentTextChanged.connect(self._zooms)
 
         self.signaler.remove_layer.connect(self.remove_layer)
         self.signaler.show_window_panel.connect(self.show_window_panel)
@@ -189,22 +194,32 @@ class WorkspaceWidget(QWidget):
         self._zoom = zoom
         self.draw_v_ruler()
         self.draw_h_ruler()
+        self.render()
 
     # def mouseMoveEvent(self, event):
     #     # layer = self.layers[self.current_layer_index]
     #     self.move(event)
     #     self.render()
 
+    def _zooms(self, val):
+        self.base_zoom = float("".join(list(filter(str.isdigit, val)))) / 10000.0
+        self.zoom = self.base_zoom
+        print(val, self.base_zoom)
+
     def mouseReleaseEvent(self, event):
         # layer = self.layers[self.current_layer_index]
+        self.up_mouse_pos = [event.x(), event.y()]
         self.move(event)
         self.render()
+        self.down_mouse_pos = [None, None]
 
     def mousePressEvent(self, event):
         # print(event)
         # self.on_click()
         # layer = self.layers[self.current_layer_index]
         # self.move(layer, event)
+        self.up_mouse_pos = [None, None]
+        self.down_mouse_pos = [event.x(), event.y()]
         pass
 
 
@@ -212,7 +227,7 @@ class WorkspaceWidget(QWidget):
         try:
             self.label.clear()
             res = self.render_layers()
-            res = res.scaledToWidth(600)
+            res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
         except Exception as e:
@@ -242,9 +257,11 @@ class WorkspaceWidget(QWidget):
         pass
 
     def move(self, event):
-        # self.layers[self.current_layer_index]
-        # print(event.x(), event.y())
-        self.layers[self.current_layer_index].position = [float(event.x()), float(event.y())]
+        dx = self.up_mouse_pos[0] - self.down_mouse_pos[0]
+        dy = self.up_mouse_pos[1] - self.down_mouse_pos[1]
+
+        self.layers[self.current_layer_index].position = [dx, dy]
+        self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
 
     def change_mode(self, layer, mode):
         layer.mode = mode
@@ -263,7 +280,7 @@ class WorkspaceWidget(QWidget):
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
 
-        layer.image = self.update_layer(layer)
+        # layer.image = self.update_layer(layer)
 
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
