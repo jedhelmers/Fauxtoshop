@@ -166,18 +166,8 @@ class WorkspaceWidget(QWidget):
             )
         )
 
-        try:
-            label = QLabel()
-            res = self.render_layers()
-            res = res.scaledToWidth(600)
-            label.setPixmap(res)
-        except Exception as e:
-            print(e)
+        self.render()
 
-
-
-
-        self.ui.gridLayout_3.addWidget(label)
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(100.0))
@@ -197,12 +187,52 @@ class WorkspaceWidget(QWidget):
         self.draw_v_ruler()
         self.draw_h_ruler()
 
+    def mousePressEvent(self, event):
+        # print(event)
+        self.on_click()
+
+    def render(self):
+        try:
+            try:
+                widget = self.ui.gridLayout_3.findChild(QLabel)
+                print('WIDGET', widget)
+                self.ui.gridLayout_3.removeWidget(widget)
+            except:
+                pass
+            label = QLabel()
+            label.objectName = "CANVAS"
+            res = self.render_layers()
+            res = res.scaledToWidth(600)
+            label.setPixmap(res)
+            self.ui.gridLayout_3.addWidget(label)
+        except Exception as e:
+            print(e)
+
+    def on_click(self):
+        # self.layers[1].scale = [2.0, 1.0]
+        self.layers[1].position = [self.layers[1].position[0] - 10, 0]
+        # print('SLICK!')
+        print(self.layers[1].position)
+        self.layers[1].image = self.move_scale(self.layers[1])
+        self.render()
+
     def render_layers(self):
         composite = self.layers[0].image
         for i in reversed(range(1, len(self.layers))):
             composite = self.def_add_image(composite, self.layers[i])
 
         return composite
+
+
+    def move_scale(self, layer) -> QPixmap:
+        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.scale(*layer.scale)
+        painter.translate(*layer.position)
+        painter.drawPixmap(0, 0, layer.image)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.end()
+        return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
@@ -211,6 +241,7 @@ class WorkspaceWidget(QWidget):
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
+
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
         painter.setCompositionMode(mode)
