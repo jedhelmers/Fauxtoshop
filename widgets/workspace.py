@@ -111,16 +111,18 @@ class WorkspaceWidget(QWidget):
         # windows = WindowsWidget(signaler=self.signaler)
         # self.ui.windowsWidget.layout().addWidget(windows)
         # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
-        windows = WindowsWidget(signaler=self.signaler)
+        # windows = WindowsWidget(signaler=self.signaler)
         # self.ui.windowsWidget.layout().addWidget(windows)
-        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=windows)
+        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=windows)
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
-        self.current_layer_index = 2
-        self.down_mouse_pos = [None, None]
-        self.up_mouse_pos = [None, None]
+        self.current_layer_index = 0
+        self.down_mouse_pos = [0, 0]
+        self.up_mouse_pos = [0, 0]
         self.base_width = 600
         self.base_zoom = 2.0
+
+        self.label.setMouseTracking(True)
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -202,7 +204,6 @@ class WorkspaceWidget(QWidget):
                 mode='Difference'
             )
         )
-        
 
         try:
             label = QLabel()
@@ -215,7 +216,8 @@ class WorkspaceWidget(QWidget):
 
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
-        self.ui.zoomComboBox.setCurrentText(str(100.0))
+        self.ui.zoomComboBox.setCurrentText(str(80.0))
+        self._zooms(80.0)
         self.ui.zoomComboBox.currentTextChanged.connect(self._zooms)
 
         self.signaler.remove_layer.connect(self.remove_layer)
@@ -234,32 +236,42 @@ class WorkspaceWidget(QWidget):
         self.draw_h_ruler()
         self.render()
 
-    # def mouseMoveEvent(self, event):
-    #     # layer = self.layers[self.current_layer_index]
-    #     self.move(event)
-    #     self.render()
+    def mouseEventFilter(self, event):
+        print(event)
 
-    def _zooms(self, val):
-        self.base_zoom = float("".join(list(filter(str.isdigit, val)))) / 10000.0
-        self.zoom = self.base_zoom
-        print(val, self.base_zoom)
-
-    def mouseReleaseEvent(self, event):
-        # layer = self.layers[self.current_layer_index]
+    def mouseMoveEvent(self, event):
+        # self.down_mouse_pos = self.up_mouse_pos
         self.up_mouse_pos = [event.x(), event.y()]
+        print(self.up_mouse_pos)
         self.move(event)
         self.render()
-        self.down_mouse_pos = [None, None]
+        # self.mouse_move_event(event.pos().x(), event.pos().y())
+
+    def _zooms(self, val):
+        self.base_zoom = float(val) / 100.0
+        self.zoom = self.base_zoom
+        # print(val, self.base_zoom)
+
+    def mouseReleaseEvent(self, event):
+        self.render()
+        self.down_mouse_pos = [0, 0]
+
+        layer = self.layers[self.current_layer_index]
+        self.invert(layer)
 
     def mousePressEvent(self, event):
         # print(event)
         # self.on_click()
         # layer = self.layers[self.current_layer_index]
         # self.move(layer, event)
-        self.up_mouse_pos = [None, None]
-        self.down_mouse_pos = [event.x(), event.y()]
-        pass
-
+        self.up_mouse_pos = [
+            *self.layers[self.current_layer_index].position
+        ]
+        self.down_mouse_pos = [
+            self.up_mouse_pos[0] + event.x(),
+            self.up_mouse_pos[1] + event.y()
+        ]
+        # self.down_mouse_pos = self.up_mouse_pos
 
     def render(self):
         try:
@@ -272,15 +284,6 @@ class WorkspaceWidget(QWidget):
             print(e)
 
     def on_click(self):
-        # self.layers[self.current_layer_index].scale = [self.layers[self.current_layer_index].scale[0] + 0.01, self.layers[self.current_layer_index].scale[1] + 0.01]
-        # self.layers[self.current_layer_index].scale = [2.0, 2.0]
-        # self.layers[self.current_layer_index].position = [self.layers[self.current_layer_index].position[0] - 10, 0]
-        # print('SLICK!')
-        # print(self.layers[self.current_layer_index].position)
-        # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
-        # self.current_layer_index += 1
-        # self.current_layer_index = (self.current_layer_index + 1) % (len(self.layers))
-        # print(self.current_layer_index)
         self.render()
 
     def render_layers(self):
@@ -294,11 +297,11 @@ class WorkspaceWidget(QWidget):
 
                 if child_count > 1:
                     for j in (range(child_count)):
-                        print(i, j, self.layers[i].children[j].name)
+                        # print(i, j, self.layers[i].children[j].name)
                         group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
 
                 self.layers[i].image = group_composite
-                
+
             composite = self.def_add_image(composite, self.layers[i])
 
         return composite
@@ -309,12 +312,22 @@ class WorkspaceWidget(QWidget):
     def scale(self, layer, event):
         pass
 
+    def invert(self, layer):
+        temp_image = layer.image.toImage()
+        temp_image.invertPixels(QImage.InvertRgba)
+        temp_image = QPixmap(layer.image.size()).fromImage(temp_image, Qt.ColorOnly)
+
+        if temp_image:
+            layer.image = temp_image
+
+        self.render()
+
     def move(self, event):
         dx = self.up_mouse_pos[0] - self.down_mouse_pos[0]
         dy = self.up_mouse_pos[1] - self.down_mouse_pos[1]
-
+        print(dx, dy)
         self.layers[self.current_layer_index].position = [dx, dy]
-        self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
+        # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
 
     def change_mode(self, layer, mode):
         layer.mode = mode
@@ -339,6 +352,9 @@ class WorkspaceWidget(QWidget):
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        painter.scale(*layer.scale)
+        painter.translate(*layer.position)
 
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
