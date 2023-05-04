@@ -242,7 +242,7 @@ class WorkspaceWidget(QWidget):
     def mouseMoveEvent(self, event):
         # self.down_mouse_pos = self.up_mouse_pos
         self.up_mouse_pos = [event.x(), event.y()]
-        print(self.up_mouse_pos)
+        # print(self.up_mouse_pos)
         self.move(event)
         self.render()
         # self.mouse_move_event(event.pos().x(), event.pos().y())
@@ -315,17 +315,18 @@ class WorkspaceWidget(QWidget):
     def invert(self, layer):
         temp_image = layer.image.toImage()
         temp_image.invertPixels(QImage.InvertRgba)
-        temp_image = QPixmap(layer.image.size()).fromImage(temp_image, Qt.ColorOnly)
-
-        if temp_image:
-            layer.image = temp_image
+        temp_image = self.image_to_pixmap(temp_image)
+        layer.image = temp_image
 
         self.render()
+
+    def image_to_pixmap(self, image) -> QPixmap:
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def move(self, event):
         dx = self.up_mouse_pos[0] - self.down_mouse_pos[0]
         dy = self.up_mouse_pos[1] - self.down_mouse_pos[1]
-        print(dx, dy)
+        # print(dx, dy)
         self.layers[self.current_layer_index].position = [dx, dy]
         # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
 
@@ -341,7 +342,8 @@ class WorkspaceWidget(QWidget):
         painter.drawPixmap(0, 0, layer.image)
         painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
-        return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
+        return self.image_to_pixmap(resultImage)
+        # return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
@@ -364,7 +366,8 @@ class WorkspaceWidget(QWidget):
         painter.fillRect(resultImage.rect(), Qt.white)
         painter.end()
 
-        return QPixmap(base_image.size()).fromImage(resultImage, Qt.ColorOnly)
+        return self.image_to_pixmap(resultImage)
+        # return QPixmap(base_image.size()).fromImage(resultImage, Qt.ColorOnly)
 
     def get_tool_settings(self):
         if os.path.exists(toolsettings_json_path):
