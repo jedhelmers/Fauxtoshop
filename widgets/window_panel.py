@@ -19,10 +19,10 @@ class WindowPanelWidget(QWidget):
 
         # for i in range(4):
         #     widget = QWidget()
-        for window in self.windows:
-            layers = LayersWindowWidget()
-            # print(window)
-            self.ui.windowPanelTabWidget.addTab(layers, 'Name')
+        # for window in self.windows:
+        #     layers = LayersWindowWidget()
+        #     # print(window)
+        #     self.ui.windowPanelTabWidget.addTab(layers, 'Name')
 
         self.setStyleSheet('background: rgba(255, 255, 255, 0.1)')
 

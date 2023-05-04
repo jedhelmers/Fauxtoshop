@@ -115,13 +115,9 @@ class Ui_LayersWindow(object):
         self.modeComboBox = QComboBox(self.layout_2)
         self.modeComboBox.setObjectName(u"modeComboBox")
         self.modeComboBox.setMinimumSize(QSize(110, 0))
-        self.modeComboBox.setMaximumSize(QSize(120, 18))
+        self.modeComboBox.setMaximumSize(QSize(16777215, 18))
 
         self.horizontalLayout_4.addWidget(self.modeComboBox)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer)
 
         self.label_3 = QLabel(self.layout_2)
         self.label_3.setObjectName(u"label_3")
@@ -242,7 +238,7 @@ class Ui_LayersWindow(object):
         self.layerScrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 307, 143))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 307, 145))
         self.layerScrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.verticalLayout.addWidget(self.layerScrollArea)

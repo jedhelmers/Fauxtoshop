@@ -112,8 +112,8 @@ class WorkspaceWidget(QWidget):
         # self.ui.windowsWidget.layout().addWidget(windows)
         # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
         windows = WindowsWidget(signaler=self.signaler)
-        self.ui.windowsWidget.layout().addWidget(windows)
-        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
+        # self.ui.windowsWidget.layout().addWidget(windows)
+        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=windows)
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
         self.current_layer_index = 2
