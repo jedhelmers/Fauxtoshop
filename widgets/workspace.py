@@ -206,13 +206,13 @@ class WorkspaceWidget(QWidget):
             )
         )
 
-        try:
-            label = QLabel()
-            res = self.render_layers()
-            res = res.scaledToWidth(600)
-            label.setPixmap(res)
-        except Exception as e:
-            print(e)
+        # try:
+        #     label = QLabel()
+        #     res = self.render_layers()
+        #     res = res.scaledToWidth(600)
+        #     label.setPixmap(res)
+        # except Exception as e:
+        #     print(e)
         self.render()
 
 
@@ -289,6 +289,7 @@ class WorkspaceWidget(QWidget):
 
             composite = self.def_add_image(composite, self.layers[i])
 
+        composite = self.draw_grid(composite)
         return composite
 
     def test(self, layer):
@@ -325,6 +326,25 @@ class WorkspaceWidget(QWidget):
         layer.mode = mode
         pass
 
+    def draw_grid(self, res):
+        rows = range(10)
+        cols = range(10)
+        layer = self.layers[0]
+        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        color = QColor(Qt.white)
+        color.setAlphaF(0.5)
+        painter.setPen(QPen(color, 2, Qt.SolidLine, Qt.RoundCap))
+
+        for r in rows:
+            painter.drawLine(0, r * 40, 400, r * 40)
+
+        for c in cols:
+            painter.drawLine(c * 40, 0, c * 40, 400)
+
+        painter.end()
+        return self.merge_images(self.image_to_pixmap(resultImage), res, 'Normal')
+
     def update_layer(self, layer) -> QPixmap:
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
@@ -335,6 +355,26 @@ class WorkspaceWidget(QWidget):
         painter.end()
         return self.image_to_pixmap(resultImage)
         # return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
+
+    def merge_images(self, image_1, image_2, mode: str='Normal'):
+        mode = mode_mappings(mode)
+
+        # layer.image = self.update_layer(layer)
+
+        resultImage = QImage(image_1.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, image_1)
+        painter.setCompositionMode(mode)
+        painter.drawPixmap(0, 0, image_2)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
