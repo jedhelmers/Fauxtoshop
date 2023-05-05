@@ -206,6 +206,14 @@ class WorkspaceWidget(QWidget):
             )
         )
 
+        self.grid = Layer(
+            lock=True,
+            name="Grid",
+            image=QPixmap(self.layers[0].image.size())
+        )
+
+        self.layers.append(self.grid)
+
         # try:
         #     label = QLabel()
         #     res = self.render_layers()
@@ -262,6 +270,7 @@ class WorkspaceWidget(QWidget):
         try:
             self.label.clear()
             res = self.render_layers()
+            self.draw_grid()
             res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
@@ -289,7 +298,6 @@ class WorkspaceWidget(QWidget):
 
             composite = self.def_add_image(composite, self.layers[i])
 
-        composite = self.draw_grid(composite)
         return composite
 
     def test(self, layer):
@@ -326,12 +334,13 @@ class WorkspaceWidget(QWidget):
         layer.mode = mode
         pass
 
-    def draw_grid(self, res):
+    def draw_grid(self):
         rows = range(10)
         cols = range(10)
         layer = self.layers[0]
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
         color = QColor(Qt.white)
         color.setAlphaF(0.5)
         painter.setPen(QPen(color, 2, Qt.SolidLine, Qt.RoundCap))
@@ -343,7 +352,7 @@ class WorkspaceWidget(QWidget):
             painter.drawLine(c * 40, 0, c * 40, 400)
 
         painter.end()
-        return self.merge_images(self.image_to_pixmap(resultImage), res, 'Normal')
+        self.grid.image = self.image_to_pixmap(resultImage)
 
     def update_layer(self, layer) -> QPixmap:
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
@@ -354,7 +363,6 @@ class WorkspaceWidget(QWidget):
         painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
         return self.image_to_pixmap(resultImage)
-        # return QPixmap(layer.image.size()).fromImage(resultImage, Qt.ColorOnly)
 
     def merge_images(self, image_1, image_2, mode: str='Normal'):
         mode = mode_mappings(mode)
