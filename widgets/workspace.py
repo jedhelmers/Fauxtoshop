@@ -121,6 +121,7 @@ class WorkspaceWidget(QWidget):
         self.up_mouse_pos = [0, 0]
         self.base_width = 600
         self.base_zoom = 2.0
+        self.drag_speed = 2.0
 
         self.label.setMouseTracking(True)
 
@@ -240,14 +241,8 @@ class WorkspaceWidget(QWidget):
         print(event)
 
     def mouseMoveEvent(self, event):
-        # self.down_mouse_pos = self.up_mouse_pos
-        # [x, y] = self.layers[self.current_layer_index].position
-        # self.up_mouse_pos = [x, y]
-        self.up_mouse_pos = [event.x(), event.y()]
-        # print(self.up_mouse_pos)
         self.move(event)
         self.render()
-        # self.mouse_move_event(event.pos().x(), event.pos().y())
 
     def _zooms(self, val):
         self.base_zoom = float(val) / 100.0
@@ -255,30 +250,13 @@ class WorkspaceWidget(QWidget):
         # print(val, self.base_zoom)
 
     def mouseReleaseEvent(self, event):
-        self.layers[self.current_layer_index].position = self.up_mouse_pos
-        self.down_mouse_pos = [0, 0]
         self.up_mouse_pos = [0, 0]
-
-        print(self.layers[self.current_layer_index].position)
-
-        layer = self.layers[self.current_layer_index]
-        self.invert(layer)
-        self.render()
+        self.down_mouse_pos = [0, 0]
 
     def mousePressEvent(self, event):
-        # print(event)
-        # self.on_click()
-        # layer = self.layers[self.current_layer_index]
-        # self.move(layer, event)
-        self.up_mouse_pos = [
-            *self.layers[self.current_layer_index].position
-        ]
-        self.down_mouse_pos = [
-            self.up_mouse_pos[0] + event.x(),
-            self.up_mouse_pos[1] + event.y()
-        ]
-        # [x, y] = self.layers[self.current_layer_index].position
-        # self.down_mouse_pos = [x, y]
+        self.down_mouse_pos = [event.x(), event.y()]
+        self.up_mouse_pos = [event.x(), event.y()]
+
 
     def render(self):
         try:
@@ -319,7 +297,9 @@ class WorkspaceWidget(QWidget):
     def scale(self, layer, event):
         pass
 
-    def invert(self, layer):
+    def invert(self):
+        layer = self.layers[self.current_layer_index]
+
         temp_image = layer.image.toImage()
         temp_image.invertPixels(QImage.InvertRgba)
         temp_image = self.image_to_pixmap(temp_image)
@@ -331,13 +311,15 @@ class WorkspaceWidget(QWidget):
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def move(self, event):
+        self.down_mouse_pos = [event.x(), event.y()]
         [x, y] = self.layers[self.current_layer_index].position
-        dx = (self.up_mouse_pos[0] - self.down_mouse_pos[0])
-        dy = (self.up_mouse_pos[1] - self.down_mouse_pos[1])
-        # print(x, y, dx, dy)
-        self.layers[self.current_layer_index].position = [dx, dy]
-        self.up_mouse_pos = [dx, dy]
-        # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
+        [x1, y1] = self.down_mouse_pos
+        [x2, y2] = self.up_mouse_pos
+        dx = (x1 - x2) * self.drag_speed
+        dy = (y1 - y2) * self.drag_speed
+
+        self.layers[self.current_layer_index].position = [x + dx, y + dy]
+        self.up_mouse_pos = self.down_mouse_pos
 
     def change_mode(self, layer, mode):
         layer.mode = mode
