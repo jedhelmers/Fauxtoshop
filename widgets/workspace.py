@@ -241,6 +241,8 @@ class WorkspaceWidget(QWidget):
 
     def mouseMoveEvent(self, event):
         # self.down_mouse_pos = self.up_mouse_pos
+        # [x, y] = self.layers[self.current_layer_index].position
+        # self.up_mouse_pos = [x, y]
         self.up_mouse_pos = [event.x(), event.y()]
         # print(self.up_mouse_pos)
         self.move(event)
@@ -253,11 +255,15 @@ class WorkspaceWidget(QWidget):
         # print(val, self.base_zoom)
 
     def mouseReleaseEvent(self, event):
-        self.render()
+        self.layers[self.current_layer_index].position = self.up_mouse_pos
         self.down_mouse_pos = [0, 0]
+        self.up_mouse_pos = [0, 0]
+
+        print(self.layers[self.current_layer_index].position)
 
         layer = self.layers[self.current_layer_index]
         self.invert(layer)
+        self.render()
 
     def mousePressEvent(self, event):
         # print(event)
@@ -271,7 +277,8 @@ class WorkspaceWidget(QWidget):
             self.up_mouse_pos[0] + event.x(),
             self.up_mouse_pos[1] + event.y()
         ]
-        # self.down_mouse_pos = self.up_mouse_pos
+        # [x, y] = self.layers[self.current_layer_index].position
+        # self.down_mouse_pos = [x, y]
 
     def render(self):
         try:
@@ -324,10 +331,12 @@ class WorkspaceWidget(QWidget):
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def move(self, event):
-        dx = self.up_mouse_pos[0] - self.down_mouse_pos[0]
-        dy = self.up_mouse_pos[1] - self.down_mouse_pos[1]
-        # print(dx, dy)
+        [x, y] = self.layers[self.current_layer_index].position
+        dx = (self.up_mouse_pos[0] - self.down_mouse_pos[0])
+        dy = (self.up_mouse_pos[1] - self.down_mouse_pos[1])
+        # print(x, y, dx, dy)
         self.layers[self.current_layer_index].position = [dx, dy]
+        self.up_mouse_pos = [dx, dy]
         # self.layers[self.current_layer_index].image = self.update_layer(self.layers[self.current_layer_index])
 
     def change_mode(self, layer, mode):
