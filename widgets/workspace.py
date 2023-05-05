@@ -209,7 +209,7 @@ class WorkspaceWidget(QWidget):
         self.grid = Layer(
             lock=True,
             name="Grid",
-            image=QPixmap(self.layers[0].image.size())
+            image=self.draw_grid()
         )
 
         self.layers.append(self.grid)
@@ -222,7 +222,6 @@ class WorkspaceWidget(QWidget):
         # except Exception as e:
         #     print(e)
         self.render()
-
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(80.0))
@@ -271,7 +270,7 @@ class WorkspaceWidget(QWidget):
         try:
             self.label.clear()
             res = self.render_layers()
-            self.draw_grid()
+            # self.draw_grid()
             res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
@@ -341,19 +340,19 @@ class WorkspaceWidget(QWidget):
         layer = self.layers[0]
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
         color = QColor(Qt.white)
         color.setAlphaF(0.5)
         painter.setPen(QPen(color, 2, Qt.SolidLine, Qt.RoundCap))
 
         for r in rows:
-            painter.drawLine(0, r * 40, 400, r * 40)
+            painter.drawLine(0, r * 100, 1000, r * 100)
 
         for c in cols:
-            painter.drawLine(c * 40, 0, c * 40, 400)
+            painter.drawLine(c * 100, 0, c * 100, 1000)
 
         painter.end()
-        self.grid.image = self.image_to_pixmap(resultImage)
+
+        return self.image_to_pixmap(resultImage)
 
     def update_layer(self, layer) -> QPixmap:
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
