@@ -60,12 +60,17 @@ def key_mappings(key):
         '73_16777248_16777249': 'zoom',
         # MAIN FUNCTIONS
         '78_16777249': 'NEW_FILE',
-        '82_16777249': 'HIDE_RULERS',
         # WORKSPACE
+        '82_16777249': 'HIDE_RULERS',
         '78_16777248_16777249': 'NEW_LAYER',
         '73_16777249': 'INVERT_IMAGE',
-        '': '',
-        '': '',
+        '61_16777249': 'ZOOM_IN',
+        '45_16777249': 'ZOOM_OUT',
+        '67_16777249': 'COPY',
+        '86_16777249': 'PASTE',
+        '88_16777249': 'CUT',
+        '90_16777249': 'UNDO',
+        '90_16777248_16777249': 'REDO',
     }
     return switch[key] if key in switch else None
 
