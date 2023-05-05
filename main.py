@@ -37,6 +37,7 @@ def shift_mappings(key):
 
 def key_mappings(key):
     switch = {
+        # TOOLS
         '73': 'eyedropper',
         '86': 'move',
         '77': 'dashed_box',
@@ -57,8 +58,14 @@ def key_mappings(key):
         '84': 'text',
         '0': 'rotate_view',
         '73_16777248_16777249': 'zoom',
-        '78_16777248_16777249': 'NEW_FILE',
+        # MAIN FUNCTIONS
+        '78_16777249': 'NEW_FILE',
         '82_16777249': 'HIDE_RULERS',
+        # WORKSPACE
+        '78_16777248_16777249': 'NEW_LAYER',
+        '73_16777249': 'INVERT_IMAGE',
+        '': '',
+        '': '',
     }
     return switch[key] if key in switch else None
 
