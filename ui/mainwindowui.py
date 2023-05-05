@@ -183,7 +183,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Fauxtoshop", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Fauxtoshop 2023", None))
         self.actionNew.setText(QCoreApplication.translate("MainWindow", u"New...", None))
         self.actionOpen.setText(QCoreApplication.translate("MainWindow", u"Open...", None))
         self.actionUndo.setText(QCoreApplication.translate("MainWindow", u"Undo", None))

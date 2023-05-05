@@ -123,7 +123,7 @@ class WorkspaceWidget(QWidget):
         self.base_zoom = 2.0
         self.drag_speed = 2.0
 
-        self.label.setMouseTracking(True)
+        # self.label.setMouseTracking(True)
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -251,6 +251,7 @@ class WorkspaceWidget(QWidget):
     def mouseMoveEvent(self, event):
         self.move(event)
         self.render()
+        self.mouse_move_event(event.pos().x(), event.pos().y())
 
     def _zooms(self, val):
         self.base_zoom = float(val) / 100.0
@@ -446,6 +447,7 @@ class WorkspaceWidget(QWidget):
     def mouse_move_event(self, x, y):
         self.y_line.move(0, y)
         self.x_line.move(x, 0)
+        print(x, y)
 
     def draw_h_ruler(self):
         for i in range(self.ruler_dimensions[0]):
