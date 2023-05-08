@@ -124,7 +124,17 @@ class WorkspaceWidget(QWidget):
         self.drag_speed = 2.0
         self.snap_to = 20 # CANNOT BE ZERO
 
-        # self.label.setMouseTracking(True)
+        # Brush
+        self.last_x, self.last_y = None, None
+        self.brush_color = qRgba(50, 50, 50, 50)
+        # self.thing = 0x88112233
+        # self.brush_color = QRgba64()
+        # self.brush_color.setAlpha(50)
+        # self.brush_color.setRed(255)
+        # self.brush_color.setGreen(0)
+        # self.brush_color.setBlue(0)
+        self.brush_size = 50
+
 
         self.width = unit_conversion(
             self.new_file_info['units_w'],
@@ -249,7 +259,7 @@ class WorkspaceWidget(QWidget):
         print(event)
 
     def mouseMoveEvent(self, event):
-        self.move(event)
+        # self.move(event)
         self.paint(event)
         self.render()
         self.mouse_move_event(event.pos().x(), event.pos().y())
@@ -262,6 +272,10 @@ class WorkspaceWidget(QWidget):
     def mouseReleaseEvent(self, event):
         self.up_mouse_pos = [0, 0]
         self.down_mouse_pos = [0, 0]
+
+        # Brush
+        self.last_x = None
+        self.last_y = None
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
@@ -404,21 +418,38 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
+        x = event.x() * self.drag_speed * self.zoom
+        y = event.y() * self.drag_speed * self.zoom
+
+        if self.last_x is None: # First event.
+            self.last_x = x
+            self.last_y = y
+
+            return # Ignore the first time.
+
         layer = self.layers[self.current_layer_index]
         mode = mode_mappings(layer.mode)
 
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
 
+        pen = QtGui.QPen()
+        pen.setWidth(self.brush_size)
+        pen.setColor(self.brush_color)
+        pen.setCosmetic(True)
+        # pen.setDashPattern([10.0, 5.0])
+        painter.setPen(pen)
+
         painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.drawPixmap(0, 0, layer.image)
         painter.setCompositionMode(mode)
-        painter.drawPoint(event.x(), event.y())
-        
+        painter.drawLine(self.last_x, self.last_y, x, y)
         painter.end()
 
+        self.last_x = x
+        self.last_y = y
+
         layer.image = self.image_to_pixmap(resultImage)
-        pass
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
