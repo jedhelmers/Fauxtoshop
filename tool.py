@@ -1,7 +1,29 @@
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QWidget, QFrame, QLabel
 
+from datas.tools import get_tool_icon
+
+class ToolBase():
+    def __init__(self, parent) -> None:
+        self.parent = parent
+        self._current_tool = None
+
+    @property
+    def current_tool(self):
+        return self._current_tool
+
+    @current_tool.setter
+    def current_tool(self, tool):
+        print(tool)
+        self._current_tool = tool
+        # TODO:
+        # Update the icon to reflect the tool.
+        tool = get_tool_icon(self.current_tool)
+        self.icon = QtGui.QIcon(tool.path).pixmap(QSize(*tool.size))
+        self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
+        self.parent.setCursor(self.cursor)
+        print(tool.name, tool.path, tool.size)
 
 class Tool():
     def __init__(self, settings):

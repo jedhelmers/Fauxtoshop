@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QPush
 from datas.misc import get_windows
 from functions import new_file
 from styles.main import main_style
+from tool import ToolBase
 from ui import mainwindowui
 from widgets.new_file import NewFileWidget
 import widgets.tools as Tools
@@ -112,6 +113,8 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.signaler = MainSignaler()
 
+        self.tool = ToolBase(parent=self)
+
         self.setMouseTracking(True)
         self.setStyleSheet(main_style())
 
@@ -164,6 +167,7 @@ class MainWindow(QMainWindow):
             button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
         self._current_tool = tool
+        self.tool.current_tool = tool
         self.setup_tool_options_bar()
 
     def setup_windows(self):
