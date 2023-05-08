@@ -140,10 +140,10 @@ class MainWindow(QMainWindow):
         self.current_tool = 'brush'
         # self.current_window = 'Layers'
 
-        self.icon = QIcon("images/toolbar_brush.svg").pixmap(QSize(52, 52))
-        self.cursor = QtGui.QCursor(self.icon, 0, 0)
+        # self.icon = QIcon("images/toolbar_brush.svg").pixmap(QSize(52, 52))
+        # self.cursor = QtGui.QCursor(self.icon, 0, 0)
 
-        self.setCursor(self.cursor)
+        # self.setCursor(self.cursor)
 
     @property
     def current_tool(self):

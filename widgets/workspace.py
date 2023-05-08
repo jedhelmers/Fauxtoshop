@@ -1,11 +1,8 @@
 import json
 import os
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt, QPoint
-from PySide6.QtWidgets import QWidget, QFrame, QLabel
-from PySide6.QtOpenGLWidgets import QOpenGLWidget
-from PySide6 import QtOpenGL
-from PySide6.QtOpenGLWidgets import QOpenGLWidget
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QFrame, QLabel, QGraphicsBlurEffect
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -133,7 +130,7 @@ class WorkspaceWidget(QWidget):
         # self.brush_color.setRed(255)
         # self.brush_color.setGreen(0)
         # self.brush_color.setBlue(0)
-        self.brush_size = 50
+        self.brush_size = 10
 
 
         self.width = unit_conversion(
@@ -445,7 +442,15 @@ class WorkspaceWidget(QWidget):
         pen.setWidth(self.brush_size)
         pen.setColor(self.brush_color)
         pen.setCosmetic(True)
-        # pen.setDashPattern([10.0, 5.0])
+
+        # circle = QPixmap(QSize(self.brush_size, self.brush_size))
+        # circle.draw
+        # painter.drawEllipse(QPoint(0, 0), self.brush_size, self.brush_size)
+        # painter.drawEllipse(300, 300, 70, 70)
+
+        # Set brush from vector
+        brush = QIcon("images/toolbar_brush.svg").pixmap(QSize(self.brush_size, self.brush_size))
+        pen.setBrush(brush)
         painter.setPen(pen)
 
         painter.fillRect(resultImage.rect(), Qt.transparent)
