@@ -122,6 +122,7 @@ class WorkspaceWidget(QWidget):
         self.base_width = 600
         self.base_zoom = 2.0
         self.drag_speed = 2.0
+        self.snap_to = 10
 
         # self.label.setMouseTracking(True)
 
@@ -265,7 +266,6 @@ class WorkspaceWidget(QWidget):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]
 
-
     def render(self):
         try:
             self.label.clear()
@@ -324,10 +324,17 @@ class WorkspaceWidget(QWidget):
         [x, y] = self.layers[self.current_layer_index].position
         [x1, y1] = self.down_mouse_pos
         [x2, y2] = self.up_mouse_pos
-        dx = (x1 - x2) * self.drag_speed
-        dy = (y1 - y2) * self.drag_speed
+        dx = ((x1 - x2) * self.drag_speed) + x
+        dy = ((y1 - y2) * self.drag_speed) + y
 
-        self.layers[self.current_layer_index].position = [x + dx, y + dy]
+        # Snap to
+        if self.snap_to:
+            if dx % self.snap_to != 0:
+                dx = x
+            if dy % self.snap_to != 0:
+                dy = y
+
+        self.layers[self.current_layer_index].position = [dx, dy]
         self.up_mouse_pos = self.down_mouse_pos
 
     def change_mode(self, layer, mode):
@@ -335,20 +342,25 @@ class WorkspaceWidget(QWidget):
         pass
 
     def draw_grid(self):
-        rows = range(10)
-        cols = range(10)
         layer = self.layers[0]
+        w = layer.image.width()
+        h = layer.image.height()
+        gap = 100
+
+        rows = h // gap
+        cols = w // gap
+
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         color = QColor(Qt.white)
         color.setAlphaF(0.5)
         painter.setPen(QPen(color, 2, Qt.SolidLine, Qt.RoundCap))
 
-        for r in rows:
-            painter.drawLine(0, r * 100, 1000, r * 100)
+        for r in range(rows):
+            painter.drawLine(0, r * gap, w, r * gap)
 
-        for c in cols:
-            painter.drawLine(c * 100, 0, c * 100, 1000)
+        for c in range(cols):
+            painter.drawLine(c * gap, 0, c * gap, h)
 
         painter.end()
 
@@ -446,7 +458,7 @@ class WorkspaceWidget(QWidget):
     def mouse_move_event(self, x, y):
         self.y_line.move(0, y)
         self.x_line.move(x, 0)
-        print(x, y)
+        # print(x, y)
 
     def draw_h_ruler(self):
         for i in range(self.ruler_dimensions[0]):
