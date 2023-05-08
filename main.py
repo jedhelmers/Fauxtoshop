@@ -140,6 +140,10 @@ class MainWindow(QMainWindow):
         self.current_tool = 'brush'
         # self.current_window = 'Layers'
 
+        self.icon = QIcon("images/toolbar_brush.svg").pixmap(QSize(52, 52))
+        self.cursor = QtGui.QCursor(self.icon, 0, 0)
+
+        self.setCursor(self.cursor)
 
     @property
     def current_tool(self):
@@ -164,7 +168,7 @@ class MainWindow(QMainWindow):
 
     def setup_windows(self):
         self.windows['Layers'] = LayersWindowWidget()
-            
+
     def resizeEvent(self, event):
         self.adjust_window_panel_pos(event.size() - event.oldSize())
         # self.WindowPanelWidget.set_position(event.size() - event.oldSize())

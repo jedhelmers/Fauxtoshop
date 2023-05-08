@@ -244,6 +244,8 @@ class WorkspaceWidget(QWidget):
 
         self.tool = Tool(self.tool_settings)
 
+        self.temp = False
+
     @property
     def zoom(self):
         return self._zoom
@@ -259,8 +261,11 @@ class WorkspaceWidget(QWidget):
         print(event)
 
     def mouseMoveEvent(self, event):
-        # self.move(event)
-        self.paint(event)
+        if self.temp:
+            self.move(event)
+        else:
+            self.paint(event)
+
         self.render()
         self.mouse_move_event(event.pos().x(), event.pos().y())
 
@@ -276,6 +281,9 @@ class WorkspaceWidget(QWidget):
         # Brush
         self.last_x = None
         self.last_y = None
+
+        self.temp = not self.temp
+
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
