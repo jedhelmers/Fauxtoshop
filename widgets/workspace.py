@@ -250,6 +250,7 @@ class WorkspaceWidget(QWidget):
 
     def mouseMoveEvent(self, event):
         self.move(event)
+        self.paint(event)
         self.render()
         self.mouse_move_event(event.pos().x(), event.pos().y())
 
@@ -402,10 +403,25 @@ class WorkspaceWidget(QWidget):
 
         return self.image_to_pixmap(resultImage)
 
-    def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
+    def paint(self, event):
+        layer = self.layers[self.current_layer_index]
         mode = mode_mappings(layer.mode)
 
-        # layer.image = self.update_layer(layer)
+        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.drawPixmap(0, 0, layer.image)
+        painter.setCompositionMode(mode)
+        painter.drawPoint(event.x(), event.y())
+        
+        painter.end()
+
+        layer.image = self.image_to_pixmap(resultImage)
+        pass
+
+    def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
+        mode = mode_mappings(layer.mode)
 
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
@@ -415,7 +431,7 @@ class WorkspaceWidget(QWidget):
         painter.scale(*layer.scale)
         painter.translate(*layer.position)
 
-        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
         painter.setCompositionMode(mode)
         painter.drawPixmap(0, 0, layer.image)
