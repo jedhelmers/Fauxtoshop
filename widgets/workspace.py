@@ -122,7 +122,7 @@ class WorkspaceWidget(QWidget):
         self.base_width = 600
         self.base_zoom = 2.0
         self.drag_speed = 2.0
-        self.snap_to = 10
+        self.snap_to = 20 # CANNOT BE ZERO
 
         # self.label.setMouseTracking(True)
 
@@ -319,20 +319,26 @@ class WorkspaceWidget(QWidget):
     def image_to_pixmap(self, image) -> QPixmap:
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
+    def quantize(self, num):
+        return num - (num % self.snap_to)
+
     def move(self, event):
-        self.down_mouse_pos = [event.x(), event.y()]
+        self.down_mouse_pos = [
+            self.quantize(event.x()),
+            self.quantize(event.y())]
+
         [x, y] = self.layers[self.current_layer_index].position
         [x1, y1] = self.down_mouse_pos
         [x2, y2] = self.up_mouse_pos
         dx = ((x1 - x2) * self.drag_speed) + x
         dy = ((y1 - y2) * self.drag_speed) + y
 
-        # Snap to
-        if self.snap_to:
-            if dx % self.snap_to != 0:
-                dx = x
-            if dy % self.snap_to != 0:
-                dy = y
+        # # Snap to
+        # if self.snap_to:
+        #     if dx % self.snap_to != 0:
+        #         dx = x
+        #     if dy % self.snap_to != 0:
+        #         dy = y
 
         self.layers[self.current_layer_index].position = [dx, dy]
         self.up_mouse_pos = self.down_mouse_pos
