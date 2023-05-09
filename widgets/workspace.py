@@ -102,15 +102,8 @@ class WorkspaceWidget(QWidget):
         self.y_line.setStyleSheet('border-color: rgba(255, 255, 255, 0.75)')
 
         self.signaler.mouseMove.connect(self.mouse_move_event)
-        self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
         self.ui.scrollArea.setWidgetResizable(True)
 
-        # windows = WindowsWidget(signaler=self.signaler)
-        # self.ui.windowsWidget.layout().addWidget(windows)
-        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
-        # windows = WindowsWidget(signaler=self.signaler)
-        # self.ui.windowsWidget.layout().addWidget(windows)
-        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=windows)
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
         self.current_layer_index = 0
@@ -130,7 +123,7 @@ class WorkspaceWidget(QWidget):
         # self.brush_color.setRed(255)
         # self.brush_color.setGreen(0)
         # self.brush_color.setBlue(0)
-        self.brush_size = 10
+        self.brush_size = 30
 
 
         self.width = unit_conversion(
@@ -423,8 +416,12 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
-        x = event.x() * self.drag_speed * self.zoom
-        y = event.y() * self.drag_speed * self.zoom
+        layer = self.layers[self.current_layer_index]
+        [x_offset, y_offset] = layer.position
+        mode = mode_mappings(layer.mode)
+
+        x = event.x() * self.drag_speed - x_offset
+        y = event.y() * self.drag_speed - y_offset
 
         if self.last_x is None: # First event.
             self.last_x = x
@@ -432,16 +429,20 @@ class WorkspaceWidget(QWidget):
 
             return # Ignore the first time.
 
-        layer = self.layers[self.current_layer_index]
-        mode = mode_mappings(layer.mode)
-
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
 
         pen = QtGui.QPen()
         pen.setWidth(self.brush_size)
         pen.setColor(self.brush_color)
-        pen.setCosmetic(True)
+        # pen.setCosmetic(True)
+
+        space = 4
+        dashes = [1, space]
+        pen.setDashPattern(dashes)
+
+        pen.setStyle(Qt.DotLine)
+        pen.setCapStyle(Qt.RoundCap)
 
         # circle = QPixmap(QSize(self.brush_size, self.brush_size))
         # circle.draw
@@ -449,13 +450,16 @@ class WorkspaceWidget(QWidget):
         # painter.drawEllipse(300, 300, 70, 70)
 
         # Set brush from vector
-        brush = QIcon("images/toolbar_brush.svg").pixmap(QSize(self.brush_size, self.brush_size))
-        pen.setBrush(brush)
+        # brush = QIcon("images/circle.svg").pixmap(QSize(self.brush_size, self.brush_size))
+        # pen.setBrush(brush)
+        # painter.setPen(pen)
         painter.setPen(pen)
 
         painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.drawPixmap(0, 0, layer.image)
         painter.setCompositionMode(mode)
+
+        # Overlap
         painter.drawLine(self.last_x, self.last_y, x, y)
         painter.end()
 
