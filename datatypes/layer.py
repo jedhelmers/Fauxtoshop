@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from PySide6.QtGui import QPainter
+from typing import List
 
 
 @dataclass
@@ -17,7 +18,6 @@ class Layer:
         'scale',
         'mode',
         'mode_percent',
-        'children',
     ]
 
     def __init__(
@@ -34,7 +34,6 @@ class Layer:
             scale=[1.0, 1.0], # qreal? Double I think.
             mode='Normal',
             mode_percent=1.0,
-            children=[],
             ):
         self.index = index
         self.color = color
@@ -48,15 +47,24 @@ class Layer:
         self.scale = scale
         self.mode = mode
         self.mode_percent = mode_percent
-        self.children = children
 
 
 @dataclass
 class LayerGroup(Layer):
-    __slots__ = ['is_collapsed']
+    __slots__ = [
+        'children',
+        'is_collapsed'
+    ]
 
-    def __init__(self, is_collapsed: bool=False, *args, **kwargs):
+    def __init__(
+            self,
+            children: List=[],
+            is_collapsed: bool=False,
+            *args,
+            **kwargs
+        ):
         super().__init__(self, *args, **kwargs)
+        self.children = children
         self.is_collapsed = is_collapsed
 
 

@@ -184,10 +184,10 @@ class WorkspaceWidget(QWidget):
                             ),
                         ]
                     ),
-                    # Layer(
-                    #     image=QPixmap("images/test_green.jpg"),
-                    #     mode='Multiply'
-                    # ),
+                    Layer(
+                        image=QPixmap("images/test_green.jpg"),
+                        mode='Multiply'
+                    ),
                     Layer(
                         image=QPixmap("images/example.jpg"),
                         mode='Normal'
@@ -337,14 +337,12 @@ class WorkspaceWidget(QWidget):
         composite = self.layers[0].image
 
         for i in range(len(self.layers)):
-            child_count = len(self.layers[i].children)
-
-            if child_count > 0:
+            if isinstance(self.layers[i], LayerGroup):
+                child_count = len(self.layers[i].children)
                 group_composite = self.layers[i].children[0].image
 
                 if child_count > 1:
                     for j in (range(child_count)):
-                        # print(i, j, self.layers[i].children[j].name)
                         group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
 
                 self.layers[i].image = group_composite
@@ -352,9 +350,6 @@ class WorkspaceWidget(QWidget):
             composite = self.def_add_image(composite, self.layers[i])
 
         return composite
-
-    def test(self, layer):
-        print(layer.children)
 
     def scale(self, layer, event):
         pass
