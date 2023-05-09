@@ -437,12 +437,12 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
-        layer = self.layers[self.current_layer_index]
-        [x_offset, y_offset] = layer.position
-        mode = mode_mappings(layer.mode)
+        # layer = self.layers[self.current_layer_index]
+        # [x_offset, y_offset] = layer.position
+        # mode = mode_mappings(layer.mode)
 
-        x = event.x() * self.drag_speed - x_offset
-        y = event.y() * self.drag_speed - y_offset
+        # x = event.x() * self.drag_speed - x_offset
+        # y = event.y() * self.drag_speed - y_offset
 
         # if self.last_x is None: # First event.
         #     self.last_x = x
@@ -450,20 +450,20 @@ class WorkspaceWidget(QWidget):
 
         #     return # Ignore the first time.
 
-        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
+        # resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        # painter = QPainter(resultImage)
 
-        pen = QtGui.QPen()
-        pen.setWidth(self.brush_size)
-        pen.setColor(self.brush_color)
-        # pen.setCosmetic(True)
+        # pen = QtGui.QPen()
+        # pen.setWidth(self.brush_size)
+        # pen.setColor(self.brush_color)
+        # # pen.setCosmetic(True)
 
-        space = 4
-        dashes = [1, space]
-        pen.setDashPattern(dashes)
+        # space = 4
+        # dashes = [1, space]
+        # pen.setDashPattern(dashes)
 
-        pen.setStyle(Qt.DotLine)
-        pen.setCapStyle(Qt.RoundCap)
+        # pen.setStyle(Qt.SolidLine)
+        # pen.setCapStyle(Qt.RoundCap)
 
         # # circle = QPixmap(QSize(self.brush_size, self.brush_size))
         # # circle.draw

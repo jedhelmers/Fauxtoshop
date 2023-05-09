@@ -73,8 +73,10 @@ class ToolBase():
         pass
 
     def brush(self, event):
-        x = event.x() * self.drag_speed
-        y = event.y() * self.drag_speed
+        [x_offset, y_offset] = self.layer.position
+
+        x = event.x() * self.drag_speed - x_offset
+        y = event.y() * self.drag_speed - y_offset
 
         if self.last_x is None: # First event.
             self.last_x = x
@@ -88,12 +90,15 @@ class ToolBase():
         pen = QtGui.QPen()
         pen.setWidth(self._brush_size)
         pen.setColor(self.brush_color)
+        pen.setStyle(Qt.SolidLine)
+        pen.setCapStyle(Qt.RoundCap)
         pen.setCosmetic(True)
-
-        # Set brush from vector
-        brush = QIcon(self._brush_shape).pixmap(QSize(self._brush_size, self._brush_size))
-        pen.setBrush(brush)
         painter.setPen(pen)
+
+        # Set STAMP
+        # brush = QIcon(self._brush_shape).pixmap(QSize(self._brush_size, self._brush_size))
+        # pen.setBrush(brush)
+        # painter.setPen(pen)
 
         painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.drawPixmap(0, 0, self.layer.image)
