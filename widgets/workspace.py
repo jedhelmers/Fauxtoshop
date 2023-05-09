@@ -251,7 +251,7 @@ class WorkspaceWidget(QWidget):
     @property
     def current_tool(self):
         return self._current_tool
-    
+
     @current_tool.setter
     def current_tool(self, current_tool):
         self._current_tool = current_tool
