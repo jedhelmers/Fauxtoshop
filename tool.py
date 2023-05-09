@@ -63,11 +63,15 @@ class ToolBase():
             'pen': self.pen,
             'brush': self.brush,
             'erase': self.erase,
-            'clone': self.clone
+            'clone': self.clone,
+            'move': self.move
         }
 
         if self._layer and self.current_tool in switch:
             switch[self.current_tool](event)
+
+    def move(self, event):
+        pass
 
     def pen(self, event):
         pass

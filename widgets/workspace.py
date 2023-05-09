@@ -150,13 +150,6 @@ class WorkspaceWidget(QWidget):
             pixel_to_inch(self.absolute_dimentions[1])
         ]
 
-        # artboard = ArtBoardWidget(
-        #     self.ui.workspaceBackgroundWidget,
-        #     new_file_info,
-        #     self.settings,
-        #     self.signaler)
-        # self.artboards.append(artboard)
-
 
         # TODO: Move rule logic to Workspace.
         # TODO: Move mouse tracking to Workspace.
@@ -302,16 +295,33 @@ class WorkspaceWidget(QWidget):
 
     def crop_workspace(self, image):
         # Crop image to a square:
+        print(self.settings)
+        x = self.settings['offset_dimensions'][0]
         imgsize = min(image.width(), image.height())
         rect = QRect(
-            100,
-            100,
+            0,
+            self.settings['offset_dimensions'][1v],
             imgsize,
             imgsize,
         )
 
         # TODO: Offset Left
-        return image.copy(rect)
+        return self.translate_layer(image.copy(rect))
+
+    def translate_layer(self, base_image) -> QPixmap:
+        resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        painter.translate(self.settings['offset_dimensions'][0], 0)
+
+        painter.drawPixmap(0, 0, base_image)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
 
     def render(self):
         try:
