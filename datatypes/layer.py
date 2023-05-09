@@ -18,6 +18,7 @@ class Layer:
         'scale',
         'mode',
         'mode_percent',
+        'parent',
     ]
 
     def __init__(
@@ -34,6 +35,7 @@ class Layer:
             scale=[1.0, 1.0], # qreal? Double I think.
             mode='Normal',
             mode_percent=1.0,
+            parent=None,
             ):
         self.index = index
         self.color = color
@@ -47,6 +49,7 @@ class Layer:
         self.scale = scale
         self.mode = mode
         self.mode_percent = mode_percent
+        self.parent = parent
 
 
 @dataclass
