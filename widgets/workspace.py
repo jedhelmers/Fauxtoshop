@@ -11,6 +11,7 @@ from PySide6.QtOpenGL import *
 from datatypes.layer import Layer, mode_mappings
 from tool import Tool
 from tool import ToolBase
+from typing import List
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
@@ -212,13 +213,6 @@ class WorkspaceWidget(QWidget):
 
         self.layers.append(self.grid)
 
-        # try:
-        #     label = QLabel()
-        #     res = self.render_layers()
-        #     res = res.scaledToWidth(600)
-        #     label.setPixmap(res)
-        # except Exception as e:
-        #     print(e)
         self.render()
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
@@ -288,6 +282,9 @@ class WorkspaceWidget(QWidget):
         self.last_y = None
 
         self.temp = not self.temp
+        # TODO: Translate layer position if moved
+        self.current_layer.image = self.translate(self.current_layer.image, self.current_layer.position)
+        self.current_layer.position = [0, 0]
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
@@ -295,12 +292,11 @@ class WorkspaceWidget(QWidget):
 
     def crop_workspace(self, image):
         # Crop image to a square:
-        print(self.settings)
         x = self.settings['offset_dimensions'][0]
         imgsize = min(image.width(), image.height())
         rect = QRect(
             0,
-            self.settings['offset_dimensions'][1v],
+            self.settings['offset_dimensions'][1],
             imgsize,
             imgsize,
         )
@@ -514,6 +510,20 @@ class WorkspaceWidget(QWidget):
             self.tool.draw(event)
         except Exception as e:
             print(e)
+
+    def translate(self, image: QPixmap, position: List) -> QPixmap:
+        resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.translate(*position)
+        painter.drawPixmap(*position, image)
+        painter.setCompositionMode(mode_mappings('Normal'))
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
