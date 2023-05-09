@@ -47,6 +47,16 @@ class Layer:
         self.mode_percent = mode_percent
         self.children = children
 
+
+@dataclass
+class LayerGroup(Layer):
+    __slots__ = ['is_collapsed']
+
+    def __init__(self, is_collapsed: bool=False):
+        super().__init__(self)
+        self.is_collapsed = is_collapsed
+
+
 def mode_mappings(mode):
     switch = {
         'Normal': QPainter.CompositionMode.CompositionMode_SourceOver,
