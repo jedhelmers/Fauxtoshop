@@ -3,6 +3,7 @@ from PySide6.QtGui import QPainter
 from typing import List
 
 id = 0
+parent_id = 0
 
 @dataclass
 class Layer:
@@ -73,8 +74,12 @@ class LayerGroup(Layer):
             **kwargs
         ):
         super().__init__(self, *args, **kwargs)
+        global parent_id
+        self.id = parent_id
         self.children = children
         self.is_collapsed = is_collapsed
+
+        parent_id += 1
 
 
 def mode_mappings(mode):

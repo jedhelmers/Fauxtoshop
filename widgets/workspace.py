@@ -155,6 +155,65 @@ class WorkspaceWidget(QWidget):
         # Define layers with a default background layer
         self.layers = []
 
+        self.flat_layers = []
+
+        # Background - Layer 0
+        # self.flat_layers.append(
+        #     Layer(
+        #         image=QPixmap("images/test_pink.jpg"),
+        #         mode='Normal',
+        #         name="Background",
+        #     )
+        # )
+        self.flat_layers + [
+            Layer(
+                image=QPixmap("images/test_green.jpg"),
+                mode='Multiply'
+            ),
+            Layer(
+                image=QPixmap("images/example.jpg"),
+                mode='Normal'
+            ),
+            LayerGroup(
+                image=QPixmap(),
+                mode="Multiply",
+            ),
+            Layer(
+                image=QPixmap("images/test_green.jpg"),
+                mode='Normal',
+                parent=0
+            ),
+            Layer(
+                image=QPixmap("images/test_pink.jpg"),
+                mode='Normal',
+                name="Background",
+            )
+        ]
+
+        def create_layers(flat_list):
+            out = []
+            children = []
+            for i in reversed(range(len(flat_list))):
+                try:
+                    if isinstance(flat_list[i], Layer):
+                        if flat_list[i].parent:
+                            children.append(flat_list[i])
+                        pass
+                    elif isinstance(flat_list[i], LayerGroup):
+                        QPixmap(flat_list.image.size())
+                        flat_list[i].children = [*children]
+                        children = []
+
+                    out.append(flat_list[i])
+                except Exception as e:
+                    print(e)
+
+            return out
+
+        self.layers = create_layers(self.flat_layers)
+
+        print(self.layers)
+
         self.layers.append(
             Layer(
                 image=QPixmap("images/test_pink.jpg"),
@@ -163,41 +222,41 @@ class WorkspaceWidget(QWidget):
             )
         )
 
-        self.layers.append(
-            LayerGroup(
-                image=QPixmap(self.layers[0].image.size()),
-                name="Group 1",
-                children=[
-                    LayerGroup(
-                        image=QPixmap(self.layers[0].image.size()),
-                        mode="Multiply",
-                        children=[
-                            Layer(
-                                image=QPixmap("images/test_green.jpg"),
-                                mode='Normal'
-                            ),
-                        ]
-                    ),
-                    Layer(
-                        image=QPixmap("images/test_green.jpg"),
-                        mode='Multiply'
-                    ),
-                    Layer(
-                        image=QPixmap("images/example.jpg"),
-                        mode='Normal'
-                    ),
-                ],
-                mode="HardLight"
-            )
-        )
+        # self.layers.append(
+        #     LayerGroup(
+        #         image=QPixmap(self.layers[0].image.size()),
+        #         name="Group 1",
+        #         children=[
+        #             LayerGroup(
+        #                 image=QPixmap(self.layers[0].image.size()),
+        #                 mode="Multiply",
+        #                 children=[
+        #                     Layer(
+        #                         image=QPixmap("images/test_green.jpg"),
+        #                         mode='Normal'
+        #                     ),
+        #                 ]
+        #             ),
+        #             # Layer(
+        #             #     image=QPixmap("images/test_green.jpg"),
+        #             #     mode='Multiply'
+        #             # ),
+        #             # Layer(
+        #             #     image=QPixmap("images/example.jpg"),
+        #             #     mode='Normal'
+        #             # ),
+        #         ],
+        #         mode="HardLight"
+        #     )
+        # )
 
-        self.layers.append(
-            Layer(
-                lock=True,
-                image=QPixmap("images/test_blue.jpg"),
-                mode='Difference'
-            )
-        )
+        # self.layers.append(
+        #     Layer(
+        #         lock=True,
+        #         image=QPixmap("images/test_blue.jpg"),
+        #         mode='Difference'
+        #     )
+        # )
 
         self.grid = Layer(
             lock=True,
