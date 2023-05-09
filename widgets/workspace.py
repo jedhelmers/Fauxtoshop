@@ -117,17 +117,11 @@ class WorkspaceWidget(QWidget):
         self.base_width = 600
         self.base_zoom = 2.0
         self.drag_speed = 2.0
-        self.snap_to = 1 # CANNOT BE ZERO
+        self.snap_to = 30 # CANNOT BE ZERO
 
         # Brush
         self.last_x, self.last_y = None, None
         self.brush_color = qRgba(50, 50, 50, 50)
-        # self.thing = 0x88112233
-        # self.brush_color = QRgba64()
-        # self.brush_color.setAlpha(50)
-        # self.brush_color.setRed(255)
-        # self.brush_color.setGreen(0)
-        # self.brush_color.setBlue(0)
         self.brush_size = 30
 
 
