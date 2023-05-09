@@ -8,7 +8,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtOpenGL import *
 
-from datatypes.layer import Layer, mode_mappings
+from datatypes.layer import Layer, LayerGroup, mode_mappings
 from tool import Tool
 from tool import ToolBase
 from typing import List
@@ -170,11 +170,11 @@ class WorkspaceWidget(QWidget):
         )
 
         self.layers.append(
-            Layer(
+            LayerGroup(
                 image=QPixmap(self.layers[0].image.size()),
                 name="Group 1",
                 children=[
-                    Layer(
+                    LayerGroup(
                         image=QPixmap(self.layers[0].image.size()),
                         mode="Multiply",
                         children=[

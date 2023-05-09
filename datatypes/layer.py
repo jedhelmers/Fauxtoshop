@@ -12,6 +12,7 @@ class Layer:
         'lock',
         'show',
         'image',
+        'masks',
         'position',
         'scale',
         'mode',
@@ -28,6 +29,7 @@ class Layer:
             lock=False,
             show=True,
             image=None,
+            masks=[],
             position=[0.0, 0.0], # QPoint
             scale=[1.0, 1.0], # qreal? Double I think.
             mode='Normal',
@@ -41,6 +43,7 @@ class Layer:
         self.lock = lock
         self.show = show
         self.image = image
+        self.masks = masks
         self.position = position
         self.scale = scale
         self.mode = mode
@@ -52,8 +55,8 @@ class Layer:
 class LayerGroup(Layer):
     __slots__ = ['is_collapsed']
 
-    def __init__(self, is_collapsed: bool=False):
-        super().__init__(self)
+    def __init__(self, is_collapsed: bool=False, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
         self.is_collapsed = is_collapsed
 
 
