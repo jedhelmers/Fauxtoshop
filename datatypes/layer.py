@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from PySide6.QtGui import QPainter
 from typing import List
 
+id = 0
 
 @dataclass
 class Layer:
     __slots__ = [
         'index',
+        'id',
         'color',
         'name',
         'alpha_lock',
@@ -37,7 +39,9 @@ class Layer:
             mode_percent=1.0,
             parent=None,
             ):
+        global id
         self.index = index
+        self.id = id
         self.color = color
         self.name = name
         self.alpha_lock = alpha_lock
@@ -50,6 +54,8 @@ class Layer:
         self.mode = mode
         self.mode_percent = mode_percent
         self.parent = parent
+
+        id += 1
 
 
 @dataclass
