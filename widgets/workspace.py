@@ -300,11 +300,24 @@ class WorkspaceWidget(QWidget):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]
 
+    def crop_workspace(self, image):
+        # Crop image to a square:
+        imgsize = min(image.width(), image.height())
+        rect = QRect(
+            100,
+            100,
+            imgsize,
+            imgsize,
+        )
+
+        # TODO: Offset Left
+        return image.copy(rect)
+
     def render(self):
         try:
             self.label.clear()
             res = self.render_layers()
-            # self.draw_grid()
+            res = self.crop_workspace(res)
             res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
