@@ -8,8 +8,10 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtOpenGL import *
 
-from datatypes.layer import Layer, mode_mappings
+from datatypes.layer import Layer, LayerGroup, mode_mappings
 from tool import Tool
+from tool import ToolBase
+from typing import List
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
@@ -78,7 +80,10 @@ class WorkspaceWidget(QWidget):
 
         self.tool_settings = {}
         self.get_tool_settings()
-        self.parent = parent
+        self._parent = parent
+
+        self._current_layer = None
+        self.tool = ToolBase(parent=self._parent, layer=self.current_layer)
 
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
@@ -102,15 +107,8 @@ class WorkspaceWidget(QWidget):
         self.y_line.setStyleSheet('border-color: rgba(255, 255, 255, 0.75)')
 
         self.signaler.mouseMove.connect(self.mouse_move_event)
-        self.ui.workspaceBackgroundWidget.setStyleSheet('padding: 40px;')
         self.ui.scrollArea.setWidgetResizable(True)
 
-        # windows = WindowsWidget(signaler=self.signaler)
-        # self.ui.windowsWidget.layout().addWidget(windows)
-        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler)
-        # windows = WindowsWidget(signaler=self.signaler)
-        # self.ui.windowsWidget.layout().addWidget(windows)
-        # self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=windows)
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
         self.current_layer_index = 0
@@ -119,18 +117,12 @@ class WorkspaceWidget(QWidget):
         self.base_width = 600
         self.base_zoom = 2.0
         self.drag_speed = 2.0
-        self.snap_to = 20 # CANNOT BE ZERO
+        self.snap_to = 30 # CANNOT BE ZERO
 
         # Brush
         self.last_x, self.last_y = None, None
         self.brush_color = qRgba(50, 50, 50, 50)
-        # self.thing = 0x88112233
-        # self.brush_color = QRgba64()
-        # self.brush_color.setAlpha(50)
-        # self.brush_color.setRed(255)
-        # self.brush_color.setGreen(0)
-        # self.brush_color.setBlue(0)
-        self.brush_size = 10
+        self.brush_size = 30
 
 
         self.width = unit_conversion(
@@ -153,13 +145,6 @@ class WorkspaceWidget(QWidget):
             pixel_to_inch(self.absolute_dimentions[1])
         ]
 
-        # artboard = ArtBoardWidget(
-        #     self.ui.workspaceBackgroundWidget,
-        #     new_file_info,
-        #     self.settings,
-        #     self.signaler)
-        # self.artboards.append(artboard)
-
 
         # TODO: Move rule logic to Workspace.
         # TODO: Move mouse tracking to Workspace.
@@ -179,11 +164,11 @@ class WorkspaceWidget(QWidget):
         )
 
         self.layers.append(
-            Layer(
+            LayerGroup(
                 image=QPixmap(self.layers[0].image.size()),
                 name="Group 1",
                 children=[
-                    Layer(
+                    LayerGroup(
                         image=QPixmap(self.layers[0].image.size()),
                         mode="Multiply",
                         children=[
@@ -193,10 +178,10 @@ class WorkspaceWidget(QWidget):
                             ),
                         ]
                     ),
-                    # Layer(
-                    #     image=QPixmap("images/test_green.jpg"),
-                    #     mode='Multiply'
-                    # ),
+                    Layer(
+                        image=QPixmap("images/test_green.jpg"),
+                        mode='Multiply'
+                    ),
                     Layer(
                         image=QPixmap("images/example.jpg"),
                         mode='Normal'
@@ -222,13 +207,6 @@ class WorkspaceWidget(QWidget):
 
         self.layers.append(self.grid)
 
-        # try:
-        #     label = QLabel()
-        #     res = self.render_layers()
-        #     res = res.scaledToWidth(600)
-        #     label.setPixmap(res)
-        # except Exception as e:
-        #     print(e)
         self.render()
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
@@ -239,9 +217,27 @@ class WorkspaceWidget(QWidget):
         self.signaler.remove_layer.connect(self.remove_layer)
         self.signaler.show_window_panel.connect(self.show_window_panel)
 
-        self.tool = Tool(self.tool_settings)
-
         self.temp = False
+        self.current_layer = self.layers[self.current_layer_index]
+
+    @property
+    def current_layer(self):
+        return self._current_layer
+
+    @current_layer.setter
+    def current_layer(self, current_layer):
+        self._current_layer = current_layer
+        self.tool.layer = self._current_layer
+
+    @property
+    def current_tool(self):
+        return self._current_tool
+
+    @current_tool.setter
+    def current_tool(self, current_tool):
+        self._current_tool = current_tool
+        self.tool.current_tool = current_tool
+        print('current_tool', current_tool)
 
     @property
     def zoom(self):
@@ -280,17 +276,48 @@ class WorkspaceWidget(QWidget):
         self.last_y = None
 
         self.temp = not self.temp
-
+        # TODO: Translate layer position if moved
+        self.current_layer.image = self.translate(self.current_layer.image, self.current_layer.position)
+        self.current_layer.position = [0, 0]
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]
 
+    def crop_workspace(self, image):
+        # Crop image to a square:
+        x = self.settings['offset_dimensions'][0]
+        imgsize = min(image.width(), image.height())
+        rect = QRect(
+            0,
+            self.settings['offset_dimensions'][1],
+            imgsize,
+            imgsize,
+        )
+
+        # TODO: Offset Left
+        return self.translate_layer(image.copy(rect))
+
+    def translate_layer(self, base_image) -> QPixmap:
+        resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        painter.translate(self.settings['offset_dimensions'][0], 0)
+
+        painter.drawPixmap(0, 0, base_image)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
+
     def render(self):
         try:
             self.label.clear()
             res = self.render_layers()
-            # self.draw_grid()
+            res = self.crop_workspace(res)
             res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
@@ -304,14 +331,12 @@ class WorkspaceWidget(QWidget):
         composite = self.layers[0].image
 
         for i in range(len(self.layers)):
-            child_count = len(self.layers[i].children)
-
-            if child_count > 0:
+            if isinstance(self.layers[i], LayerGroup):
+                child_count = len(self.layers[i].children)
                 group_composite = self.layers[i].children[0].image
 
                 if child_count > 1:
                     for j in (range(child_count)):
-                        # print(i, j, self.layers[i].children[j].name)
                         group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
 
                 self.layers[i].image = group_composite
@@ -319,9 +344,6 @@ class WorkspaceWidget(QWidget):
             composite = self.def_add_image(composite, self.layers[i])
 
         return composite
-
-    def test(self, layer):
-        print(layer.children)
 
     def scale(self, layer, event):
         pass
@@ -423,46 +445,74 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
-        x = event.x() * self.drag_speed * self.zoom
-        y = event.y() * self.drag_speed * self.zoom
+        # layer = self.layers[self.current_layer_index]
+        # [x_offset, y_offset] = layer.position
+        # mode = mode_mappings(layer.mode)
 
-        if self.last_x is None: # First event.
-            self.last_x = x
-            self.last_y = y
+        # x = event.x() * self.drag_speed - x_offset
+        # y = event.y() * self.drag_speed - y_offset
 
-            return # Ignore the first time.
+        # if self.last_x is None: # First event.
+        #     self.last_x = x
+        #     self.last_y = y
 
-        layer = self.layers[self.current_layer_index]
-        mode = mode_mappings(layer.mode)
+        #     return # Ignore the first time.
 
-        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        # resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        # painter = QPainter(resultImage)
+
+        # pen = QtGui.QPen()
+        # pen.setWidth(self.brush_size)
+        # pen.setColor(self.brush_color)
+        # # pen.setCosmetic(True)
+
+        # space = 4
+        # dashes = [1, space]
+        # pen.setDashPattern(dashes)
+
+        # pen.setStyle(Qt.SolidLine)
+        # pen.setCapStyle(Qt.RoundCap)
+
+        # # circle = QPixmap(QSize(self.brush_size, self.brush_size))
+        # # circle.draw
+        # # painter.drawEllipse(QPoint(0, 0), self.brush_size, self.brush_size)
+        # # painter.drawEllipse(300, 300, 70, 70)
+
+        # # Set brush from vector
+        # brush = QIcon("images/toolbar_brush.svg").pixmap(QSize(self.brush_size, self.brush_size))
+        # pen.setBrush(brush)
+        # painter.setPen(pen)
+
+        # painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.drawPixmap(0, 0, layer.image)
+        # painter.setCompositionMode(mode)
+        # painter.drawLine(self.last_x, self.last_y, x, y)
+        # painter.end()
+
+        # self.last_x = x
+        # self.last_y = y
+
+        # layer.image = self.image_to_pixmap(resultImage)
+        # print(self.current_layer.image)
+        try:
+            # self.current_layer.image = self.tool.draw(event)
+            self.tool.draw(event)
+        except Exception as e:
+            print(e)
+
+    def translate(self, image: QPixmap, position: List) -> QPixmap:
+        resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
-
-        pen = QtGui.QPen()
-        pen.setWidth(self.brush_size)
-        pen.setColor(self.brush_color)
-        pen.setCosmetic(True)
-
-        # circle = QPixmap(QSize(self.brush_size, self.brush_size))
-        # circle.draw
-        # painter.drawEllipse(QPoint(0, 0), self.brush_size, self.brush_size)
-        # painter.drawEllipse(300, 300, 70, 70)
-
-        # Set brush from vector
-        brush = QIcon("images/toolbar_brush.svg").pixmap(QSize(self.brush_size, self.brush_size))
-        pen.setBrush(brush)
-        painter.setPen(pen)
-
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.drawPixmap(0, 0, layer.image)
-        painter.setCompositionMode(mode)
-        painter.drawLine(self.last_x, self.last_y, x, y)
+        # painter.translate(*position)
+        painter.drawPixmap(*position, image)
+        painter.setCompositionMode(mode_mappings('Normal'))
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
 
-        self.last_x = x
-        self.last_y = y
-
-        layer.image = self.image_to_pixmap(resultImage)
+        return self.image_to_pixmap(resultImage)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)

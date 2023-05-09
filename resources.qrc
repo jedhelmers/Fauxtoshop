@@ -66,6 +66,7 @@
     <file>images/window_properties.svg</file>
     <file>images/window_swatches.svg</file>
 
+    <!-- Window Icons -->
     <file>images/window_lock_position.svg</file>
     <file>images/window_prevent_auto_nesting.svg</file>
     <file>images/window_partial_lock.svg</file>
@@ -85,6 +86,23 @@
     <file>images/window_add_layer.svg</file>
     <file>images/window_delete_layer.svg</file>
 
+    <!--  Cursor Icons -->
+    <file>images/cursor_icon_move.svg</file>
+    <file>images/cursor_icon_eyedropper.svg</file>
+    <file>images/cursor_icon_path_select.svg</file>
+    <file>images/cursor_icon_frame.svg</file>
+    <file>images/cursor_icon_crop.svg</file>
+    <file>images/cursor_icon-06.svg</file>
+    <file>images/cursor_icon_pen_remove_point.svg</file>
+    <file>images/cursor_icon_pen_add_point.svg</file>
+    <file>images/cursor_icon_pen_close_path.svg</file>
+    <file>images/cursor_icon_pen_extend_path.svg</file>
+    <file>images/cursor_icon_pen_start_path.svg</file>
+    <file>images/cursor_icon_pen.svg</file>
+
+
+
+    <file>images/circle.svg</file>
     <file>images/smithers.jpg</file>
     <file>images/example.png</file>
 

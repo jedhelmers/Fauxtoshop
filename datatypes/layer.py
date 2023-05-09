@@ -1,22 +1,26 @@
 from dataclasses import dataclass
 from PySide6.QtGui import QPainter
+from typing import List
 
+id = 0
 
 @dataclass
 class Layer:
     __slots__ = [
         'index',
+        'id',
         'color',
         'name',
         'alpha_lock',
         'lock',
         'show',
         'image',
+        'masks',
         'position',
         'scale',
         'mode',
         'mode_percent',
-        'children',
+        'parent',
     ]
 
     def __init__(
@@ -28,24 +32,50 @@ class Layer:
             lock=False,
             show=True,
             image=None,
+            masks=[],
             position=[0.0, 0.0], # QPoint
             scale=[1.0, 1.0], # qreal? Double I think.
             mode='Normal',
             mode_percent=1.0,
-            children=[],
+            parent=None,
             ):
+        global id
         self.index = index
+        self.id = id
         self.color = color
         self.name = name
         self.alpha_lock = alpha_lock
         self.lock = lock
         self.show = show
         self.image = image
+        self.masks = masks
         self.position = position
         self.scale = scale
         self.mode = mode
         self.mode_percent = mode_percent
+        self.parent = parent
+
+        id += 1
+
+
+@dataclass
+class LayerGroup(Layer):
+    __slots__ = [
+        'children',
+        'is_collapsed'
+    ]
+
+    def __init__(
+            self,
+            children: List=[],
+            is_collapsed: bool=False,
+            *args,
+            **kwargs
+        ):
+        super().__init__(self, *args, **kwargs)
         self.children = children
+        self.is_collapsed = is_collapsed
+
 
 def mode_mappings(mode):
     switch = {
