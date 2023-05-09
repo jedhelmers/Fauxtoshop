@@ -1,9 +1,15 @@
 import json
 import math
 import os
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter, QImage, QIcon, qRgba, QPixmap
+
 
 SETTINGS_PATH = './settings.json'
 
+
+def image_to_pixmap(image) -> QPixmap:
+    return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
 def load_settings():
     if not os.path.exists(SETTINGS_PATH):

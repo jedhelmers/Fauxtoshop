@@ -52,7 +52,7 @@ def key_mappings(key):
         '0': 'gradient',
         '0': 'pointer_finger',
         '0': 'pin',
-        'P': 'pen',
+        '80': 'pen',
         '0': 'quick_selection',
         '0': 'spot_headling',
         'S': 'stamp',
@@ -113,8 +113,6 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.signaler = MainSignaler()
 
-        self.tool = ToolBase(parent=self)
-
         self.setMouseTracking(True)
         self.setStyleSheet(main_style())
 
@@ -125,6 +123,7 @@ class MainWindow(QMainWindow):
         self.current_options_widget = None
         self.tab_index = 0
         self.tabs = []
+        self.current_tab = None
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
@@ -167,7 +166,9 @@ class MainWindow(QMainWindow):
             button.setStyleSheet('QPushButton {background-color: rgba(255, 255, 255, .25);}')
 
         self._current_tool = tool
-        self.tool.current_tool = tool
+        # self.tool.current_tool = tool
+        if self.current_tab:
+            self.current_tab.current_tool = tool
         self.setup_tool_options_bar()
 
     def setup_windows(self):
@@ -239,6 +240,7 @@ class MainWindow(QMainWindow):
 
     def new_file(self, new_file_info):
         tab = WorkspaceWidget(self, new_file_info)
+        self.current_tab = tab
         self.tabs.append(tab)
 
         self.ui.workspaceTabWidget.addTab(tab, "")

@@ -10,6 +10,7 @@ from PySide6.QtOpenGL import *
 
 from datatypes.layer import Layer, mode_mappings
 from tool import Tool
+from tool import ToolBase
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
 from widgets.artboard import ArtBoardWidget
@@ -78,7 +79,10 @@ class WorkspaceWidget(QWidget):
 
         self.tool_settings = {}
         self.get_tool_settings()
-        self.parent = parent
+        self._parent = parent
+
+        self._current_layer = None
+        self.tool = ToolBase(parent=self._parent, layer=self.current_layer)
 
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info
@@ -112,7 +116,7 @@ class WorkspaceWidget(QWidget):
         self.base_width = 600
         self.base_zoom = 2.0
         self.drag_speed = 2.0
-        self.snap_to = 20 # CANNOT BE ZERO
+        self.snap_to = 1 # CANNOT BE ZERO
 
         # Brush
         self.last_x, self.last_y = None, None
@@ -232,9 +236,27 @@ class WorkspaceWidget(QWidget):
         self.signaler.remove_layer.connect(self.remove_layer)
         self.signaler.show_window_panel.connect(self.show_window_panel)
 
-        self.tool = Tool(self.tool_settings)
-
         self.temp = False
+        self.current_layer = self.layers[self.current_layer_index]
+
+    @property
+    def current_layer(self):
+        return self._current_layer
+
+    @current_layer.setter
+    def current_layer(self, current_layer):
+        self._current_layer = current_layer
+        self.tool.layer = self._current_layer
+
+    @property
+    def current_tool(self):
+        return self._current_tool
+    
+    @current_tool.setter
+    def current_tool(self, current_tool):
+        self._current_tool = current_tool
+        self.tool.current_tool = current_tool
+        print('current_tool', current_tool)
 
     @property
     def zoom(self):
@@ -273,7 +295,6 @@ class WorkspaceWidget(QWidget):
         self.last_y = None
 
         self.temp = not self.temp
-
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
@@ -423,11 +444,11 @@ class WorkspaceWidget(QWidget):
         x = event.x() * self.drag_speed - x_offset
         y = event.y() * self.drag_speed - y_offset
 
-        if self.last_x is None: # First event.
-            self.last_x = x
-            self.last_y = y
+        # if self.last_x is None: # First event.
+        #     self.last_x = x
+        #     self.last_y = y
 
-            return # Ignore the first time.
+        #     return # Ignore the first time.
 
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
@@ -444,29 +465,32 @@ class WorkspaceWidget(QWidget):
         pen.setStyle(Qt.DotLine)
         pen.setCapStyle(Qt.RoundCap)
 
-        # circle = QPixmap(QSize(self.brush_size, self.brush_size))
-        # circle.draw
-        # painter.drawEllipse(QPoint(0, 0), self.brush_size, self.brush_size)
-        # painter.drawEllipse(300, 300, 70, 70)
+        # # circle = QPixmap(QSize(self.brush_size, self.brush_size))
+        # # circle.draw
+        # # painter.drawEllipse(QPoint(0, 0), self.brush_size, self.brush_size)
+        # # painter.drawEllipse(300, 300, 70, 70)
 
-        # Set brush from vector
-        # brush = QIcon("images/circle.svg").pixmap(QSize(self.brush_size, self.brush_size))
+        # # Set brush from vector
+        # brush = QIcon("images/toolbar_brush.svg").pixmap(QSize(self.brush_size, self.brush_size))
         # pen.setBrush(brush)
         # painter.setPen(pen)
-        painter.setPen(pen)
 
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.drawPixmap(0, 0, layer.image)
-        painter.setCompositionMode(mode)
+        # painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.drawPixmap(0, 0, layer.image)
+        # painter.setCompositionMode(mode)
+        # painter.drawLine(self.last_x, self.last_y, x, y)
+        # painter.end()
 
-        # Overlap
-        painter.drawLine(self.last_x, self.last_y, x, y)
-        painter.end()
+        # self.last_x = x
+        # self.last_y = y
 
-        self.last_x = x
-        self.last_y = y
-
-        layer.image = self.image_to_pixmap(resultImage)
+        # layer.image = self.image_to_pixmap(resultImage)
+        # print(self.current_layer.image)
+        try:
+            # self.current_layer.image = self.tool.draw(event)
+            self.tool.draw(event)
+        except Exception as e:
+            print(e)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
