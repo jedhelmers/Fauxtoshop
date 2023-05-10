@@ -90,6 +90,8 @@ class ToolBase():
 
         resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
 
         pen = QtGui.QPen()
         pen.setWidth(self._brush_size)

@@ -111,7 +111,6 @@ class WorkspaceWidget(QWidget):
 
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
-        self.current_layer_index = 0
         self.down_mouse_pos = [0, 0]
         self.up_mouse_pos = [0, 0]
         self.base_width = 600
@@ -154,6 +153,18 @@ class WorkspaceWidget(QWidget):
         # TODO: Add all layers and layer rendering to Artboard.
         # Define layers with a default background layer
         self.layers = []
+
+        self.flat_layers = []
+        self.layers_dict = []
+
+        # Background - Layer 0
+        self.flat_layers.append(
+            Layer(
+                image=QPixmap("images/test_pink.jpg"),
+                mode='Normal',
+                name="Background",
+            )
+        )
 
         self.layers.append(
             Layer(
@@ -218,7 +229,7 @@ class WorkspaceWidget(QWidget):
         self.signaler.show_window_panel.connect(self.show_window_panel)
 
         self.temp = False
-        self.current_layer = self.layers[self.current_layer_index]
+        self.current_layer = self.layers[0]
 
     @property
     def current_layer(self):
@@ -349,7 +360,7 @@ class WorkspaceWidget(QWidget):
         pass
 
     def invert(self):
-        layer = self.layers[self.current_layer_index]
+        layer = self.current_layer
 
         temp_image = layer.image.toImage()
         temp_image.invertPixels(QImage.InvertRgba)
@@ -369,7 +380,7 @@ class WorkspaceWidget(QWidget):
             self.quantize(event.x()),
             self.quantize(event.y())]
 
-        [x, y] = self.layers[self.current_layer_index].position
+        [x, y] = self.current_layer.position
         [x1, y1] = self.down_mouse_pos
         [x2, y2] = self.up_mouse_pos
         dx = ((x1 - x2) * self.drag_speed) + x
@@ -382,7 +393,7 @@ class WorkspaceWidget(QWidget):
         #     if dy % self.snap_to != 0:
         #         dy = y
 
-        self.layers[self.current_layer_index].position = [dx, dy]
+        self.current_layer.position = [dx, dy]
         self.up_mouse_pos = self.down_mouse_pos
 
     def change_mode(self, layer, mode):
@@ -445,7 +456,7 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
-        # layer = self.layers[self.current_layer_index]
+        # layer = self.current_layer
         # [x_offset, y_offset] = layer.position
         # mode = mode_mappings(layer.mode)
 
@@ -530,7 +541,7 @@ class WorkspaceWidget(QWidget):
         painter.setCompositionMode(mode)
         painter.drawPixmap(0, 0, layer.image)
         painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
 
         return self.image_to_pixmap(resultImage)
