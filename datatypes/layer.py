@@ -49,7 +49,7 @@ class Layer:
             self.layer_id = id
             id += 1
         else:
-            self.id = layer_id
+            self.layer_id = layer_id
         self.color = color
         self.name = name
         self.alpha_lock = alpha_lock

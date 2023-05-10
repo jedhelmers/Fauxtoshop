@@ -111,7 +111,6 @@ class WorkspaceWidget(QWidget):
 
         self.label = QLabel()
         self.ui.gridLayout_3.addWidget(self.label)
-        self.current_layer_index = 0
         self.down_mouse_pos = [0, 0]
         self.up_mouse_pos = [0, 0]
         self.base_width = 600
@@ -156,63 +155,16 @@ class WorkspaceWidget(QWidget):
         self.layers = []
 
         self.flat_layers = []
+        self.layers_dict = []
 
         # Background - Layer 0
-        # self.flat_layers.append(
-        #     Layer(
-        #         image=QPixmap("images/test_pink.jpg"),
-        #         mode='Normal',
-        #         name="Background",
-        #     )
-        # )
-        self.flat_layers + [
-            Layer(
-                image=QPixmap("images/test_green.jpg"),
-                mode='Multiply'
-            ),
-            Layer(
-                image=QPixmap("images/example.jpg"),
-                mode='Normal'
-            ),
-            LayerGroup(
-                image=QPixmap(),
-                mode="Multiply",
-            ),
-            Layer(
-                image=QPixmap("images/test_green.jpg"),
-                mode='Normal',
-                parent=0
-            ),
+        self.flat_layers.append(
             Layer(
                 image=QPixmap("images/test_pink.jpg"),
                 mode='Normal',
                 name="Background",
             )
-        ]
-
-        def create_layers(flat_list):
-            out = []
-            children = []
-            for i in reversed(range(len(flat_list))):
-                try:
-                    if isinstance(flat_list[i], Layer):
-                        if flat_list[i].parent:
-                            children.append(flat_list[i])
-                        pass
-                    elif isinstance(flat_list[i], LayerGroup):
-                        QPixmap(flat_list.image.size())
-                        flat_list[i].children = [*children]
-                        children = []
-
-                    out.append(flat_list[i])
-                except Exception as e:
-                    print(e)
-
-            return out
-
-        self.layers = create_layers(self.flat_layers)
-
-        print(self.layers)
+        )
 
         self.layers.append(
             Layer(
@@ -222,41 +174,41 @@ class WorkspaceWidget(QWidget):
             )
         )
 
-        # self.layers.append(
-        #     LayerGroup(
-        #         image=QPixmap(self.layers[0].image.size()),
-        #         name="Group 1",
-        #         children=[
-        #             LayerGroup(
-        #                 image=QPixmap(self.layers[0].image.size()),
-        #                 mode="Multiply",
-        #                 children=[
-        #                     Layer(
-        #                         image=QPixmap("images/test_green.jpg"),
-        #                         mode='Normal'
-        #                     ),
-        #                 ]
-        #             ),
-        #             # Layer(
-        #             #     image=QPixmap("images/test_green.jpg"),
-        #             #     mode='Multiply'
-        #             # ),
-        #             # Layer(
-        #             #     image=QPixmap("images/example.jpg"),
-        #             #     mode='Normal'
-        #             # ),
-        #         ],
-        #         mode="HardLight"
-        #     )
-        # )
+        self.layers.append(
+            LayerGroup(
+                image=QPixmap(self.layers[0].image.size()),
+                name="Group 1",
+                children=[
+                    LayerGroup(
+                        image=QPixmap(self.layers[0].image.size()),
+                        mode="Multiply",
+                        children=[
+                            Layer(
+                                image=QPixmap("images/test_green.jpg"),
+                                mode='Normal'
+                            ),
+                        ]
+                    ),
+                    Layer(
+                        image=QPixmap("images/test_green.jpg"),
+                        mode='Multiply'
+                    ),
+                    Layer(
+                        image=QPixmap("images/example.jpg"),
+                        mode='Normal'
+                    ),
+                ],
+                mode="HardLight"
+            )
+        )
 
-        # self.layers.append(
-        #     Layer(
-        #         lock=True,
-        #         image=QPixmap("images/test_blue.jpg"),
-        #         mode='Difference'
-        #     )
-        # )
+        self.layers.append(
+            Layer(
+                lock=True,
+                image=QPixmap("images/test_blue.jpg"),
+                mode='Difference'
+            )
+        )
 
         self.grid = Layer(
             lock=True,
@@ -277,7 +229,7 @@ class WorkspaceWidget(QWidget):
         self.signaler.show_window_panel.connect(self.show_window_panel)
 
         self.temp = False
-        self.current_layer = self.layers[self.current_layer_index]
+        self.current_layer = self.layers[0]
 
     @property
     def current_layer(self):
@@ -408,7 +360,7 @@ class WorkspaceWidget(QWidget):
         pass
 
     def invert(self):
-        layer = self.layers[self.current_layer_index]
+        layer = self.current_layer
 
         temp_image = layer.image.toImage()
         temp_image.invertPixels(QImage.InvertRgba)
@@ -428,7 +380,7 @@ class WorkspaceWidget(QWidget):
             self.quantize(event.x()),
             self.quantize(event.y())]
 
-        [x, y] = self.layers[self.current_layer_index].position
+        [x, y] = self.current_layer.position
         [x1, y1] = self.down_mouse_pos
         [x2, y2] = self.up_mouse_pos
         dx = ((x1 - x2) * self.drag_speed) + x
@@ -441,7 +393,7 @@ class WorkspaceWidget(QWidget):
         #     if dy % self.snap_to != 0:
         #         dy = y
 
-        self.layers[self.current_layer_index].position = [dx, dy]
+        self.current_layer.position = [dx, dy]
         self.up_mouse_pos = self.down_mouse_pos
 
     def change_mode(self, layer, mode):
@@ -504,7 +456,7 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def paint(self, event):
-        # layer = self.layers[self.current_layer_index]
+        # layer = self.current_layer
         # [x_offset, y_offset] = layer.position
         # mode = mode_mappings(layer.mode)
 
@@ -589,7 +541,7 @@ class WorkspaceWidget(QWidget):
         painter.setCompositionMode(mode)
         painter.drawPixmap(0, 0, layer.image)
         painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
 
         return self.image_to_pixmap(resultImage)
