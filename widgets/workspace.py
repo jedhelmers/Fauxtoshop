@@ -295,19 +295,28 @@ class WorkspaceWidget(QWidget):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]
 
-    def crop_workspace(self, image):
+    def crop_workspace(self, image) -> QPixmap:
         # Crop image to a square:
-        x = self.settings['offset_dimensions'][0]
-        imgsize = min(image.width(), image.height())
-        rect = QRect(
-            0,
-            self.settings['offset_dimensions'][1],
-            imgsize,
-            imgsize,
+        artboard = QImage(QSize(*self.absolute_dimentions), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(artboard)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(
+            QRect(
+                0,
+                0,
+                *self.absolute_dimentions
+            ),
+            Qt.black
         )
+        painter.fillRect(QRect(
+                *self.settings['offset_dimensions'],
+                *self.settings['document_dimensions'],
+            ),
+            image
+        )
+        painter.end()
 
-        # TODO: Offset Left
-        return self.translate_layer(image.copy(rect))
+        return self.image_to_pixmap(artboard)
 
     def translate_layer(self, base_image) -> QPixmap:
         resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
