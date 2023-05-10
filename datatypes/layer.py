@@ -9,7 +9,7 @@ parent_id = 0
 class Layer:
     __slots__ = [
         'index',
-        'id',
+        'layer_id',
         'color',
         'name',
         'alpha_lock',
@@ -22,10 +22,12 @@ class Layer:
         'mode',
         'mode_percent',
         'parent',
+        'effects',
     ]
 
     def __init__(
             self,
+            layer_id=None,
             index=0,
             color=None,
             name='Layer',
@@ -39,10 +41,15 @@ class Layer:
             mode='Normal',
             mode_percent=1.0,
             parent=None,
+            effects=[],
             ):
         global id
         self.index = index
-        self.id = id
+        if layer_id is None:
+            self.layer_id = id
+            id += 1
+        else:
+            self.id = layer_id
         self.color = color
         self.name = name
         self.alpha_lock = alpha_lock
@@ -55,8 +62,7 @@ class Layer:
         self.mode = mode
         self.mode_percent = mode_percent
         self.parent = parent
-
-        id += 1
+        self.effects = effects
 
 
 @dataclass
@@ -74,12 +80,9 @@ class LayerGroup(Layer):
             **kwargs
         ):
         super().__init__(self, *args, **kwargs)
-        global parent_id
-        self.id = parent_id
         self.children = children
         self.is_collapsed = is_collapsed
 
-        parent_id += 1
 
 
 def mode_mappings(mode):
