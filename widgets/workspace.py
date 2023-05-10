@@ -297,6 +297,8 @@ class WorkspaceWidget(QWidget):
 
     def crop_workspace(self, image) -> QPixmap:
         # Crop image to a square:
+        # TODO:
+        # Figure out why artboard is being pushed down when its dimensions are less then its contents
         artboard = QImage(QSize(*self.absolute_dimentions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(artboard)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
@@ -306,7 +308,7 @@ class WorkspaceWidget(QWidget):
                 0,
                 *self.absolute_dimentions
             ),
-            Qt.black
+            QColor(235, 235, 255, 50)
         )
         painter.fillRect(QRect(
                 *self.settings['offset_dimensions'],
@@ -334,6 +336,8 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def render(self):
+        # TODO:
+        # ALL layers should match the size of ABSOLUTE DIMENSIONS.
         try:
             self.label.clear()
             res = self.render_layers()
@@ -410,6 +414,8 @@ class WorkspaceWidget(QWidget):
         pass
 
     def draw_grid(self):
+        # TODO: Create layer for QLabel that is always present when document is open.
+        # Replace all references to self.layers[0]
         layer = self.layers[0]
         w = layer.image.width()
         h = layer.image.height()
@@ -418,6 +424,7 @@ class WorkspaceWidget(QWidget):
         rows = h // gap
         cols = w // gap
 
+        print(layer.image.size())
         resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         color = QColor(Qt.white)
