@@ -66,7 +66,7 @@
     <file>images/window_properties.svg</file>
     <file>images/window_swatches.svg</file>
 
-    <!-- Window Icons -->
+    <!-- Window Icons windows.ai -->
     <file>images/window_lock_position.svg</file>
     <file>images/window_prevent_auto_nesting.svg</file>
     <file>images/window_partial_lock.svg</file>
@@ -81,12 +81,18 @@
     <file>images/window_pixel_lock.svg</file>
     <file>images/window_layer_style.svg</file>
     <file>images/window_add_mask.svg</file>
-    <file>images/window_add_group.svg</file>
+    <file>images/window_group_closed.svg</file>
+    <file>images/window_group_open.svg</file>
     <file>images/window_link.svg</file>
     <file>images/window_add_layer.svg</file>
     <file>images/window_delete_layer.svg</file>
+    <file>images/window_show.svg</file>
+    <file>images/window_hide.svg</file>
+    <file>images/window_close.svg</file>
+    <file>images/window_open.svg</file>
+    <file>images/window_add_group.svg</file>
 
-    <!--  Cursor Icons -->
+    <!--  Cursor Icons icons.ai -->
     <file>images/cursor_icon_move.svg</file>
     <file>images/cursor_icon_eyedropper.svg</file>
     <file>images/cursor_icon_path_select.svg</file>

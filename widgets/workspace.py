@@ -91,7 +91,7 @@ class WorkspaceWidget(QWidget):
         self.are_rulers_hidden = False
         self.ruler_dimensions = None
         self.settings = load_settings()
-        self.absolute_dimentions = []
+        self.absolute_dimensions = []
         self.artboards = []
         self.active_artboard = 0
         self.current_window = None
@@ -131,17 +131,17 @@ class WorkspaceWidget(QWidget):
             self.new_file_info['units_h'],
             float(self.new_file_info['height']))
 
-        self.absolute_dimentions = [
+        self.absolute_dimensions = [
             self.width + self.offset + self.offset,
             self.height + self.offset + self.offset
         ]
         self.settings['offset_dimensions'] = [self.offset, self.offset]
         self.settings['document_dimensions'] = [self.width, self.height]
-        self.settings['absolute_dimensions'] = self.absolute_dimentions
+        self.settings['absolute_dimensions'] = self.absolute_dimensions
 
         self.ruler_dimensions = [
-            pixel_to_inch(self.absolute_dimentions[0]),
-            pixel_to_inch(self.absolute_dimentions[1])
+            pixel_to_inch(self.absolute_dimensions[0]),
+            pixel_to_inch(self.absolute_dimensions[1])
         ]
 
 
@@ -219,6 +219,7 @@ class WorkspaceWidget(QWidget):
         self.layers.append(self.grid)
 
         self.render()
+        self.ui.scrollArea.scrollContentsBy(300, 300)
 
         self.ui.zoomComboBox.currentTextChanged.connect(self.change_zoom_factor)
         self.ui.zoomComboBox.setCurrentText(str(80.0))
@@ -299,16 +300,16 @@ class WorkspaceWidget(QWidget):
         # Crop image to a square:
         # TODO:
         # Figure out why artboard is being pushed down when its dimensions are less then its contents
-        artboard = QImage(QSize(*self.absolute_dimentions), QImage.Format_ARGB32_Premultiplied)
+        artboard = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(artboard)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(
             QRect(
                 0,
                 0,
-                *self.absolute_dimentions
+                *self.absolute_dimensions
             ),
-            QColor(235, 235, 255, 50)
+            QColor(240, 245, 255, 10)
         )
         painter.fillRect(QRect(
                 *self.settings['offset_dimensions'],
@@ -321,7 +322,7 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(artboard)
 
     def translate_layer(self, base_image) -> QPixmap:
-        resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
@@ -342,7 +343,7 @@ class WorkspaceWidget(QWidget):
             self.label.clear()
             res = self.render_layers()
             res = self.crop_workspace(res)
-            res = res.scaledToWidth(self.base_zoom * self.base_width)
+            # res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
             # self.ui.gridLayout_3.addWidget(self.label)
         except Exception as e:
@@ -425,7 +426,7 @@ class WorkspaceWidget(QWidget):
         cols = w // gap
 
         print(layer.image.size())
-        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         color = QColor(Qt.white)
         color.setAlphaF(0.5)
@@ -442,7 +443,7 @@ class WorkspaceWidget(QWidget):
         return self.image_to_pixmap(resultImage)
 
     def update_layer(self, layer) -> QPixmap:
-        resultImage = QImage(layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.scale(*layer.scale)
         painter.translate(*layer.position)
@@ -456,7 +457,7 @@ class WorkspaceWidget(QWidget):
 
         # layer.image = self.update_layer(layer)
 
-        resultImage = QImage(image_1.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
@@ -528,7 +529,7 @@ class WorkspaceWidget(QWidget):
             print(e)
 
     def translate(self, image: QPixmap, position: List) -> QPixmap:
-        resultImage = QImage(image.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
@@ -544,7 +545,7 @@ class WorkspaceWidget(QWidget):
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
 
-        resultImage = QImage(base_image.size(), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
