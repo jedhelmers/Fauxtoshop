@@ -72,7 +72,12 @@ class WorkspaceSignaler(QtCore.QObject):
 
 
 class WorkspaceWidget(QWidget):
-    def __init__(self, parent, new_file_info):
+    def __init__(
+            self,
+            parent,
+            new_file_info,
+            signaler
+        ):
         super().__init__(parent)
         self.ui = workspaceui.Ui_Workspace()
         self.ui.setupUi(self)
@@ -81,6 +86,7 @@ class WorkspaceWidget(QWidget):
         self.tool_settings = {}
         self.get_tool_settings()
         self._parent = parent
+        self.main_signaler = signaler
 
         self._current_layer = None
         self.tool = ToolBase(parent=self._parent, layer=self.current_layer)
@@ -345,6 +351,7 @@ class WorkspaceWidget(QWidget):
             res = self.crop_workspace(res)
             # res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
+            self.main_signaler.layer_manager.emit(self.layers)
             # self.ui.gridLayout_3.addWidget(self.label)
         except Exception as e:
             print(e)

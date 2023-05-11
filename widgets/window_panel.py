@@ -6,12 +6,19 @@ from widgets.windows.layers import LayersWindowWidget
 
 
 class WindowPanelWidget(QWidget):
-    def __init__(self, parent, windows, signaler=None):
+    def __init__(
+            self,
+            parent,
+            windows,
+            layers,
+            signaler=None):
         super().__init__(parent)
         self.ui = window_flyout_panelui.Ui_WindowPanel()
         self.ui.setupUi(self)
 
+        self.main_signaler = signaler
         self.windows = windows
+        self.layers = layers
         self.ui.windowPanelTabWidget.setStyleSheet(flyout_panel())
         self.setMaximumWidth(240)
 
@@ -20,9 +27,12 @@ class WindowPanelWidget(QWidget):
         # for i in range(4):
         #     widget = QWidget()
         for window in self.windows:
-            layers = LayersWindowWidget()
-            # print(window)
-            self.ui.windowPanelTabWidget.addTab(layers, 'Name')
+            layers = LayersWindowWidget(
+                signaler=self.main_signaler,
+                layers=self.layers
+            )
+        # print(window)
+        self.ui.windowPanelTabWidget.addTab(layers, 'Name')
 
         self.setStyleSheet('background: rgba(255, 255, 255, 0.1)')
 

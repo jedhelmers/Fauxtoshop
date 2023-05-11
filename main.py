@@ -104,6 +104,7 @@ class MainSignaler(QtCore.QObject):
     select_tool = QtCore.Signal(str)
     show_window_panel = QtCore.Signal(dict)
     select_window = QtCore.Signal(str)
+    layer_manager = QtCore.Signal(dict)
 
 
 class MainWindow(QMainWindow):
@@ -124,6 +125,7 @@ class MainWindow(QMainWindow):
         self.tab_index = 0
         self.tabs = []
         self.current_tab = None
+        self.layers = []
 
         toolbar = ToolbarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
@@ -134,10 +136,15 @@ class MainWindow(QMainWindow):
         self.signaler.select_tool.connect(self.select_tool)
         self.signaler.show_window_panel.connect(self.show_window_panel)
         self.signaler.select_window.connect(self.select_window)
+        self.signaler.layer_manager.connect(self.layer_manager)
 
         self.setup_windows()
 
-        self.WindowPanelWidget = WindowPanelWidget(parent=self, signaler=self.signaler, windows=self.windows)
+        self.WindowPanelWidget = WindowPanelWidget(
+            parent=self,
+            signaler=self.signaler,
+            windows=self.windows,
+            layers=self.layers)
         self.WindowPanelWidget.hide()
         self.current_tool = 'brush'
         # self.current_window = 'Layers'
@@ -171,8 +178,16 @@ class MainWindow(QMainWindow):
             self.current_tab.current_tool = tool
         self.setup_tool_options_bar()
 
+    def layer_manager(self, layers):
+        print('layers!', layers)
+        self.layers = layers
+        self.windows['Layers'].update_layers(self.layers)
+
     def setup_windows(self):
-        self.windows['Layers'] = LayersWindowWidget()
+        self.windows['Layers'] = LayersWindowWidget(
+            signaler=self.signaler,
+            layers=self.layers
+        )
 
     def resizeEvent(self, event):
         self.adjust_window_panel_pos(event.size() - event.oldSize())
@@ -239,7 +254,11 @@ class MainWindow(QMainWindow):
             pass
 
     def new_file(self, new_file_info):
-        tab = WorkspaceWidget(self, new_file_info)
+        tab = WorkspaceWidget(
+            self,
+            new_file_info,
+            signaler=self.signaler
+        )
         self.current_tab = tab
         self.tabs.append(tab)
 

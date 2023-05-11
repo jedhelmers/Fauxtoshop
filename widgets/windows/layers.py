@@ -10,10 +10,20 @@ from widgets.windows.layergroup import LayerGroupWidget
 
 
 class LayersWindowWidget(QWidget):
-    def __init__(self, signaler=None):
+    def __init__(
+            self,
+            layers,
+            signaler=None
+        ):
         super().__init__()
         self.ui = layerswindowui.Ui_LayersWindow()
         self.ui.setupUi(self)
+
+        self.main_signaler = signaler
+        self.layers = layers
+
+        for l in self.layers:
+            print(l.name)
 
         layer = LayerWidget(layer={'is_selected': False, 'hidden': True})
         layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False})
@@ -24,3 +34,9 @@ class LayersWindowWidget(QWidget):
         self.ui.verticalLayout_3.insertWidget(0, group)
         # print(len(self.ui.verticalLayout_3.children()))
 
+    def update_layers(self, layers):
+        # self.main_signaler.layer_manager.emit()
+        print('WQEEE')
+        self.layers = layers
+        for l in self.layers:
+            print(l.name)
