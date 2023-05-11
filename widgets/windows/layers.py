@@ -21,13 +21,11 @@ class LayersWindowWidget(QWidget):
 
         self.main_signaler = signaler
         self.layers = layers
+        self.update_layers(layers)
 
-        for l in self.layers:
-            print(l.name)
-
-        layer = LayerWidget(layer={'is_selected': False, 'hidden': True})
-        layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False})
-        group = LayerGroupWidget(layer={'is_selected': False, 'hidden': True})
+        layer = LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
+        layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False, 'name': 'Stuff'})
+        group = LayerGroupWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
         # v = QVBoxLayout()
         self.ui.verticalLayout_3.insertWidget(0, layer)
         self.ui.verticalLayout_3.insertWidget(0, layer2)
@@ -35,8 +33,7 @@ class LayersWindowWidget(QWidget):
         # print(len(self.ui.verticalLayout_3.children()))
 
     def update_layers(self, layers):
-        # self.main_signaler.layer_manager.emit()
-        print('WQEEE')
         self.layers = layers
         for l in self.layers:
-            print(l.name)
+            layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name})
+            self.ui.verticalLayout_3.insertWidget(0, layer)

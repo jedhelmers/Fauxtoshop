@@ -42,6 +42,8 @@ class LayerWidget(QWidget):
         self.selected()
 
         self.ui.hidePushButton.clicked.connect(self.show)
+        print('name:', layer['name'])
+        self.ui.layerNameLabel.setText(layer['name'])
 
     def selected(self):
         # if self.is_selected:

@@ -104,7 +104,7 @@ class MainSignaler(QtCore.QObject):
     select_tool = QtCore.Signal(str)
     show_window_panel = QtCore.Signal(dict)
     select_window = QtCore.Signal(str)
-    layer_manager = QtCore.Signal(dict)
+    layer_manager = QtCore.Signal(list)
 
 
 class MainWindow(QMainWindow):
@@ -179,7 +179,6 @@ class MainWindow(QMainWindow):
         self.setup_tool_options_bar()
 
     def layer_manager(self, layers):
-        print('layers!', layers)
         self.layers = layers
         self.windows['Layers'].update_layers(self.layers)
 
