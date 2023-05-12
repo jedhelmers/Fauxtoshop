@@ -280,11 +280,6 @@ class WorkspaceWidget(QWidget):
         self.render()
         self.mouse_move_event(event.pos().x(), event.pos().y())
 
-    def _zooms(self, val):
-        self.base_zoom = float(val) / 100.0
-        self.zoom = self.base_zoom
-        # print(val, self.base_zoom)
-
     def mouseReleaseEvent(self, event):
         self.up_mouse_pos = [0, 0]
         self.down_mouse_pos = [0, 0]
@@ -301,6 +296,14 @@ class WorkspaceWidget(QWidget):
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]
+
+    def get_layers(self):
+        return self.layers
+
+    def _zooms(self, val):
+        self.base_zoom = float(val) / 100.0
+        self.zoom = self.base_zoom
+        # print(val, self.base_zoom)
 
     def crop_workspace(self, image) -> QPixmap:
         # Crop image to a square:
@@ -351,7 +354,7 @@ class WorkspaceWidget(QWidget):
             res = self.crop_workspace(res)
             # res = res.scaledToWidth(self.base_zoom * self.base_width)
             self.label.setPixmap(res)
-            self.main_signaler.layer_manager.emit(self.layers)
+            # self.main_signaler.layer_manager.emit(self.layers)
             # self.ui.gridLayout_3.addWidget(self.label)
         except Exception as e:
             print(e)

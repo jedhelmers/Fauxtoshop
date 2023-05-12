@@ -1,6 +1,6 @@
 from datatypes.window import Window
 
-def get_windows():
+def get_window_controls():
     return {
             'Actions': Window(**{'tooltip': 'actions', 'name': 'Actions', 'path': u':/images/images/window_actions.svg'}),
             'Adjustments': Window(**{'tooltip': 'adjustments', 'name': 'Adjustments', 'path': u':/images/images/window_adjustments.svg'}),
