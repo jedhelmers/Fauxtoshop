@@ -4,7 +4,7 @@
     <style>
       .cls-1 {
         fill: #fff;
-        opacity: .4;
+        opacity: .55;
         stroke: #221f20;
         stroke-miterlimit: 10;
       }

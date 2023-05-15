@@ -38,10 +38,12 @@ class LayerWidget(QWidget):
 
         self.hidden = layer['hidden']
         self.is_selected = layer['is_selected']
-        self.show()
+        self.render()
         self.selected()
 
         self.ui.hidePushButton.clicked.connect(self.show)
+        # print('name:', layer['name'])
+        self.ui.layerNameLabel.setText(layer['name'])
 
     def selected(self):
         # if self.is_selected:
@@ -62,8 +64,7 @@ class LayerWidget(QWidget):
         #     """)
         pass
 
-    def show(self):
-        self.hidden = not self.hidden
+    def render(self):
         icon = QIcon()
 
         if self.hidden:
@@ -72,3 +73,8 @@ class LayerWidget(QWidget):
             icon.addFile(u":/images/images/window_show.svg", QSize(), QIcon.Normal, QIcon.Off)
 
         self.ui.hidePushButton.setIcon(icon)
+
+    def show(self):
+        self.hidden = not self.hidden
+        self.render()
+
