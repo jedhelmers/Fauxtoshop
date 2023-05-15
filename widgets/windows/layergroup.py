@@ -38,9 +38,9 @@ class LayerGroupWidget(QWidget):
         """)
 
         self.hidden = layer['hidden']
-        self.is_open = False
-        # print('self.is_open', layer)
+        self.is_open = True
         self.is_selected = layer['is_selected']
+
         self.show()
 
         self.ui.hidePushButton.clicked.connect(self.show)
@@ -49,7 +49,6 @@ class LayerGroupWidget(QWidget):
     def open(self):
         self.is_open = not self.is_open
         icon = QIcon()
-        # icon_folder = QPixmap()
         
         if self.is_open:
             icon.addFile(u":images/images/window_open.svg", QSize(12, 12), QIcon.Normal, QIcon.Off)
