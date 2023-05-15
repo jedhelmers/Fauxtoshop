@@ -63,14 +63,26 @@ class Ui_LayerWidget(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(4, -1, 4, -1)
-        self.label = QLabel(self.widget)
-        self.label.setObjectName(u"label")
-        self.label.setMinimumSize(QSize(15, 15))
-        self.label.setMaximumSize(QSize(15, 15))
-        self.label.setPixmap(QPixmap(u":/images/images/window_group_closed.svg"))
-        self.label.setScaledContents(True)
+        self.openPushButton = QPushButton(self.widget)
+        self.openPushButton.setObjectName(u"openPushButton")
+        self.openPushButton.setMinimumSize(QSize(18, 0))
+        self.openPushButton.setMaximumSize(QSize(18, 16777215))
+        icon1 = QIcon()
+        icon1.addFile(u":/images/images/window_open.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.openPushButton.setIcon(icon1)
+        self.openPushButton.setIconSize(QSize(12, 12))
+        self.openPushButton.setFlat(False)
 
-        self.horizontalLayout.addWidget(self.label)
+        self.horizontalLayout.addWidget(self.openPushButton)
+
+        self.folderLabel = QLabel(self.widget)
+        self.folderLabel.setObjectName(u"folderLabel")
+        self.folderLabel.setMinimumSize(QSize(15, 15))
+        self.folderLabel.setMaximumSize(QSize(15, 15))
+        self.folderLabel.setPixmap(QPixmap(u":/images/images/window_group_closed.svg"))
+        self.folderLabel.setScaledContents(True)
+
+        self.horizontalLayout.addWidget(self.folderLabel)
 
 
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
@@ -103,7 +115,8 @@ class Ui_LayerWidget(object):
     def retranslateUi(self, LayerWidget):
         LayerWidget.setWindowTitle(QCoreApplication.translate("LayerWidget", u"Form", None))
         self.hidePushButton.setText("")
-        self.label.setText("")
+        self.openPushButton.setText("")
+        self.folderLabel.setText("")
         self.layerNameLabel.setText(QCoreApplication.translate("LayerWidget", u"Group Name", None))
     # retranslateUi
 

@@ -69,19 +69,19 @@ class Layer:
 class LayerGroup(Layer):
     __slots__ = [
         'children',
-        'is_collapsed'
+        'is_open'
     ]
 
     def __init__(
             self,
             children: List=[],
-            is_collapsed: bool=False,
+            is_open: bool=False,
             *args,
             **kwargs
         ):
         super().__init__(self, *args, **kwargs)
         self.children = children
-        self.is_collapsed = is_collapsed
+        self.is_open = is_open
 
 
 

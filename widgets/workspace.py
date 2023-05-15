@@ -293,6 +293,8 @@ class WorkspaceWidget(QWidget):
         self.current_layer.image = self.translate(self.current_layer.image, self.current_layer.position)
         self.current_layer.position = [0, 0]
 
+        self.main_signaler.layer_manager.emit(self.layers)
+
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.x(), event.y()]
         self.up_mouse_pos = [event.x(), event.y()]

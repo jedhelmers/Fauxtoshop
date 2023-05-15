@@ -111,9 +111,11 @@ class LayersWindowWidget(QWidget):
     def test(self):
         self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Test'}))
 
-    def update_layers(self, layers):
-        # self.layers = layers
-        for l in layers:
-            layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name})
-            self.ui.verticalLayout_3.insertWidget(0, layer)
+    def update_layers(self, layers=None):
+        self.layers = layers
+        # layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': "l.name"})
+        self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': "l.name"}))
+        for l in self.layers:
+            # layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name})
+            self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name}))
             print(l.name)
