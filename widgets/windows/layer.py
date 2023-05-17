@@ -17,6 +17,7 @@ class LayerWidget(QWidget):
         super().__init__()
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
+        self.objectName = layer['name']
         if parent:
             self.setParent(parent)
 
