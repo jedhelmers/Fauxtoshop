@@ -30,7 +30,7 @@ class Layer:
             layer_id=None,
             index=0,
             color=None,
-            name='Layer',
+            name=None,
             alpha_lock=False,
             lock=False,
             show=True,
@@ -50,8 +50,14 @@ class Layer:
             id += 1
         else:
             self.layer_id = layer_id
+
         self.color = color
-        self.name = name
+
+        if name:
+            self.name = name
+        else:
+            self.name = f'Layer {self.layer_id}'
+
         self.alpha_lock = alpha_lock
         self.lock = lock
         self.show = show

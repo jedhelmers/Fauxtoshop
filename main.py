@@ -11,6 +11,7 @@ from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
 from workspace import WorkspaceWidget
+from widgets.windows.layers import LayersWindowWidget
 
 
 class QHLine(QFrame):
@@ -34,7 +35,7 @@ class QVLine(QFrame):
 
 
 class MainSignaler(QtCore.QObject):
-    pass
+    new_layer = QtCore.Signal(Layer)
 
 
 class MainWindow(QMainWindow):
@@ -59,8 +60,14 @@ class MainWindow(QMainWindow):
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
 
+        # Windows
+        self.windows = {}
+
         # DATA
         self.layers = []
+
+        # Signals
+        self.signaler.new_layer.connect(self.new_layer)
 
         # TEMP
         new_file_information = {
@@ -70,7 +77,8 @@ class MainWindow(QMainWindow):
             'offset_dimensions': [300, 300]
         }
         self.initialize_document(new_file_information)
-        self.draw_v_ruler()
+        self.draw_rulers()
+        self.generate_window_panels()
         self.render()
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
@@ -85,43 +93,52 @@ class MainWindow(QMainWindow):
         self._layers = layers
         self.render()
 
+        # TODO: Handle this better
+        print(self.windows)
+        print('UPDATED')
+        if 'layers_widget'  in self.windows:
+            print('CLICKED')
+
+            self.windows['layers_widget'].update_layers()
+
     def initialize_document(self, new_file_information):
         # Background layer
         self.settings = {**new_file_information, **self.settings}
         background = Layer()
         background.image = QPixmap(QSize(*new_file_information['absolute_dimensions']))
         background.image.fill(new_file_information['color'])
-        background.image = self.crop_workspace(background.image)
         background.name = 'Background'
 
         self.layers.append(background)
 
     def crop_workspace(self, image) -> QPixmap:
-        artboard = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(artboard)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(
-            QRect(
-                0,
-                0,
-                *self.settings['absolute_dimensions']
-            ),
-            QColor(0, 245, 255, 100)
-        )
+        if 'absolute_dimensions' in self.settings:
+            artboard = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+            painter = QPainter(artboard)
+            painter.setCompositionMode(QPainter.CompositionMode_Source)
+            painter.fillRect(
+                QRect(
+                    0,
+                    0,
+                    *self.settings['absolute_dimensions']
+                ),
+                QColor(0, 245, 255, 100)
+            )
 
-        # TODO: Move to new_file_information dict.
-        document_dimensions = [*self.settings['absolute_dimensions']]
-        document_dimensions[0] -= self.settings['offset_dimensions'][0] * 2
-        document_dimensions[1] -= self.settings['offset_dimensions'][1] * 2
-        painter.fillRect(QRect(
-                *self.settings['offset_dimensions'],
-                *document_dimensions,
-            ),
-            image
-        )
-        painter.end()
+            # TODO: Move to new_file_information dict.
+            document_dimensions = [*self.settings['absolute_dimensions']]
+            document_dimensions[0] -= self.settings['offset_dimensions'][0] * 2
+            document_dimensions[1] -= self.settings['offset_dimensions'][1] * 2
+            painter.fillRect(QRect(
+                    *self.settings['offset_dimensions'],
+                    *document_dimensions,
+                ),
+                image
+            )
+            painter.end()
 
-        return self.image_to_pixmap(artboard)
+            return self.image_to_pixmap(artboard)
+        return image
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
@@ -145,6 +162,20 @@ class MainWindow(QMainWindow):
         return self.image_to_pixmap(resultImage)
         # return QPixmap(base_image.size()).fromImage(resultImage, Qt.ColorOnly)
 
+    def new_layer(self, layer):
+        self.layers += [layer]
+
+    def generate_window_panels(self):
+        layers_widget = LayersWindowWidget(
+            signaler=self.signaler,
+            settings=self.settings,
+            layers=self.layers
+        )
+
+        self.windows['layers_widget'] = layers_widget
+
+        self.ui.windowsWidget.layout().addChildWidget(self.windows['layers_widget'])
+
     def render_layers(self):
         if self.layers:
             composite = self.layers[0].image
@@ -166,6 +197,31 @@ class MainWindow(QMainWindow):
 
     def image_to_pixmap(self, image) -> QPixmap:
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
+    def draw_rulers(self):
+        # TODO: Extend entire length/height of application
+        self.draw_v_ruler()
+        self.draw_h_ruler()
+
+    def draw_h_ruler(self):
+        ruler_dimensions = self.settings['absolute_dimensions']
+        for i in range(int(ruler_dimensions[0] // 100)):
+            # self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
+            self.draw_h_unit(i - (self.settings['offset_dimensions'][1] // 100), i * 100)
+
+    def draw_h_unit(self, index, h_offset=0):
+        # TODO: create dynamically
+        inch_ticks = [
+            16, 14, 16, 0
+        ]
+        label = QLabel(self.ui.horizontalRulerWidget)
+        label.setText(str(index))
+        label.move(h_offset + 4, -6)
+        tick_width = 94 / len(inch_ticks)
+
+        for i, v_offset in enumerate(inch_ticks):
+            line = QVLine(self.ui.horizontalRulerWidget, 20 - v_offset)
+            line.move(((i + 1) * tick_width + h_offset) * (self.zoom/100.0), v_offset)
 
     def draw_v_unit(self, index, v_offset=0):
         # TODO: create dynamically
@@ -193,6 +249,7 @@ class MainWindow(QMainWindow):
 
         # Pixel to mm
         # TODO: Make versatile
+        # TODO: Fix lines
         for i in range(int(ruler_dimensions[1] // 100)):
             # print(self.zoom, type(self.zoom))
             # self.draw_v_unit(i - self.settings['offset_dimensions'][0], i)
@@ -200,6 +257,7 @@ class MainWindow(QMainWindow):
 
     def render(self):
         res = self.render_layers()
+        res = self.crop_workspace(res)
         if res:
             self.label.setPixmap(res)
 

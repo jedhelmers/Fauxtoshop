@@ -168,7 +168,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 838, 510))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 563, 510))
         self.gridLayout_6 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_6.setSpacing(0)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
@@ -204,7 +204,7 @@ class Ui_MainWindow(object):
 
         self.windowsWidget = QWidget(self.centralwidget)
         self.windowsWidget.setObjectName(u"windowsWidget")
-        self.windowsWidget.setMinimumSize(QSize(0, 0))
+        self.windowsWidget.setMinimumSize(QSize(275, 0))
         self.verticalLayout_2 = QVBoxLayout(self.windowsWidget)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")

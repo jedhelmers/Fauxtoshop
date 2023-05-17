@@ -1,8 +1,9 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QPoint
 from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap, QColor
 
+from datatypes.layer import Layer
 from styles.window_panel import window_panel_style
 from ui.windows import layerswindowui
 from widgets.windows.layer import LayerWidget
@@ -13,6 +14,7 @@ class LayersWindowWidget(QWidget):
     def __init__(
             self,
             layers,
+            settings,
             signaler=None
         ):
         super().__init__()
@@ -21,18 +23,20 @@ class LayersWindowWidget(QWidget):
 
         self.main_signaler = signaler
         self.layers = layers
+        self.settings = settings
         # self.update_layers(layers)
 
-        layer = LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
-        layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False, 'name': 'Stuff'})
-        group = LayerGroupWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
-        # v = QVBoxLayout()
-        self.ui.verticalLayout_3.insertWidget(0, layer)
-        self.ui.verticalLayout_3.insertWidget(0, layer2)
-        self.ui.verticalLayout_3.insertWidget(0, group)
+        # layer = LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
+        # layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False, 'name': 'Stuff'})
+        # group = LayerGroupWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
+        # # v = QVBoxLayout()
+        # self.ui.verticalLayout_3.insertWidget(0, layer)
+        # self.ui.verticalLayout_3.insertWidget(0, layer2)
+        # self.ui.verticalLayout_3.insertWidget(0, group)
         # print(len(self.ui.verticalLayout_3.children()))
 
-        self.ui.newLayerPushButton.clicked.connect(self.test)
+        self.ui.newLayerPushButton.clicked.connect(self.new_layer)
+        self.update_layers()
 
         self.setStyleSheet("""
             QComboBox {
@@ -108,14 +112,24 @@ class LayersWindowWidget(QWidget):
 
         """)
 
-    def test(self):
-        self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Test'}))
+    def new_layer(self):
+        layer = Layer()
+        layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
+        layer.image.fill(QColor(255, 255, 0, 10))
+        # layer.image = self.crop_workspace(layer.image)
+        # layer.name = 'Background'
+        self.main_signaler.new_layer.emit(layer)
 
-    def update_layers(self, layers=None):
-        self.layers = layers
-        # layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': "l.name"})
-        self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': "l.name"}))
+    def update_layers(self, index=0):
+        # self.ui.verticalLayout_3 = QVBoxLayout(self)
+        # children = []
+        print('CLICKED')
+
+        for child_index in range(self.ui.verticalLayout_3.count()):
+            child_widget = self.ui.verticalLayout_3.itemAt(child_index).widget()
+            if child_widget and isinstance(child_widget, LayerWidget):
+                child_widget.setParent(None)
+
         for l in self.layers:
             # layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name})
-            self.ui.verticalLayout_3.insertWidget(0, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name}))
-            print(l.name)
+            self.ui.verticalLayout_3.insertWidget(index, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name}))
