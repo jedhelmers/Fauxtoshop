@@ -10,6 +10,11 @@ from widgets.windows.layer import LayerWidget
 from widgets.windows.layergroup import LayerGroupWidget
 
 
+# SIGNALS
+class LayerSignaler(QtCore.QObject):
+    update_selected_layer = QtCore.Signal()
+
+
 class LayersWindowWidget(QWidget):
     def __init__(
             self,
@@ -22,10 +27,14 @@ class LayersWindowWidget(QWidget):
         self.ui = layerswindowui.Ui_LayersWindow()
         self.ui.setupUi(self)
 
+        self.signaler = LayerSignaler()
         self.main_signaler = signaler
         self.layers = layers
         self.current_layer = current_layer
         self.settings = settings
+
+        # Signals
+        self.signaler.update_selected_layer.connect(self.update_selected_layer)
 
         # Clicks
         self.ui.newLayerPushButton.clicked.connect(self.new_layer)
@@ -114,6 +123,9 @@ class LayersWindowWidget(QWidget):
     def current_layer(self, current_layer):
         self._current_layer = current_layer
 
+    def update_selected_layer(self):
+        self.update_layers()
+
     def new_layer(self):
         layer = Layer()
         layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
@@ -171,8 +183,8 @@ class LayersWindowWidget(QWidget):
         for l in self.layers:
             layer = LayerWidget(
                 parent=self.ui.verticalLayout_3.widget(),
-                signaler=self.main_signaler,
-                current_layer=self.current_layer,
+                main_signaler=self.main_signaler,
+                layer_signaler=self.signaler,
                 layer={'is_selected': False, 'hidden': False, 'name': l.name}
             )
             layer.setObjectName(l.name)
@@ -182,12 +194,8 @@ class LayersWindowWidget(QWidget):
             else:
                 layer.ui.thumbnailWidget.setFixedHeight(32 * self.settings['aspect_ratio'][1])
 
-            if self.current_layer == layer.objectName:
-                print('WEEEEE', self.current_layer)
-                # layer.selected(f'WEEEE: {self.current_layer}')
             layer.selected(self.current_layer == layer.objectName)
 
-            # print(self.current_layer)
             # Add thumbnail to thumbnailwidget
             thumb = QLabel(layer.ui.thumbnailWidget)
             thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), l.image))

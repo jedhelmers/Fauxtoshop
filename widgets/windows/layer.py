@@ -12,13 +12,15 @@ class LayerWidget(QWidget):
             self,
             layer,
             parent=None,
-            signaler=None
+            main_signaler=None,
+            layer_signaler=None
         ):
         super().__init__()
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
         self.objectName = layer['name']
-        self.signaler = signaler
+        self.main_signaler = main_signaler
+        self.layer_signaler = layer_signaler
 
         if parent:
             self.setParent(parent)
@@ -45,17 +47,16 @@ class LayerWidget(QWidget):
         self.hidden = layer['hidden']
         self.is_selected = layer['is_selected']
         self.render()
-        # self.selected()
 
         self.ui.hidePushButton.clicked.connect(self.show)
         self.ui.layerNameLabel.setText(layer['name'])
 
     def mousePressEvent(self, event):
-        # print(self.objectName)
-        self.signaler.set_current_layer.emit(self.objectName)
+        self.main_signaler.set_current_layer.emit(self.objectName)
+        self.layer_signaler.update_selected_layer.emit()
 
     def set_current_layer(self):
-        self.signaler.set_current_layer.emit()
+        self.main_signaler.set_current_layer.emit()
 
     def selected(self, is_selected=False):
         # TODO: Update list onClick, and NOT on addNewLayer
@@ -77,8 +78,6 @@ class LayerWidget(QWidget):
             # }
             # """)
             self.setStyleSheet("background: rgba(255, 255, 255, .02);")
-        print(is_selected)
-        pass
 
     def render(self):
         icon = QIcon()

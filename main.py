@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         self.signaler.set_current_layer.connect(self.set_current_layer)
 
         # TEMP
-        document_dimensions = [1800, 1600]
+        document_dimensions = [800, 1600]
         offset_dimensions = [300, 300]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
