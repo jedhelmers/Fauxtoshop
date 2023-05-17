@@ -14,6 +14,8 @@ from workspace import WorkspaceWidget
 from widgets.windows.layers import LayersWindowWidget
 
 
+# RULER LINES
+# Create a Ruler class to handle all this.
 class QHLine(QFrame):
     def __init__(self, parent, width=20, thickness=1):
         super(QHLine, self).__init__(parent=parent)
@@ -34,6 +36,7 @@ class QVLine(QFrame):
         self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
 
 
+# SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
 
@@ -83,7 +86,6 @@ class MainWindow(QMainWindow):
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
 
-
     @property
     def layers(self):
         return self._layers
@@ -101,6 +103,7 @@ class MainWindow(QMainWindow):
 
             self.windows['layers_widget'].update_layers()
 
+    # INITIALIZATION
     def initialize_document(self, new_file_information):
         # Background layer
         self.settings = {**new_file_information, **self.settings}
@@ -111,6 +114,7 @@ class MainWindow(QMainWindow):
 
         self.layers.append(background)
 
+    # UTILITIES
     def crop_workspace(self, image) -> QPixmap:
         if 'absolute_dimensions' in self.settings:
             artboard = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
@@ -165,17 +169,6 @@ class MainWindow(QMainWindow):
     def new_layer(self, layer):
         self.layers += [layer]
 
-    def generate_window_panels(self):
-        layers_widget = LayersWindowWidget(
-            signaler=self.signaler,
-            settings=self.settings,
-            layers=self.layers
-        )
-
-        self.windows['layers_widget'] = layers_widget
-
-        self.ui.windowsWidget.layout().addChildWidget(self.windows['layers_widget'])
-
     def render_layers(self):
         if self.layers:
             composite = self.layers[0].image
@@ -198,6 +191,19 @@ class MainWindow(QMainWindow):
     def image_to_pixmap(self, image) -> QPixmap:
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
+    # WINDOW PANELS
+    def generate_window_panels(self):
+        layers_widget = LayersWindowWidget(
+            signaler=self.signaler,
+            settings=self.settings,
+            layers=self.layers
+        )
+
+        self.windows['layers_widget'] = layers_widget
+
+        self.ui.windowsWidget.layout().addChildWidget(self.windows['layers_widget'])
+
+    # RULERS
     def draw_rulers(self):
         # TODO: Extend entire length/height of application
         self.draw_v_ruler()
@@ -255,6 +261,7 @@ class MainWindow(QMainWindow):
             # self.draw_v_unit(i - self.settings['offset_dimensions'][0], i)
             self.draw_v_unit(i - (self.settings['offset_dimensions'][0] // 100), i * 100)
 
+    # MAIN RENDER
     def render(self):
         res = self.render_layers()
         res = self.crop_workspace(res)
