@@ -109,16 +109,11 @@ class LayersWindowWidget(QWidget):
         self.main_signaler.new_layer.emit(layer)
 
     def update_layers(self, index=0):
-        # print(len(self.ui.verticalLayout_3.findChildren(LayerWidget)))
-        for child_index in range(self.ui.verticalLayout_3.count()):
-            child_widget = self.ui.verticalLayout_3.itemAt(child_index)
-            if child_widget:
-                child_widget = child_widget.widget()
+        # Remove all existing layers from layout
+        for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
+            child.setParent(None)
 
-                if isinstance(child_widget, LayerWidget):
-                    child_widget.setParent(None)
-                    # child_widget.deleteLater()
-
+        # Add all layers to layout
         for l in self.layers:
             self.ui.verticalLayout_3.insertWidget(
                 index,
