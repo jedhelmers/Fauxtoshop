@@ -11,11 +11,14 @@ class LayerWidget(QWidget):
     def __init__(
             self,
             layer,
+            parent=None,
             signaler=None
         ):
         super().__init__()
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
+        if parent:
+            self.setParent(parent)
 
         self.setStyleSheet("""
             QWidget[objectName*=thumbnailWidget] {

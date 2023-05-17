@@ -24,16 +24,6 @@ class LayersWindowWidget(QWidget):
         self.main_signaler = signaler
         self.layers = layers
         self.settings = settings
-        # self.update_layers(layers)
-
-        # layer = LayerWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
-        # layer2 = LayerWidget(layer={'is_selected': True, 'hidden': False, 'name': 'Stuff'})
-        # group = LayerGroupWidget(layer={'is_selected': False, 'hidden': True, 'name': 'Stuff'})
-        # # v = QVBoxLayout()
-        # self.ui.verticalLayout_3.insertWidget(0, layer)
-        # self.ui.verticalLayout_3.insertWidget(0, layer2)
-        # self.ui.verticalLayout_3.insertWidget(0, group)
-        # print(len(self.ui.verticalLayout_3.children()))
 
         self.ui.newLayerPushButton.clicked.connect(self.new_layer)
         self.update_layers()
@@ -116,20 +106,21 @@ class LayersWindowWidget(QWidget):
         layer = Layer()
         layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
         layer.image.fill(QColor(255, 255, 0, 10))
-        # layer.image = self.crop_workspace(layer.image)
-        # layer.name = 'Background'
         self.main_signaler.new_layer.emit(layer)
 
     def update_layers(self, index=0):
-        # self.ui.verticalLayout_3 = QVBoxLayout(self)
-        # children = []
-        print('CLICKED')
-
+        # print(len(self.ui.verticalLayout_3.findChildren(LayerWidget)))
         for child_index in range(self.ui.verticalLayout_3.count()):
-            child_widget = self.ui.verticalLayout_3.itemAt(child_index).widget()
-            if child_widget and isinstance(child_widget, LayerWidget):
-                child_widget.setParent(None)
+            child_widget = self.ui.verticalLayout_3.itemAt(child_index)
+            if child_widget:
+                child_widget = child_widget.widget()
+
+                if isinstance(child_widget, LayerWidget):
+                    child_widget.setParent(None)
+                    # child_widget.deleteLater()
 
         for l in self.layers:
-            # layer = LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name})
-            self.ui.verticalLayout_3.insertWidget(index, LayerWidget(layer={'is_selected': False, 'hidden': False, 'name': l.name}))
+            self.ui.verticalLayout_3.insertWidget(
+                index,
+                LayerWidget(parent=self.ui.verticalLayout_3.widget(), layer={'is_selected': False, 'hidden': False, 'name': l.name})
+            )

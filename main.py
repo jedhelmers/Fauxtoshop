@@ -96,11 +96,7 @@ class MainWindow(QMainWindow):
         self.render()
 
         # TODO: Handle this better
-        print(self.windows)
-        print('UPDATED')
         if 'layers_widget'  in self.windows:
-            print('CLICKED')
-
             self.windows['layers_widget'].update_layers()
 
     # INITIALIZATION
@@ -113,6 +109,9 @@ class MainWindow(QMainWindow):
         background.name = 'Background'
 
         self.layers.append(background)
+
+    # SCRAP
+    # SCRAP END
 
     # UTILITIES
     def crop_workspace(self, image) -> QPixmap:
