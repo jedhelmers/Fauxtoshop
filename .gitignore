@@ -4,6 +4,7 @@ ui/__pycache__
 ui/tools/__pycache__
 widgets/__pycache__/
 widgets/tools/__pycache__/
+CONCURENCY/*
 
 styles/__pycache__
 functions/__pycache__
