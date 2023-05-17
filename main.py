@@ -39,6 +39,7 @@ class QVLine(QFrame):
 # SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
+    set_current_layer = QtCore.Signal(Layer)
 
 
 class MainWindow(QMainWindow):
@@ -68,9 +69,11 @@ class MainWindow(QMainWindow):
 
         # DATA
         self.layers = []
+        self.current_layer = None
 
         # Signals
         self.signaler.new_layer.connect(self.new_layer)
+        self.signaler.set_current_layer.connect(self.set_current_layer)
 
         # TEMP
         document_dimensions = [1800, 1600]
@@ -178,6 +181,10 @@ class MainWindow(QMainWindow):
     def new_layer(self, layer):
         self.layers += [layer]
 
+    def set_current_layer(self, layer):
+        self.current_layer = layer
+        self.windows['layers_widget'].current_layer = self.current_layer
+
     def render_layers(self):
         if self.layers:
             composite = self.layers[0].image
@@ -205,6 +212,7 @@ class MainWindow(QMainWindow):
         layers_widget = LayersWindowWidget(
             signaler=self.signaler,
             settings=self.settings,
+            current_layer=self.current_layer,
             layers=self.layers
         )
 

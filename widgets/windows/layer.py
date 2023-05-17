@@ -18,6 +18,8 @@ class LayerWidget(QWidget):
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
         self.objectName = layer['name']
+        self.signaler = signaler
+
         if parent:
             self.setParent(parent)
 
@@ -43,29 +45,39 @@ class LayerWidget(QWidget):
         self.hidden = layer['hidden']
         self.is_selected = layer['is_selected']
         self.render()
-        self.selected()
+        # self.selected()
 
         self.ui.hidePushButton.clicked.connect(self.show)
-        # print('name:', layer['name'])
         self.ui.layerNameLabel.setText(layer['name'])
 
-    def selected(self):
-        # if self.is_selected:
-        #     self.setStyleSheet("""
-        #     QWidget[objectName=LayerWidget] {
-        #         border: 1px solid rgba(0, 0, 0, .5);
-        #         border-top: none;
-        #         background: rgba(255, 255, 255, .1)
-        #     }
-        #     """)
-        # else:
-        #     self.setStyleSheet("""
-        #     QWidget[objectName=LayerWidget] {
-        #         border: 1px solid rgba(0, 0, 0, .5);
-        #         border-top: none;
-        #         background: rgba(255, 255, 255, .02)
-        #     }
-        #     """)
+    def mousePressEvent(self, event):
+        # print(self.objectName)
+        self.signaler.set_current_layer.emit(self.objectName)
+
+    def set_current_layer(self):
+        self.signaler.set_current_layer.emit()
+
+    def selected(self, is_selected=False):
+        # TODO: Update list onClick, and NOT on addNewLayer
+        if is_selected:
+            self.setStyleSheet("background: rgba(255, 255, 255, .1);")
+            # self.setStyleSheet("""
+            # QWidget[objectName=LayerWidget] {
+            #     border: 1px solid rgba(0, 0, 0, .5);
+            #     border-top: none;
+            #     background: rgba(255, 255, 255, 255)
+            # }
+            # """)
+        else:
+            # self.setStyleSheet("""
+            # QWidget[objectName=LayerWidget] {
+            #     border: 1px solid rgba(0, 0, 0, .5);
+            #     border-top: none;
+            #     background: rgba(255, 255, 255, .02)
+            # }
+            # """)
+            self.setStyleSheet("background: rgba(255, 255, 255, .02);")
+        print(is_selected)
         pass
 
     def render(self):
