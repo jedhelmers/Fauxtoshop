@@ -127,7 +127,7 @@
          <number>4</number>
         </property>
         <item>
-         <widget class="QFrame" name="thumbnailWidget">
+         <widget class="QWidget" name="thumbnailWidget" native="true">
           <property name="minimumSize">
            <size>
             <width>32</width>
@@ -139,12 +139,6 @@
             <width>32</width>
             <height>25</height>
            </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
           </property>
          </widget>
         </item>

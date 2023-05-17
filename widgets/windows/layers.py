@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt, QSize, QPoint
+from PySide6.QtCore import Qt, QSize, QPoint, QRect
 from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
-from PySide6.QtGui import QIcon, QPixmap, QColor
+from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen, QImage
 
 from datatypes.layer import Layer
 from styles.window_panel import window_panel_style
@@ -105,8 +105,48 @@ class LayersWindowWidget(QWidget):
     def new_layer(self):
         layer = Layer()
         layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
-        layer.image.fill(QColor(255, 255, 0, 10))
+        layer.image.fill(QColor(255, 255, 0, 100))
         self.main_signaler.new_layer.emit(layer)
+
+    def image_to_pixmap(self, image) -> QPixmap:
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
+    def merge_images(self, image_1, image_2, mode: str='Normal'):
+        mode = QPainter.CompositionMode.CompositionMode_SourceOver
+
+        resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, image_1)
+        painter.setCompositionMode(mode)
+        painter.drawPixmap(0, 0, image_2)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.white)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
+
+    def generate_checkerboard(self, dimensions=[0, 0], checker_width=5, grid_cnt=10):
+        image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
+        image.fill(Qt.white)
+        painter = QPainter(image)
+        color = QColor(Qt.black)
+        color.setAlphaF(0.5)
+
+        for i in range(grid_cnt):
+            for j in range(grid_cnt):
+                color = QColor(0, 0, 0, 100) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+                painter.fillRect(QRect(
+                    i * checker_width, j * checker_width,
+                    checker_width, checker_width
+                ), color)
+
+        painter.end()
+
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def update_layers(self, index=0):
         # Remove all existing layers from layout
@@ -115,7 +155,14 @@ class LayersWindowWidget(QWidget):
 
         # Add all layers to layout
         for l in self.layers:
-            self.ui.verticalLayout_3.insertWidget(
-                index,
-                LayerWidget(parent=self.ui.verticalLayout_3.widget(), layer={'is_selected': False, 'hidden': False, 'name': l.name})
-            )
+            layer = LayerWidget(parent=self.ui.verticalLayout_3.widget(), layer={'is_selected': False, 'hidden': False, 'name': l.name})
+
+            if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
+                layer.ui.thumbnailWidget.setFixedWidth(32 * self.settings['aspect_ratio'][0])
+            else:
+                layer.ui.thumbnailWidget.setFixedHeight(32 * self.settings['aspect_ratio'][1])
+
+            # Add thumbnail to thumbnailwidget
+            thumb = QLabel(layer.ui.thumbnailWidget)
+            thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), l.image))
+            self.ui.verticalLayout_3.insertWidget(index, layer)

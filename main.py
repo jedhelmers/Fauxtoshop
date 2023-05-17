@@ -73,11 +73,21 @@ class MainWindow(QMainWindow):
         self.signaler.new_layer.connect(self.new_layer)
 
         # TEMP
+        document_dimensions = [1800, 1600]
+        offset_dimensions = [300, 300]
+        absolute_dimensions = [
+            document_dimensions[0] + offset_dimensions[0],
+            document_dimensions[1] + offset_dimensions[1],
+        ]
         new_file_information = {
-            'document_dimensions': [800, 600],
-            'absolute_dimensions': [1000, 900],
+            'document_dimensions': document_dimensions,
+            'absolute_dimensions': absolute_dimensions,
             'color': QColor(155, 245, 255, 255),
-            'offset_dimensions': [300, 300]
+            'offset_dimensions': offset_dimensions,
+            'aspect_ratio': [
+                document_dimensions[0] / document_dimensions[1],
+                document_dimensions[1] / document_dimensions[0],
+            ]
         }
         self.initialize_document(new_file_information)
         self.draw_rulers()
