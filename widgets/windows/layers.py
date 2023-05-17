@@ -109,9 +109,11 @@ class LayersWindowWidget(QWidget):
         self.main_signaler.new_layer.emit(layer)
 
     def image_to_pixmap(self, image) -> QPixmap:
+        # TODO: Move this into a utils
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def merge_images(self, image_1, image_2, mode: str='Normal'):
+        # TODO: Move this into a utils
         mode = QPainter.CompositionMode.CompositionMode_SourceOver
 
         resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
