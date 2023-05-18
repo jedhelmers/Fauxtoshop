@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent
+from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
@@ -41,6 +41,11 @@ class QVLine(QFrame):
 class Tool(QWidget):
     def __init__(self, parent) -> None:
         super().__init__(parent)
+        self._layer = None
+        self.brush_color = qRgba(50, 50, 50, 50)
+        self.last_x = None
+        self.last_y = None
+        self.drag_speed  = 1.0
 
     @property
     def active_tool(self):
@@ -59,12 +64,76 @@ class Tool(QWidget):
     def brush_size(self, brush_size):
         self._brush_size = brush_size
 
+    @property
+    def layer(self):
+        return self._layer
+
+    @layer.setter
+    def layer(self, layer):
+        self._layer = layer
+        self._mode = mode_mappings(layer.mode) if layer else None
+
     def draw_cursor(self):
         tool = get_tool_icon(self.active_tool)
         self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
         self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
         self.parent().setCursor(self.cursor)
 
+    def draw(self, event):
+        switch = {
+            # 'pen': self.pen,
+            'brush': self.brush,
+            # 'erase': self.erase,
+            # 'clone': self.clone,
+            # 'move': self.move
+        }
+
+        if self.layer and self.current_tool in switch:
+            switch[self.active_tool](event)
+
+    def image_to_pixmap(self, image) -> QPixmap:
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
+    def brush(self, event):
+        [x_offset, y_offset] = self.layer.position
+
+        x = event.x() * self.drag_speed - x_offset
+        y = event.y() * self.drag_speed - y_offset
+
+        if self.last_x is None: # First event.
+            self.last_x = x
+            self.last_y = y
+
+            return # Ignore the first time.
+
+        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        pen = QtGui.QPen()
+        pen.setWidth(self._brush_size)
+        pen.setColor(self.brush_color)
+        pen.setStyle(Qt.SolidLine)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setCosmetic(True)
+        painter.setPen(pen)
+
+        # Set STAMP
+        # brush = QIcon(self._brush_shape).pixmap(QSize(self._brush_size, self._brush_size))
+        # pen.setBrush(brush)
+        # painter.setPen(pen)
+
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.drawPixmap(0, 0, self.layer.image)
+        painter.setCompositionMode(self._mode)
+        painter.drawLine(self.last_x, self.last_y, x, y)
+        painter.end()
+
+        self.last_x = x
+        self.last_y = y
+
+        self.layer.image = self.image_to_pixmap(resultImage)
 
 # SIGNALS
 class MainSignaler(QtCore.QObject):
@@ -73,7 +142,7 @@ class MainSignaler(QtCore.QObject):
     lock_layer = QtCore.Signal(int)
     hide_layer = QtCore.Signal(int)
     update_layer_mode = QtCore.Signal(int, str)
-    set_current_layer = QtCore.Signal(Layer)
+    set_current_layer = QtCore.Signal(str)
 
 
 class MainWindow(QMainWindow):
@@ -106,6 +175,11 @@ class MainWindow(QMainWindow):
         # Windows
         self.windows = {}
 
+        # Tools
+        self.tool = Tool(self)
+        self.tool.setMouseTracking(True)
+        self.tool.active_tool = 'brush'
+
         # DATA
         self.layers = []
         self.current_layer = None
@@ -117,11 +191,6 @@ class MainWindow(QMainWindow):
         self.signaler.lock_layer.connect(self.lock_layer)
         self.signaler.hide_layer.connect(self.hide_layer)
         self.signaler.update_layer_mode.connect(self.update_layer_mode)
-
-        # Tools
-        self.tool = Tool(self)
-        self.tool.setMouseTracking(True)
-        self.tool.active_tool = 'brush'
 
         # TEMP
         document_dimensions = [500, 700]
@@ -161,11 +230,22 @@ class MainWindow(QMainWindow):
             self.windows['layers_widget'].layers = self.layers
             self.windows['layers_widget'].render_layers()
 
+    @property
+    def current_layer(self):
+        return self._current_layer
+
+    @current_layer.setter
+    def current_layer(self, current_layer):
+        self._current_layer = current_layer
+        layer = self.get_layer()
+        self.tool.layer = layer
+
     # Mouse overrides
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
         # self.get_workspace_dimensions(event)
         print(event.windowPos(), self.ui.scrollArea.geometry())
+        self.tool.draw(event)
         pass
 
     # INITIALIZATION
@@ -277,6 +357,17 @@ class MainWindow(QMainWindow):
 
         self.layers = layers
 
+    def get_layer(self) -> Layer:
+        # TODO: Change current_layer to a unique ID
+        layer = None
+
+        for l in self.layers:
+            if l.name == self.current_layer:
+                layer = l
+                break
+
+        return layer
+
     def set_current_layer(self, layer):
         self.current_layer = layer
         self.windows['layers_widget'].current_layer = self.current_layer
@@ -302,6 +393,7 @@ class MainWindow(QMainWindow):
             return composite
 
     def image_to_pixmap(self, image) -> QPixmap:
+        # TODO: Utility
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     # WINDOW PANELS
