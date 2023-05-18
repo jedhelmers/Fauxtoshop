@@ -21,6 +21,9 @@ class ToolbarWidget(QWidget):
         self._current_tool = 'text'
         self.current_tool = 'text'
 
+        # UI
+        self.ui.toolbarWidget.layout().setAlignment(Qt.AlignTop)
+
         self.render()
 
     @property

@@ -264,7 +264,7 @@ class MainWindow(QMainWindow):
         layer = self.get_layer()
         self.tool.layer = layer
 
-    # Mouse overrides
+    # Overrides
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
         # self.get_workspace_dimensions(event)
@@ -274,6 +274,11 @@ class MainWindow(QMainWindow):
 
     def mouseReleaseEvent(self, event):
         self.tool.reset_mouse_pos()
+
+    def resizeEvent(self, event):
+        final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
+        toolbar_size = self.ui.toolbarWidget.size()
+        print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
