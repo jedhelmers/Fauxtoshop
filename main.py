@@ -2,16 +2,18 @@ import json
 import random
 import sys
 from pathlib import Path
+
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor
+from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout, QLabel
 
+from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
-from workspace import WorkspaceWidget
 from widgets.windows.layers import LayersWindowWidget
+from workspace import WorkspaceWidget
 
 
 # RULER LINES
@@ -36,6 +38,34 @@ class QVLine(QFrame):
         self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
 
 
+class Tool(QWidget):
+    def __init__(self, parent) -> None:
+        super().__init__(parent)
+
+    @property
+    def active_tool(self):
+        return self._active_tool
+
+    @active_tool.setter
+    def active_tool(self, active_tool):
+        self._active_tool = active_tool
+        self.draw_cursor()
+
+    @property
+    def brush_size(self):
+        return self._brush_size
+
+    @brush_size.setter
+    def brush_size(self, brush_size):
+        self._brush_size = brush_size
+
+    def draw_cursor(self):
+        tool = get_tool_icon(self.active_tool)
+        self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
+        self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
+        self.parent().setCursor(self.cursor)
+
+
 # SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
@@ -52,6 +82,7 @@ class MainWindow(QMainWindow):
         # SETUP
         self.ui = mainwindow_newui.Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setMouseTracking(True)
         self.signaler = MainSignaler()
         self.settings = {}
         self.setStyleSheet(main_style())
@@ -67,6 +98,7 @@ class MainWindow(QMainWindow):
         self.ui.gridLayout_3.addWidget(self.label)
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
+        self.scroll_area_size_pos = [0, 0, 0, 0]
 
         # Windows
         self.windows = {}
@@ -83,9 +115,13 @@ class MainWindow(QMainWindow):
         self.signaler.hide_layer.connect(self.hide_layer)
         self.signaler.update_layer_mode.connect(self.update_layer_mode)
 
+        # Tools
+        self.tool = Tool(self)
+        self.tool.active_tool = 'brush'
+
         # TEMP
-        document_dimensions = [500, 200]
-        offset_dimensions = [300, 300]
+        document_dimensions = [500, 700]
+        offset_dimensions = [200, 200]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
             document_dimensions[1] + offset_dimensions[1],
@@ -121,6 +157,13 @@ class MainWindow(QMainWindow):
             self.windows['layers_widget'].layers = self.layers
             self.windows['layers_widget'].render_layers()
 
+    # Mouse overrides
+    def mouseMoveEvent(self, event: QMouseEvent):
+        # print(event, self.get_workspace_dimensions(event))
+        self.get_workspace_dimensions(event)
+        pass
+
+
     # INITIALIZATION
     def initialize_document(self, new_file_information):
         # Background layer
@@ -137,6 +180,14 @@ class MainWindow(QMainWindow):
     # SCRAP END
 
     # UTILITIES
+    def get_workspace_dimensions(self, event: QMouseEvent) -> list[int, int]:
+        # TODO: define pos and size on resize event
+        scroll_area_size = self.ui.scrollArea.size()
+        scroll_area_point = self.ui.scrollArea.pos()
+        self.scroll_area_size_pos = [*scroll_area_size, *scroll_area_point]
+        print(scroll_area_size, scroll_area_point)
+        return [0, 0]
+
     def crop_workspace(self, image) -> QPixmap:
         if 'absolute_dimensions' in self.settings:
             artboard = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
