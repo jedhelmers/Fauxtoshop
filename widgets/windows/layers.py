@@ -13,6 +13,7 @@ from widgets.windows.layergroup import LayerGroupWidget
 # SIGNALS
 class LayerSignaler(QtCore.QObject):
     update_selected_layer = QtCore.Signal()
+    hide_layer = QtCore.Signal(int)
 
 
 class LayersWindowWidget(QWidget):
@@ -35,6 +36,7 @@ class LayersWindowWidget(QWidget):
 
         # Signals
         self.signaler.update_selected_layer.connect(self.update_selected_layer)
+        self.signaler.hide_layer.connect(self.hide_layer)
 
         # Clicks
         self.ui.newLayerPushButton.clicked.connect(self.new_layer)
@@ -186,6 +188,9 @@ class LayersWindowWidget(QWidget):
         layer.setParent(None)
         self.current_layer = None
 
+    def hide_layer(self, layer_id):
+        self.main_signaler.hide_layer.emit(layer_id)
+
     def lock_layer(self):
         layer = self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
         self.main_signaler.lock_layer.emit(layer.layer_id)
@@ -206,7 +211,11 @@ class LayersWindowWidget(QWidget):
                 main_signaler=self.main_signaler,
                 layer_signaler=self.signaler,
                 layer_id=l.layer_id,
-                layer={'is_selected': False, 'hidden': False, 'name': l.name}
+                layer={
+                    'is_selected': False,
+                    'hidden': not l.show,
+                    'name': l.name
+                }
             )
             layer.setObjectName(l.name)
             self.ui.verticalLayout_3.insertWidget(index, layer)

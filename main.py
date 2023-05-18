@@ -41,6 +41,7 @@ class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
     delete_layer = QtCore.Signal(int)
     lock_layer = QtCore.Signal(int)
+    hide_layer = QtCore.Signal(int)
     set_current_layer = QtCore.Signal(Layer)
 
 
@@ -78,9 +79,10 @@ class MainWindow(QMainWindow):
         self.signaler.set_current_layer.connect(self.set_current_layer)
         self.signaler.delete_layer.connect(self.delete_layer)
         self.signaler.lock_layer.connect(self.lock_layer)
+        self.signaler.hide_layer.connect(self.hide_layer)
 
         # TEMP
-        document_dimensions = [800, 1600]
+        document_dimensions = [500, 200]
         offset_dimensions = [300, 300]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
@@ -200,6 +202,15 @@ class MainWindow(QMainWindow):
 
         self.layers = layers
 
+    def hide_layer(self, layer_id):
+        layers = []
+        for l in self.layers:
+            if l.layer_id == layer_id:
+                l.show = not l.show
+            layers.append(l)
+
+        self.layers = layers
+
     def set_current_layer(self, layer):
         self.current_layer = layer
         self.windows['layers_widget'].current_layer = self.current_layer
@@ -209,17 +220,18 @@ class MainWindow(QMainWindow):
             composite = self.layers[0].image
 
             for i in range(len(self.layers)):
-                if isinstance(self.layers[i], LayerGroup):
-                    child_count = len(self.layers[i].children)
-                    group_composite = self.layers[i].children[0].image
+                if self.layers[i].show:
+                    if isinstance(self.layers[i], LayerGroup):
+                        child_count = len(self.layers[i].children)
+                        group_composite = self.layers[i].children[0].image
 
-                    if child_count > 1:
-                        for j in (range(child_count)):
-                            group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
+                        if child_count > 1:
+                            for j in (range(child_count)):
+                                group_composite = self.def_add_image(group_composite, self.layers[i].children[j])
 
-                    self.layers[i].image = group_composite
+                        self.layers[i].image = group_composite
 
-                composite = self.def_add_image(composite, self.layers[i])
+                    composite = self.def_add_image(composite, self.layers[i])
 
             return composite
 

@@ -113,5 +113,6 @@ class LayerWidget(QWidget):
 
     def show(self):
         self.hidden = not self.hidden
+        self.layer_signaler.hide_layer.emit(self.layer_id)
         self.render()
 
