@@ -39,6 +39,8 @@ class QVLine(QFrame):
 # SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
+    delete_layer = QtCore.Signal(int)
+    lock_layer = QtCore.Signal(int)
     set_current_layer = QtCore.Signal(Layer)
 
 
@@ -74,6 +76,8 @@ class MainWindow(QMainWindow):
         # Signals
         self.signaler.new_layer.connect(self.new_layer)
         self.signaler.set_current_layer.connect(self.set_current_layer)
+        self.signaler.delete_layer.connect(self.delete_layer)
+        self.signaler.lock_layer.connect(self.lock_layer)
 
         # TEMP
         document_dimensions = [800, 1600]
@@ -110,7 +114,8 @@ class MainWindow(QMainWindow):
 
         # TODO: Handle this better
         if 'layers_widget'  in self.windows:
-            self.windows['layers_widget'].update_layers()
+            self.windows['layers_widget'].layers = self.layers
+            self.windows['layers_widget'].render_layers()
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
@@ -120,6 +125,7 @@ class MainWindow(QMainWindow):
         background.image = QPixmap(QSize(*new_file_information['absolute_dimensions']))
         background.image.fill(new_file_information['color'])
         background.name = 'Background'
+        background.lock = True
 
         self.layers.append(background)
 
@@ -180,6 +186,19 @@ class MainWindow(QMainWindow):
 
     def new_layer(self, layer):
         self.layers += [layer]
+
+    def delete_layer(self, layer_id: int):
+        # TODO: Handle groups
+        self.layers = [l for l in self.layers if l.layer_id != layer_id or l.lock]
+
+    def lock_layer(self, layer_id):
+        layers = []
+        for l in self.layers:
+            if l.layer_id == layer_id:
+                l.lock = not l.lock
+            layers.append(l)
+
+        self.layers = layers
 
     def set_current_layer(self, layer):
         self.current_layer = layer

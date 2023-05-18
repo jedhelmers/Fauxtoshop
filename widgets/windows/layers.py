@@ -38,8 +38,10 @@ class LayersWindowWidget(QWidget):
 
         # Clicks
         self.ui.newLayerPushButton.clicked.connect(self.new_layer)
+        self.ui.deleteLayerPushButton.clicked.connect(self.delete_layer)
+        self.ui.layerLockPushButton.clicked.connect(self.lock_layer)
 
-        self.update_layers()
+        self.render_layers()
 
         self.setStyleSheet("""
             QComboBox {
@@ -124,7 +126,7 @@ class LayersWindowWidget(QWidget):
         self._current_layer = current_layer
 
     def update_selected_layer(self):
-        self.update_layers()
+        self.update_layers_selected()
 
     def new_layer(self):
         layer = Layer()
@@ -174,7 +176,25 @@ class LayersWindowWidget(QWidget):
 
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
-    def update_layers(self, index=0):
+    def update_layers_selected(self):
+        for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
+            child.selected(child.objectName == self.current_layer)
+
+    def delete_layer(self):
+        layer = self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
+        self.main_signaler.delete_layer.emit(layer.layer_id)
+        layer.setParent(None)
+        self.current_layer = None
+
+    def lock_layer(self):
+        layer = self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
+        self.main_signaler.lock_layer.emit(layer.layer_id)
+
+    def lock_layer_ui(self, layer):
+        lock = QIcon('images/window_lock.svg').pixmap(QSize(12, 12))
+        layer.ui.lockLabel.setPixmap(lock)
+
+    def render_layers(self, index=0):
         # Remove all existing layers from layout
         for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
             child.setParent(None)
@@ -185,18 +205,23 @@ class LayersWindowWidget(QWidget):
                 parent=self.ui.verticalLayout_3.widget(),
                 main_signaler=self.main_signaler,
                 layer_signaler=self.signaler,
+                layer_id=l.layer_id,
                 layer={'is_selected': False, 'hidden': False, 'name': l.name}
             )
             layer.setObjectName(l.name)
+            self.ui.verticalLayout_3.insertWidget(index, layer)
 
+            # Thumbnails
             if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
                 layer.ui.thumbnailWidget.setFixedWidth(32 * self.settings['aspect_ratio'][0])
             else:
                 layer.ui.thumbnailWidget.setFixedHeight(32 * self.settings['aspect_ratio'][1])
 
-            layer.selected(self.current_layer == layer.objectName)
+            # Lock UI
+            if l.lock:
+                self.lock_layer_ui(layer)
 
             # Add thumbnail to thumbnailwidget
             thumb = QLabel(layer.ui.thumbnailWidget)
             thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), l.image))
-            self.ui.verticalLayout_3.insertWidget(index, layer)
+

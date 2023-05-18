@@ -11,6 +11,7 @@ class LayerWidget(QWidget):
     def __init__(
             self,
             layer,
+            layer_id,
             parent=None,
             main_signaler=None,
             layer_signaler=None
@@ -19,6 +20,7 @@ class LayerWidget(QWidget):
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
         self.objectName = layer['name']
+        self.layer_id = layer_id
         self.main_signaler = main_signaler
         self.layer_signaler = layer_signaler
 
@@ -61,23 +63,43 @@ class LayerWidget(QWidget):
     def selected(self, is_selected=False):
         # TODO: Update list onClick, and NOT on addNewLayer
         if is_selected:
-            self.setStyleSheet("background: rgba(255, 255, 255, .1);")
-            # self.setStyleSheet("""
-            # QWidget[objectName=LayerWidget] {
-            #     border: 1px solid rgba(0, 0, 0, .5);
-            #     border-top: none;
-            #     background: rgba(255, 255, 255, 255)
-            # }
-            # """)
+            self.setStyleSheet("""
+            QWidget[objectName*=thumbnailWidget] {
+                border: 1px solid rgba(0, 0, 0, .5);
+            }
+            QWidget {
+                border: 1px solid rgba(0, 0, 0, .5);
+                border-top: none;
+                background: rgba(255, 255, 255, .1)
+            }
+            QLabel {
+                background: transparent;
+                border: none;
+            }
+            QPushButton {
+                background: transparent;
+                border: none;
+            }
+        """)
         else:
-            # self.setStyleSheet("""
-            # QWidget[objectName=LayerWidget] {
-            #     border: 1px solid rgba(0, 0, 0, .5);
-            #     border-top: none;
-            #     background: rgba(255, 255, 255, .02)
-            # }
-            # """)
-            self.setStyleSheet("background: rgba(255, 255, 255, .02);")
+            self.setStyleSheet("""
+            QWidget[objectName*=thumbnailWidget] {
+                border: 1px solid rgba(0, 0, 0, .5);
+            }
+            QWidget {
+                border: 1px solid rgba(0, 0, 0, .5);
+                border-top: none;
+                background: rgba(255, 255, 255, .02)
+            }
+            QLabel {
+                background: transparent;
+                border: none;
+            }
+            QPushButton {
+                background: transparent;
+                border: none;
+            }
+            """)
 
     def render(self):
         icon = QIcon()
