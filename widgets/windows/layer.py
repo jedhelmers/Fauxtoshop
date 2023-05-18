@@ -21,6 +21,7 @@ class LayerWidget(QWidget):
         self.ui.setupUi(self)
         self.objectName = layer['name']
         self.layer_id = layer_id
+        self.mode = layer['mode']
         self.main_signaler = main_signaler
         self.layer_signaler = layer_signaler
 
@@ -64,9 +65,6 @@ class LayerWidget(QWidget):
         # TODO: Update list onClick, and NOT on addNewLayer
         if is_selected:
             self.setStyleSheet("""
-            QWidget[objectName*=thumbnailWidget] {
-                border: 1px solid rgba(0, 0, 0, .5);
-            }
             QWidget {
                 border: 1px solid rgba(0, 0, 0, .5);
                 border-top: none;
@@ -79,6 +77,9 @@ class LayerWidget(QWidget):
             QPushButton {
                 background: transparent;
                 border: none;
+            }
+            QWidget[objectName*=thumbnailWidget] {
+                border: 3px solid rgba(255, 255, 255, .5);
             }
         """)
         else:

@@ -42,6 +42,7 @@ class MainSignaler(QtCore.QObject):
     delete_layer = QtCore.Signal(int)
     lock_layer = QtCore.Signal(int)
     hide_layer = QtCore.Signal(int)
+    update_layer_mode = QtCore.Signal(int, str)
     set_current_layer = QtCore.Signal(Layer)
 
 
@@ -80,6 +81,7 @@ class MainWindow(QMainWindow):
         self.signaler.delete_layer.connect(self.delete_layer)
         self.signaler.lock_layer.connect(self.lock_layer)
         self.signaler.hide_layer.connect(self.hide_layer)
+        self.signaler.update_layer_mode.connect(self.update_layer_mode)
 
         # TEMP
         document_dimensions = [500, 200]
@@ -192,6 +194,15 @@ class MainWindow(QMainWindow):
     def delete_layer(self, layer_id: int):
         # TODO: Handle groups
         self.layers = [l for l in self.layers if l.layer_id != layer_id or l.lock]
+
+    def update_layer_mode(self, layer_id: int, mode: str):
+        layers = []
+        for l in self.layers:
+            if l.layer_id == layer_id:
+                l.mode = mode
+            layers.append(l)
+
+        self.layers = layers      
 
     def lock_layer(self, layer_id):
         layers = []

@@ -90,6 +90,34 @@ class LayerGroup(Layer):
         self.is_open = is_open
 
 
+def modes():
+    return [
+        'Normal',
+        "DestinationOver",
+        "Clear",
+        "Source",
+        "Destination",
+        "SourceIn",
+        "DestinationIn",
+        "SourceOut",
+        "DestinationOut",
+        "SourceAtop",
+        "DestinationAtop",
+        "Xor",
+        "Plus",
+        "Multiply",
+        "Screen",
+        "Overlay",
+        "Darken",
+        "Lighten",
+        "ColorDodge",
+        "ColorBurn",
+        "HardLight",
+        "SoftLight",
+        "Difference",
+        "Exclusion",
+    ]
+
 
 def mode_mappings(mode):
     switch = {

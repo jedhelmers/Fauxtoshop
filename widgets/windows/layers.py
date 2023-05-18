@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QSize, QPoint, QRect
 from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen, QImage
 
-from datatypes.layer import Layer
+from datatypes.layer import Layer, modes, mode_mappings
 from styles.window_panel import window_panel_style
 from ui.windows import layerswindowui
 from widgets.windows.layer import LayerWidget
@@ -42,6 +42,10 @@ class LayersWindowWidget(QWidget):
         self.ui.newLayerPushButton.clicked.connect(self.new_layer)
         self.ui.deleteLayerPushButton.clicked.connect(self.delete_layer)
         self.ui.layerLockPushButton.clicked.connect(self.lock_layer)
+        self.ui.modeComboBox.currentTextChanged.connect(self.update_layer_mode)
+
+        # UI
+        self.ui.modeComboBox.addItems(modes())
 
         self.render_layers()
 
@@ -126,6 +130,9 @@ class LayersWindowWidget(QWidget):
     @current_layer.setter
     def current_layer(self, current_layer):
         self._current_layer = current_layer
+        layer = self.get_layer()
+        if layer:
+            self.update_layer_mode(layer.mode)
 
     def update_selected_layer(self):
         self.update_layers_selected()
@@ -135,6 +142,9 @@ class LayersWindowWidget(QWidget):
         layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
         layer.image.fill(QColor(255, 255, 0, 100))
         self.main_signaler.new_layer.emit(layer)
+
+    def get_layer(self) -> LayerWidget:
+        return self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
 
     def image_to_pixmap(self, image) -> QPixmap:
         # TODO: Move this into a utils
@@ -183,7 +193,7 @@ class LayersWindowWidget(QWidget):
             child.selected(child.objectName == self.current_layer)
 
     def delete_layer(self):
-        layer = self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
+        layer = self.get_layer()
         self.main_signaler.delete_layer.emit(layer.layer_id)
         layer.setParent(None)
         self.current_layer = None
@@ -191,8 +201,14 @@ class LayersWindowWidget(QWidget):
     def hide_layer(self, layer_id):
         self.main_signaler.hide_layer.emit(layer_id)
 
+    def update_layer_mode(self, mode=None):
+        layer = self.get_layer()
+        if layer and mode:
+            self.ui.modeComboBox.setCurrentText(mode)
+            self.main_signaler.update_layer_mode.emit(layer.layer_id, mode)
+
     def lock_layer(self):
-        layer = self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
+        layer = self.get_layer()
         self.main_signaler.lock_layer.emit(layer.layer_id)
 
     def lock_layer_ui(self, layer):
@@ -214,7 +230,8 @@ class LayersWindowWidget(QWidget):
                 layer={
                     'is_selected': False,
                     'hidden': not l.show,
-                    'name': l.name
+                    'name': l.name,
+                    'mode': l.mode
                 }
             )
             layer.setObjectName(l.name)
