@@ -82,7 +82,9 @@ class MainWindow(QMainWindow):
         # SETUP
         self.ui = mainwindow_newui.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setMouseTracking(True)
+        # self.setMouseTracking(True)
+        # self.ui.windowsWidget.setMouseTracking(True)
+        # self.ui.scrollArea.widget().setMouseTracking(True)
         self.signaler = MainSignaler()
         self.settings = {}
         self.setStyleSheet(main_style())
@@ -95,6 +97,7 @@ class MainWindow(QMainWindow):
 
         # UI
         self.label = QLabel()
+        self.label.setMouseTracking(True)
         self.ui.gridLayout_3.addWidget(self.label)
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
@@ -117,6 +120,7 @@ class MainWindow(QMainWindow):
 
         # Tools
         self.tool = Tool(self)
+        self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
 
         # TEMP
@@ -159,10 +163,10 @@ class MainWindow(QMainWindow):
 
     # Mouse overrides
     def mouseMoveEvent(self, event: QMouseEvent):
-        # print(event, self.get_workspace_dimensions(event))
-        self.get_workspace_dimensions(event)
+        # print(self.get_workspace_dimensions(event))
+        # self.get_workspace_dimensions(event)
+        print(event.windowPos(), self.ui.scrollArea.geometry())
         pass
-
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
@@ -185,7 +189,7 @@ class MainWindow(QMainWindow):
         scroll_area_size = self.ui.scrollArea.size()
         scroll_area_point = self.ui.scrollArea.pos()
         self.scroll_area_size_pos = [*scroll_area_size, *scroll_area_point]
-        print(scroll_area_size, scroll_area_point)
+        # print(scroll_area_size, scroll_area_point)
         return [0, 0]
 
     def crop_workspace(self, image) -> QPixmap:
@@ -309,6 +313,7 @@ class MainWindow(QMainWindow):
             layers=self.layers
         )
 
+        layers_widget.setMouseTracking(True)
         self.windows['layers_widget'] = layers_widget
 
         self.ui.windowsWidget.layout().addChildWidget(self.windows['layers_widget'])
