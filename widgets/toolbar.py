@@ -10,11 +10,13 @@ from widgets.tools.text_options import TextOptionsWidget
 
 
 class ToolbarWidget(QWidget):
-    def __init__(self, signaler):
+    def __init__(self, signaler, tool):
+        # TODO: Clean this thing up
         super().__init__()
         self.ui = toolbarui.Ui_Toolbar()
         self.ui.setupUi(self)
         self.signaler = signaler
+        self.tool = tool
 
         self._current_tool = 'text'
         self.current_tool = 'text'
@@ -46,7 +48,9 @@ class ToolbarWidget(QWidget):
         self.current_tool = name
 
     def select_tool(self):
-        self.signaler.select_tool.emit(self.current_tool)
+        # self.signaler.select_tool.emit(self.current_tool)
+        # self.tool.active_tool = 'move'
+        pass
 
     def add_icon(self, icon_path):
         button = QPushButton(self.ui.toolbarWidget)

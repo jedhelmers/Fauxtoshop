@@ -12,6 +12,7 @@ from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
+from widgets.toolbar import ToolbarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
 
@@ -92,7 +93,7 @@ class Tool(QWidget):
             'brush': self.brush,
             # 'erase': self.erase,
             # 'clone': self.clone,
-            # 'move': self.move
+            'move': self.move
         }
 
         if self.layer and self.active_tool in switch:
@@ -101,6 +102,24 @@ class Tool(QWidget):
     def image_to_pixmap(self, image) -> QPixmap:
         if image:
             return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
+    def move(self, event):
+        [x_offset, y_offset] = self.layer.position
+
+        x = event.position().x() * self.drag_speed - x_offset
+        y = event.position().y() * self.drag_speed - y_offset
+
+        if self.last_x is None: # First event.
+            self.last_x = x
+            self.last_y = y
+
+        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.translate(self.last_x, self.last_y)
+        painter.drawPixmap(self.last_x, self.last_y, self.layer.image)
+        painter.end()
+        self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
         if self.layer.image:
@@ -154,9 +173,6 @@ class MainWindow(QMainWindow):
         # SETUP
         self.ui = mainwindow_newui.Ui_MainWindow()
         self.ui.setupUi(self)
-        # self.setMouseTracking(True)
-        # self.ui.windowsWidget.setMouseTracking(True)
-        # self.ui.scrollArea.widget().setMouseTracking(True)
         self.signaler = MainSignaler()
         self.settings = {}
         self.setStyleSheet(main_style())
@@ -182,6 +198,11 @@ class MainWindow(QMainWindow):
         self.tool = Tool(self)
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
+        toolbar = ToolbarWidget(
+            signaler=self.signaler,
+            tool=self.tool
+        )
+        self.ui.toolbarWidget.layout().addWidget(toolbar)
 
         # DATA
         self.layers = []
