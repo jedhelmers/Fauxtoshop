@@ -43,6 +43,7 @@ class Tool(QWidget):
         super().__init__(parent)
         self._layer = None
         self.brush_color = qRgba(50, 50, 50, 50)
+        self.brush_size = 20
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
@@ -71,7 +72,12 @@ class Tool(QWidget):
     @layer.setter
     def layer(self, layer):
         self._layer = layer
+        # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
+
+    def reset_mouse_pos(self):
+        self.last_x = None
+        self.last_y = None
 
     def draw_cursor(self):
         tool = get_tool_icon(self.active_tool)
@@ -80,6 +86,7 @@ class Tool(QWidget):
         self.parent().setCursor(self.cursor)
 
     def draw(self, event):
+        # TODO: Figure out why the brush is offset
         switch = {
             # 'pen': self.pen,
             'brush': self.brush,
@@ -88,52 +95,48 @@ class Tool(QWidget):
             # 'move': self.move
         }
 
-        if self.layer and self.current_tool in switch:
+        if self.layer and self.active_tool in switch:
             switch[self.active_tool](event)
 
     def image_to_pixmap(self, image) -> QPixmap:
-        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+        if image:
+            return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def brush(self, event):
-        [x_offset, y_offset] = self.layer.position
+        if self.layer.image:
+            [x_offset, y_offset] = self.layer.position
 
-        x = event.x() * self.drag_speed - x_offset
-        y = event.y() * self.drag_speed - y_offset
+            x = event.position().x() * self.drag_speed - x_offset
+            y = event.position().y() * self.drag_speed - y_offset
 
-        if self.last_x is None: # First event.
+            if self.last_x is None: # First event.
+                self.last_x = x
+                self.last_y = y
+
+                return # Ignore the first time.
+
+            resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+            painter = QPainter(resultImage)
+            painter.setCompositionMode(QPainter.CompositionMode_Source)
+            painter.fillRect(resultImage.rect(), Qt.transparent)
+
+            pen = QtGui.QPen()
+            pen.setWidth(self.brush_size)
+            pen.setColor(self.brush_color)
+            pen.setStyle(Qt.SolidLine)
+            pen.setCapStyle(Qt.RoundCap)
+            pen.setCosmetic(True)
+            painter.setPen(pen)
+            painter.fillRect(resultImage.rect(), Qt.transparent)
+            painter.drawPixmap(0, 0, self.layer.image)
+            painter.setCompositionMode(self._mode)
+            painter.drawLine(self.last_x, self.last_y, x, y)
+            painter.end()
+
             self.last_x = x
             self.last_y = y
 
-            return # Ignore the first time.
-
-        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-
-        pen = QtGui.QPen()
-        pen.setWidth(self._brush_size)
-        pen.setColor(self.brush_color)
-        pen.setStyle(Qt.SolidLine)
-        pen.setCapStyle(Qt.RoundCap)
-        pen.setCosmetic(True)
-        painter.setPen(pen)
-
-        # Set STAMP
-        # brush = QIcon(self._brush_shape).pixmap(QSize(self._brush_size, self._brush_size))
-        # pen.setBrush(brush)
-        # painter.setPen(pen)
-
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.drawPixmap(0, 0, self.layer.image)
-        painter.setCompositionMode(self._mode)
-        painter.drawLine(self.last_x, self.last_y, x, y)
-        painter.end()
-
-        self.last_x = x
-        self.last_y = y
-
-        self.layer.image = self.image_to_pixmap(resultImage)
+            self.layer.image = self.image_to_pixmap(resultImage)
 
 # SIGNALS
 class MainSignaler(QtCore.QObject):
@@ -244,9 +247,12 @@ class MainWindow(QMainWindow):
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
         # self.get_workspace_dimensions(event)
-        print(event.windowPos(), self.ui.scrollArea.geometry())
+        # print(event.windowPos(), self.ui.scrollArea.geometry())
         self.tool.draw(event)
-        pass
+        self.render()
+
+    def mouseReleaseEvent(self, event):
+        self.tool.reset_mouse_pos()
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
