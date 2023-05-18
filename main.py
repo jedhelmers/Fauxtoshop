@@ -331,6 +331,7 @@ class MainWindow(QMainWindow):
 
     def new_layer(self, layer):
         self.layers += [layer]
+        self.set_current_layer(layer=layer.name)
 
     def delete_layer(self, layer_id: int):
         # TODO: Handle groups
