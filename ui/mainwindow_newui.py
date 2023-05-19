@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
         self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
         self.widget = QWidget(self.scrollAreaWidgetContents)
         self.widget.setObjectName(u"widget")
-        self.widget.setStyleSheet(u"background: pink;")
+        self.widget.setStyleSheet(u"")
         self.gridLayout_4 = QGridLayout(self.widget)
         self.gridLayout_4.setSpacing(0)
         self.gridLayout_4.setObjectName(u"gridLayout_4")

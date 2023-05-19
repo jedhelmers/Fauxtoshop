@@ -320,7 +320,7 @@
                   <item row="0" column="0">
                    <widget class="QWidget" name="widget" native="true">
                     <property name="styleSheet">
-                     <string notr="true">background: pink;</string>
+                     <string notr="true"/>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_4">
                      <property name="leftMargin">

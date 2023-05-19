@@ -48,6 +48,9 @@ class Tool(QWidget):
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
+        self.down_mouse_pos = [0, 0]
+        self.up_mouse_pos = [0, 0]
+        self.snap_to = 30 # CANNOT BE ZERO
 
     @property
     def active_tool(self):
@@ -76,6 +79,13 @@ class Tool(QWidget):
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
 
+    def mousePressEvent(self, event):
+        self.down_mouse_pos = [event.position().x(), event.position().y()]
+        self.up_mouse_pos = [event.position().x(), event.position().y()]
+
+    def quantize(self, num):
+        return num - (num % self.snap_to)
+
     def reset_mouse_pos(self):
         self.last_x = None
         self.last_y = None
@@ -88,6 +98,7 @@ class Tool(QWidget):
 
     def draw(self, event):
         # TODO: Figure out why the brush is offset
+        print(self.active_tool)
         switch = {
             # 'pen': self.pen,
             'brush': self.brush,
@@ -104,22 +115,43 @@ class Tool(QWidget):
             return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def move(self, event):
-        [x_offset, y_offset] = self.layer.position
+        self.down_mouse_pos = [
+            self.quantize(event.x()),
+            self.quantize(event.y())]
 
-        x = event.position().x() * self.drag_speed - x_offset
-        y = event.position().y() * self.drag_speed - y_offset
+        [x, y] = self.layer.position
+        [x1, y1] = self.down_mouse_pos
+        [x2, y2] = self.up_mouse_pos
+        dx = ((x1 - x2) * self.drag_speed) + x
+        dy = ((y1 - y2) * self.drag_speed) + y
 
-        if self.last_x is None: # First event.
-            self.last_x = x
-            self.last_y = y
+        # # Snap to
+        # if self.snap_to:
+        #     if dx % self.snap_to != 0:
+        #         dx = x
+        #     if dy % self.snap_to != 0:
+        #         dy = y
 
-        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-        # painter.translate(self.last_x, self.last_y)
-        painter.drawPixmap(self.last_x, self.last_y, self.layer.image)
-        painter.end()
-        self.layer.image = self.image_to_pixmap(resultImage)
+        self.layer.position = [dx, dy]
+        self.up_mouse_pos = self.down_mouse_pos
+
+    # def move(self, event):
+    #     [x_offset, y_offset] = self.layer.position
+
+    #     x = event.position().x() * self.drag_speed - x_offset
+    #     y = event.position().y() * self.drag_speed - y_offset
+
+    #     if self.last_x is None: # First event.
+    #         self.last_x = x
+    #         self.last_y = y
+
+    #     resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+    #     painter = QPainter(resultImage)
+    #     painter.fillRect(resultImage.rect(), Qt.transparent)
+    #     # painter.translate(self.last_x, self.last_y)
+    #     painter.drawPixmap(x, y, self.layer.image)
+    #     painter.end()
+    #     self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
         if self.layer.image:
@@ -165,6 +197,7 @@ class MainSignaler(QtCore.QObject):
     hide_layer = QtCore.Signal(int)
     update_layer_mode = QtCore.Signal(int, str)
     set_current_layer = QtCore.Signal(str)
+    set_active_tool = QtCore.Signal(str)
 
 
 class MainWindow(QMainWindow):
@@ -199,14 +232,14 @@ class MainWindow(QMainWindow):
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
         toolbar = ToolbarWidget(
-            signaler=self.signaler,
+            main_signaler=self.signaler,
             tool=self.tool
         )
         self.ui.toolbarWidget.layout().addWidget(toolbar)
 
         # DATA
         self.layers = []
-        self.current_layer = None
+        self.layer = None
 
         # Signals
         self.signaler.new_layer.connect(self.new_layer)
@@ -215,6 +248,7 @@ class MainWindow(QMainWindow):
         self.signaler.lock_layer.connect(self.lock_layer)
         self.signaler.hide_layer.connect(self.hide_layer)
         self.signaler.update_layer_mode.connect(self.update_layer_mode)
+        self.signaler.set_active_tool.connect(self.set_active_tool)
 
         # TEMP
         document_dimensions = [500, 700]
@@ -264,6 +298,15 @@ class MainWindow(QMainWindow):
         layer = self.get_layer()
         self.tool.layer = layer
 
+    @property
+    def active_tool(self):
+        return self._active_tool
+
+    @active_tool.setter
+    def active_tool(self, active_tool):
+        self._active_tool = active_tool
+        self.tool.active_tool = self.active_tool
+
     # Overrides
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
@@ -274,6 +317,10 @@ class MainWindow(QMainWindow):
 
     def mouseReleaseEvent(self, event):
         self.tool.reset_mouse_pos()
+        self.tool.mousePressEvent(event)
+
+        self.layer.image = self.translate(self.layer.image, self.layer.position)
+        self.layer.position = [0, 0]
 
     def resizeEvent(self, event):
         final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
@@ -296,13 +343,16 @@ class MainWindow(QMainWindow):
     # SCRAP END
 
     # UTILITIES
-    def get_workspace_dimensions(self, event: QMouseEvent) -> list[int, int]:
+    def get_workspace_dimensions(self, event: QMouseEvent):
         # TODO: define pos and size on resize event
         scroll_area_size = self.ui.scrollArea.size()
         scroll_area_point = self.ui.scrollArea.pos()
         self.scroll_area_size_pos = [*scroll_area_size, *scroll_area_point]
         # print(scroll_area_size, scroll_area_point)
         return [0, 0]
+
+    def set_active_tool(self, tool):
+        self.active_tool = tool
 
     def crop_workspace(self, image) -> QPixmap:
         if 'absolute_dimensions' in self.settings:
@@ -315,7 +365,7 @@ class MainWindow(QMainWindow):
                     0,
                     *self.settings['absolute_dimensions']
                 ),
-                QColor(0, 245, 255, 100)
+                QColor(20, 24, 30, 100)
             )
 
             # TODO: Move to new_file_information dict.
@@ -332,6 +382,20 @@ class MainWindow(QMainWindow):
 
             return self.image_to_pixmap(artboard)
         return image
+
+    def translate(self, image: QPixmap, position) -> QPixmap:
+        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.translate(*position)
+        painter.drawPixmap(*position, image)
+        painter.setCompositionMode(mode_mappings('Normal'))
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
         mode = mode_mappings(layer.mode)
@@ -395,15 +459,15 @@ class MainWindow(QMainWindow):
         layer = None
 
         for l in self.layers:
-            if l.name == self.current_layer:
+            if l.name == self.layer:
                 layer = l
                 break
 
         return layer
 
     def set_current_layer(self, layer):
-        self.current_layer = layer
-        self.windows['layers_widget'].current_layer = self.current_layer
+        self.layer = layer
+        self.windows['layers_widget'].current_layer = self.layer
 
     def render_layers(self):
         if self.layers:
@@ -434,7 +498,7 @@ class MainWindow(QMainWindow):
         layers_widget = LayersWindowWidget(
             signaler=self.signaler,
             settings=self.settings,
-            current_layer=self.current_layer,
+            current_layer=self.layer,
             layers=self.layers
         )
 
