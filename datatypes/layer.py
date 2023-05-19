@@ -93,29 +93,45 @@ class LayerGroup(Layer):
 def modes():
     return [
         'Normal',
-        "DestinationOver",
-        "Clear",
-        "Source",
-        "Destination",
-        "SourceIn",
-        "DestinationIn",
-        "SourceOut",
-        "DestinationOut",
-        "SourceAtop",
-        "DestinationAtop",
-        "Xor",
-        "Plus",
-        "Multiply",
-        "Screen",
-        "Overlay",
+        'Dissolve', # 2 Added
+        # "DestinationOver",
+        # "Clear",
+        # "Source",
+        # "Destination",
+        # "SourceIn",
+        # "DestinationIn",
+        # "SourceOut",
+        # "DestinationOut",
+        # "SourceAtop",
+        # "DestinationAtop",
         "Darken",
+        "Multiply",
+        "Color Burn",
+        "Linear Burn", # Added
+        "Darker Color", # 8 Added
+
         "Lighten",
-        "ColorDodge",
-        "ColorBurn",
-        "HardLight",
-        "SoftLight",
+        "Screen",
+        "Color Dodge",
+        "Linear Dodge (Add)",
+        "Lighter Color", # 14
+
+        "Overlay",
+        "Soft Light",
+        "Hard Light",
+        "Vivid Light", # 19 Added
+
         "Difference",
         "Exclusion",
+        "Subtract", # Added
+        "Divide", # 24 Added
+
+        'Hue', # Added
+        'Saturation', # Added
+        'Color', # Added
+        'Luminosity', # 29 Added
+        "Xor",
+        "Plus",
     ]
 
 
@@ -139,10 +155,10 @@ def mode_mappings(mode):
         "Overlay": QPainter.CompositionMode.CompositionMode_Overlay,
         "Darken": QPainter.CompositionMode.CompositionMode_Darken,
         "Lighten": QPainter.CompositionMode.CompositionMode_Lighten,
-        "ColorDodge": QPainter.CompositionMode.CompositionMode_ColorDodge,
-        "ColorBurn": QPainter.CompositionMode.CompositionMode_ColorBurn,
-        "HardLight": QPainter.CompositionMode.CompositionMode_HardLight,
-        "SoftLight": QPainter.CompositionMode.CompositionMode_SoftLight,
+        "Color Dodge": QPainter.CompositionMode.CompositionMode_ColorDodge,
+        "Color Burn": QPainter.CompositionMode.CompositionMode_ColorBurn,
+        "Hard Light": QPainter.CompositionMode.CompositionMode_HardLight,
+        "Soft Light": QPainter.CompositionMode.CompositionMode_SoftLight,
         "Difference": QPainter.CompositionMode.CompositionMode_Difference,
         "Exclusion": QPainter.CompositionMode.CompositionMode_Exclusion,
     }

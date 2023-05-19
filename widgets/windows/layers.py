@@ -46,6 +46,12 @@ class LayersWindowWidget(QWidget):
 
         # UI
         self.ui.modeComboBox.addItems(modes())
+        self.ui.modeComboBox.insertSeparator(2)
+        self.ui.modeComboBox.insertSeparator(8)
+        self.ui.modeComboBox.insertSeparator(14)
+        self.ui.modeComboBox.insertSeparator(19)
+        self.ui.modeComboBox.insertSeparator(24)
+        self.ui.modeComboBox.insertSeparator(29)
 
         self.render_layers()
 
