@@ -59,7 +59,7 @@ class LayerWidget(QWidget):
         self.layer_signaler.update_selected_layer.emit()
 
     def set_current_layer(self):
-        self.main_signaler.set_current_layer.emit()
+        self.main_signaler.set_current_layer.emit(self.objectName)
 
     def selected(self, is_selected=False):
         # TODO: Update list onClick, and NOT on addNewLayer

@@ -75,6 +75,7 @@ class Tool(QWidget):
 
     @layer.setter
     def layer(self, layer):
+        print('78', layer)
         self._layer = layer
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
@@ -98,7 +99,7 @@ class Tool(QWidget):
 
     def draw(self, event):
         # TODO: Figure out why the brush is offset
-        print(self.active_tool)
+        # print(self.active_tool)
         switch = {
             # 'pen': self.pen,
             'brush': self.brush,
@@ -154,7 +155,10 @@ class Tool(QWidget):
     #     self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
-        if self.layer.image:
+        print('self.layer')
+        if self.layer and self.layer.image:
+            # TODO: why is self.layer None?
+            print('brush')
             [x_offset, y_offset] = self.layer.position
 
             x = event.position().x() * self.drag_speed - x_offset
@@ -239,7 +243,7 @@ class MainWindow(QMainWindow):
 
         # DATA
         self.layers = []
-        self.layer = None
+        self.current_layer = None
 
         # Signals
         self.signaler.new_layer.connect(self.new_layer)
@@ -294,8 +298,10 @@ class MainWindow(QMainWindow):
 
     @current_layer.setter
     def current_layer(self, current_layer):
+        print('current_layer', current_layer)
         self._current_layer = current_layer
         layer = self.get_layer()
+        print('layer', layer)
         self.tool.layer = layer
 
     @property
@@ -319,8 +325,10 @@ class MainWindow(QMainWindow):
         self.tool.reset_mouse_pos()
         self.tool.mousePressEvent(event)
 
-        self.layer.image = self.translate(self.layer.image, self.layer.position)
-        self.layer.position = [0, 0]
+        layer = self.get_layer()
+        if layer:
+            layer.image = self.translate(layer.image, layer.position)
+            layer.position = [0, 0]
 
     def resizeEvent(self, event):
         final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
@@ -384,7 +392,7 @@ class MainWindow(QMainWindow):
         return image
 
     def translate(self, image: QPixmap, position) -> QPixmap:
-        resultImage = QImage(QSize(*self.absolute_dimensions), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
@@ -406,7 +414,7 @@ class MainWindow(QMainWindow):
         painter.fillRect(resultImage.rect(), Qt.transparent)
 
         # painter.scale(*layer.scale)
-        # painter.translate(*layer.position)
+        painter.translate(*layer.position)
 
         # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
@@ -459,15 +467,16 @@ class MainWindow(QMainWindow):
         layer = None
 
         for l in self.layers:
-            if l.name == self.layer:
+            if l.name == self.current_layer:
                 layer = l
                 break
 
         return layer
 
     def set_current_layer(self, layer):
-        self.layer = layer
-        self.windows['layers_widget'].current_layer = self.layer
+        self.current_layer = layer
+        print('480 layer', layer)
+        self.windows['layers_widget'].current_layer = self.current_layer
 
     def render_layers(self):
         if self.layers:
@@ -498,7 +507,7 @@ class MainWindow(QMainWindow):
         layers_widget = LayersWindowWidget(
             signaler=self.signaler,
             settings=self.settings,
-            current_layer=self.layer,
+            current_layer=self.current_layer,
             layers=self.layers
         )
 

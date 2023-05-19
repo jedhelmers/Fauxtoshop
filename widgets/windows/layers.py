@@ -139,6 +139,7 @@ class LayersWindowWidget(QWidget):
         layer = self.get_layer()
         if layer:
             self.update_layer_mode(layer.mode)
+        print(self.current_layer)
 
     def update_selected_layer(self):
         self.update_layers_selected()
