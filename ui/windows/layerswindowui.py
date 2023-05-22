@@ -24,7 +24,7 @@ class Ui_LayersWindow(object):
     def setupUi(self, LayersWindow):
         if not LayersWindow.objectName():
             LayersWindow.setObjectName(u"LayersWindow")
-        LayersWindow.resize(313, 273)
+        LayersWindow.resize(227, 379)
         LayersWindow.setStyleSheet(u"")
         self.verticalLayout = QVBoxLayout(LayersWindow)
 #ifndef Q_OS_MAC
@@ -239,7 +239,7 @@ class Ui_LayersWindow(object):
         self.layerScrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 307, 145))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 221, 251))
         self.gridLayout = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName(u"gridLayout")

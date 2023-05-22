@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
     QLabel, QPushButton, QSizePolicy, QSpacerItem,
     QWidget)
 import resources_rc
+import resources_rc
 
 class Ui_LayerWidget(object):
     def setupUi(self, LayerWidget):
@@ -96,6 +97,15 @@ class Ui_LayerWidget(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
+        self.lockLabel = QLabel(self.widget)
+        self.lockLabel.setObjectName(u"lockLabel")
+        self.lockLabel.setMinimumSize(QSize(15, 15))
+        self.lockLabel.setMaximumSize(QSize(15, 15))
+        self.lockLabel.setPixmap(QPixmap(u":/images/images/window_group_closed.svg"))
+        self.lockLabel.setScaledContents(True)
+
+        self.horizontalLayout_2.addWidget(self.lockLabel)
+
         self.layerOptionsWidget = QWidget(self.widget)
         self.layerOptionsWidget.setObjectName(u"layerOptionsWidget")
         self.layerOptionsWidget.setMinimumSize(QSize(0, 32))
@@ -118,5 +128,6 @@ class Ui_LayerWidget(object):
         self.openPushButton.setText("")
         self.folderLabel.setText("")
         self.layerNameLabel.setText(QCoreApplication.translate("LayerWidget", u"Group Name", None))
+        self.lockLabel.setText("")
     # retranslateUi
 

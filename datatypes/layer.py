@@ -23,6 +23,7 @@ class Layer:
         'mode_percent',
         'parent',
         'effects',
+        'opacity',
     ]
 
     def __init__(
@@ -30,7 +31,7 @@ class Layer:
             layer_id=None,
             index=0,
             color=None,
-            name='Layer',
+            name=None,
             alpha_lock=False,
             lock=False,
             show=True,
@@ -42,6 +43,7 @@ class Layer:
             mode_percent=1.0,
             parent=None,
             effects=[],
+            opacity=1.0,
             ):
         global id
         self.index = index
@@ -50,8 +52,14 @@ class Layer:
             id += 1
         else:
             self.layer_id = layer_id
+
         self.color = color
-        self.name = name
+
+        if name:
+            self.name = name
+        else:
+            self.name = f'Layer {self.layer_id}'
+
         self.alpha_lock = alpha_lock
         self.lock = lock
         self.show = show
@@ -63,6 +71,7 @@ class Layer:
         self.mode_percent = mode_percent
         self.parent = parent
         self.effects = effects
+        self.opacity = opacity
 
 
 @dataclass
@@ -83,6 +92,50 @@ class LayerGroup(Layer):
         self.children = children
         self.is_open = is_open
 
+
+def modes():
+    return [
+        'Normal',
+        'Dissolve', # 2 Added
+        # "DestinationOver",
+        # "Clear",
+        # "Source",
+        # "Destination",
+        # "SourceIn",
+        # "DestinationIn",
+        # "SourceOut",
+        # "DestinationOut",
+        # "SourceAtop",
+        # "DestinationAtop",
+        "Darken",
+        "Multiply",
+        "Color Burn",
+        "Linear Burn", # Added
+        "Darker Color", # 8 Added
+
+        "Lighten",
+        "Screen",
+        "Color Dodge",
+        "Linear Dodge (Add)",
+        "Lighter Color", # 14
+
+        "Overlay",
+        "Soft Light",
+        "Hard Light",
+        "Vivid Light", # 19 Added
+
+        "Difference",
+        "Exclusion",
+        "Subtract", # Added
+        "Divide", # 24 Added
+
+        'Hue', # Added
+        'Saturation', # Added
+        'Color', # Added
+        'Luminosity', # 29 Added
+        "Xor",
+        "Plus",
+    ]
 
 
 def mode_mappings(mode):
@@ -105,10 +158,10 @@ def mode_mappings(mode):
         "Overlay": QPainter.CompositionMode.CompositionMode_Overlay,
         "Darken": QPainter.CompositionMode.CompositionMode_Darken,
         "Lighten": QPainter.CompositionMode.CompositionMode_Lighten,
-        "ColorDodge": QPainter.CompositionMode.CompositionMode_ColorDodge,
-        "ColorBurn": QPainter.CompositionMode.CompositionMode_ColorBurn,
-        "HardLight": QPainter.CompositionMode.CompositionMode_HardLight,
-        "SoftLight": QPainter.CompositionMode.CompositionMode_SoftLight,
+        "Color Dodge": QPainter.CompositionMode.CompositionMode_ColorDodge,
+        "Color Burn": QPainter.CompositionMode.CompositionMode_ColorBurn,
+        "Hard Light": QPainter.CompositionMode.CompositionMode_HardLight,
+        "Soft Light": QPainter.CompositionMode.CompositionMode_SoftLight,
         "Difference": QPainter.CompositionMode.CompositionMode_Difference,
         "Exclusion": QPainter.CompositionMode.CompositionMode_Exclusion,
     }

@@ -206,6 +206,31 @@
        </spacer>
       </item>
       <item>
+       <widget class="QLabel" name="lockLabel">
+        <property name="minimumSize">
+         <size>
+          <width>15</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>15</width>
+          <height>15</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../../resources.qrc">:/images/images/window_group_closed.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QWidget" name="layerOptionsWidget" native="true">
         <property name="minimumSize">
          <size>
@@ -228,6 +253,7 @@
  </widget>
  <resources>
   <include location="../../resources.qrc"/>
+  <include location="Users/jedhelmers/Documents/GitHub/Fauxtoshop/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -10,14 +10,19 @@ from widgets.tools.text_options import TextOptionsWidget
 
 
 class ToolbarWidget(QWidget):
-    def __init__(self, signaler):
+    def __init__(self, main_signaler, tool):
+        # TODO: Clean this thing up
         super().__init__()
         self.ui = toolbarui.Ui_Toolbar()
         self.ui.setupUi(self)
-        self.signaler = signaler
+        self.main_signaler = main_signaler
+        self.tool = tool
 
         self._current_tool = 'text'
         self.current_tool = 'text'
+
+        # UI
+        self.ui.toolbarWidget.layout().setAlignment(Qt.AlignTop)
 
         self.render()
 
@@ -44,9 +49,12 @@ class ToolbarWidget(QWidget):
 
     def on_toolbar_icon_click(self, name):
         self.current_tool = name
+        self.main_signaler.set_active_tool.emit(name)
 
     def select_tool(self):
-        self.signaler.select_tool.emit(self.current_tool)
+        # self.main_signaler.select_tool.emit(self.current_tool)
+        # self.tool.active_tool = 'move'
+        pass
 
     def add_icon(self, icon_path):
         button = QPushButton(self.ui.toolbarWidget)
@@ -59,7 +67,7 @@ class ToolbarWidget(QWidget):
         button.setIcon(icon)
         button.setFlat(False)
         # self.ui.verticalLayout.addWidget(button)
-        self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count() - 1, button)
+        self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count(), button)
         button.setText("")
 
         button.clicked.connect(

@@ -63,12 +63,10 @@ class Ui_LayerWidget(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(4, -1, 4, -1)
-        self.thumbnailWidget = QFrame(self.widget)
+        self.thumbnailWidget = QWidget(self.widget)
         self.thumbnailWidget.setObjectName(u"thumbnailWidget")
         self.thumbnailWidget.setMinimumSize(QSize(32, 25))
         self.thumbnailWidget.setMaximumSize(QSize(32, 25))
-        self.thumbnailWidget.setFrameShape(QFrame.StyledPanel)
-        self.thumbnailWidget.setFrameShadow(QFrame.Raised)
 
         self.horizontalLayout.addWidget(self.thumbnailWidget)
 
