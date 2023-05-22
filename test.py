@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         # Create text item
-        scene = QGraphicsScene(self, 0, 0, 400, 200)
+        scene = QGraphicsScene(self, 0, 0, 400, 400)
         text = QGraphicsTextItem("Howdy, world!")
 
         # TODO: Composition mode does not work
@@ -29,9 +29,13 @@ class MainWindow(QMainWindow):
         img.fill(QColor(0, 255, 0, 100))
         img_item = QGraphicsPixmapItem(img)
         painter = QPainter(img)
+        painter.save()
+        brush_9 = QBrush(QColor(0, 0, 255, 100))
+        painter.setBackground(brush_9)
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
         painter.drawPixmap(0, 0, img)
-        painter.end()
+        # painter.end()
+        painter.restore()
 
         # Create rect
         rect = QGraphicsRectItem(0, 0, 200, 50)
@@ -54,9 +58,12 @@ class MainWindow(QMainWindow):
         # Make movable
         scene.addItem(group)
         group.setFlag(QGraphicsItem.ItemIsMovable)
+        group.setFlag(QGraphicsItem.ItemIsSelectable)
 
         # Create view with scene and add to layout
         view = QGraphicsView(scene)
+        view.setBackgroundBrush(brush_9)
+        view.setMask(QRect(50, 50, 300, 300))
         self.ui.gridLayout_2.addWidget(view)
 
 
