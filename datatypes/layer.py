@@ -23,6 +23,7 @@ class Layer:
         'mode_percent',
         'parent',
         'effects',
+        'opacity',
     ]
 
     def __init__(
@@ -42,6 +43,7 @@ class Layer:
             mode_percent=1.0,
             parent=None,
             effects=[],
+            opacity=1.0,
             ):
         global id
         self.index = index
@@ -69,6 +71,7 @@ class Layer:
         self.mode_percent = mode_percent
         self.parent = parent
         self.effects = effects
+        self.opacity = opacity
 
 
 @dataclass
