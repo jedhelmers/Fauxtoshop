@@ -19,38 +19,43 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        # Create text item
         scene = QGraphicsScene(self, 0, 0, 400, 200)
         text = QGraphicsTextItem("Howdy, world!")
-        # scene.addText("Howdy, world!")
-        # scene.addItem(text)
 
+        # TODO: Composition mode does not work
+        # Create pixmap
         img = QPixmap(100, 100)
         img.fill(QColor(0, 255, 0, 100))
         img_item = QGraphicsPixmapItem(img)
-
-        # TODO: Composition mode does not work
         painter = QPainter(img)
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
         painter.drawPixmap(0, 0, img)
         painter.end()
 
+        # Create rect
         rect = QGraphicsRectItem(0, 0, 200, 50)
-        rect2 = QGraphicsRectItem(0, 0, 200, 50)
         rect.setPos(50, 20)
         brush = QBrush(QColor(0, 0, 255, 100))
-        brush2 = QBrush(QColor(255, 0, 0, 100))
         rect.setBrush(brush)
+
+        # Create rect
+        rect2 = QGraphicsRectItem(0, 0, 200, 50)
+        brush2 = QBrush(QColor(255, 0, 0, 100))
         rect2.setBrush(brush2)
 
+        # Create group and add to it
         group = QGraphicsItemGroup()
         group.addToGroup(rect)
         group.addToGroup(rect2)
         group.addToGroup(text)
         group.addToGroup(img_item)
 
+        # Make movable
         scene.addItem(group)
         group.setFlag(QGraphicsItem.ItemIsMovable)
 
+        # Create view with scene and add to layout
         view = QGraphicsView(scene)
         self.ui.gridLayout_2.addWidget(view)
 
