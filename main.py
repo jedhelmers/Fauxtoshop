@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba
+from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
@@ -183,7 +183,7 @@ class Tool(QWidget):
             painter.setCompositionMode(QPainter.CompositionMode_Source)
             painter.fillRect(resultImage.rect(), Qt.transparent)
 
-            pen = QtGui.QPen()
+            pen = QPen()
             pen.setWidth(self.brush_size)
             pen.setColor(self.brush_color)
             pen.setStyle(Qt.SolidLine)
@@ -235,6 +235,9 @@ class MainWindow(QMainWindow):
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
+
+        # Grid
+        self.grid = None
 
         # Windows
         self.windows = {}
@@ -348,10 +351,16 @@ class MainWindow(QMainWindow):
         # Background layer
         self.settings = {**new_file_information, **self.settings}
         # Checkboard
-        print(self.settings['absolute_dimensions'])
         checkerboard = Layer(
-            image=self.generate_checkerboard(self.settings['absolute_dimensions'], 20),
+            image=self.generate_checkerboard(20),
             name='Checkerboard',
+        )
+
+        # Grid
+        self.grid = Layer(
+            image=self.draw_grid(20),
+            name='Grid',
+            mode='Multiply'
         )
 
         # Background layer
@@ -368,7 +377,42 @@ class MainWindow(QMainWindow):
     # SCRAP END
 
     # UTILITIES
-    def generate_checkerboard(self, dimensions=[0, 0], checker_width=50):
+    def draw_grid(self, grid_width=50):
+        # TODO: Create layer for QLabel that is always present when document is open.
+        # Replace all references to self.layers[0]
+        if 'absolute_dimensions' in self.settings:
+            [w, h] = self.settings['absolute_dimensions']
+
+            rows = int(h // grid_width)
+            cols = int(w // grid_width)
+
+            resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+            resultImage.fill(Qt.transparent)
+            painter = QPainter(resultImage)
+            color = QColor(Qt.transparent)
+            color.setAlphaF(0.15)
+            painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+
+            for r in range(rows):
+                if r % 4 == 0:
+                    painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
+                else:
+                    painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+                painter.drawLine(0, r * grid_width, w, r * grid_width)
+
+            for c in range(cols):
+                if c % 4 == 0:
+                    painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
+                else:
+                    painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+                painter.drawLine(c * grid_width, 0, c * grid_width, h)
+
+            painter.end()
+
+            return self.image_to_pixmap(resultImage)
+
+    def generate_checkerboard(self, checker_width=50):
+        dimensions = self.settings['absolute_dimensions']
         grid_cnt = int(max(*dimensions) // checker_width)
         image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
         image.fill(Qt.white)
@@ -615,6 +659,10 @@ class MainWindow(QMainWindow):
     def render(self):
         res = self.render_layers()
         res = self.crop_workspace(res)
+
+        if self.grid:
+            res = self.def_add_image(res, self.grid)
+
         if res:
             self.label.setPixmap(res)
 
