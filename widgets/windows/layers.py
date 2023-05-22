@@ -64,7 +64,7 @@ class LayersWindowWidget(QWidget):
     {
 
         background-color: pink;
-        width: 15px;
+        width: 15px;CompositionMode
         margin: 15px 3px 15px 3px;
         border: 1px transparent #2A2929;
         border-radius: 4px;
@@ -185,7 +185,7 @@ class LayersWindowWidget(QWidget):
 
         for i in range(grid_cnt):
             for j in range(grid_cnt):
-                color = QColor(0, 0, 0, 100) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+                color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
                 painter.fillRect(QRect(
                     i * checker_width, j * checker_width,
                     checker_width, checker_width
@@ -228,7 +228,7 @@ class LayersWindowWidget(QWidget):
             child.setParent(None)
 
         # Add all layers to layout
-        for l in self.layers:
+        for l in self.layers[1:]:
             layer = LayerWidget(
                 parent=self.ui.verticalLayout_3.widget(),
                 main_signaler=self.main_signaler,

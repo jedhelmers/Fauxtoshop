@@ -6,7 +6,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba
-from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
@@ -79,6 +79,14 @@ class Tool(QWidget):
         self._layer = layer
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
+
+    def graphics_scene(self):
+        scene = QGraphicsScene(self.parent())
+        pixmap = QPixmap(QSize(400, 400))
+        pixmap.fill(qRgba(250, 50, 50, 50))
+        item = QGraphicsPixmapItem(pixmap)
+        scene.addItem(item)
+        return scene
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.position().x(), event.position().y()]
@@ -339,18 +347,47 @@ class MainWindow(QMainWindow):
     def initialize_document(self, new_file_information):
         # Background layer
         self.settings = {**new_file_information, **self.settings}
+        # Checkboard
+        print(self.settings['absolute_dimensions'])
+        checkerboard = Layer(
+            image=self.generate_checkerboard(self.settings['absolute_dimensions'], 20),
+            name='Checkerboard',
+        )
+
+        # Background layer
         background = Layer()
         background.image = QPixmap(QSize(*new_file_information['absolute_dimensions']))
         background.image.fill(new_file_information['color'])
         background.name = 'Background'
         background.lock = True
 
+        self.layers.append(checkerboard)
         self.layers.append(background)
 
     # SCRAP
     # SCRAP END
 
     # UTILITIES
+    def generate_checkerboard(self, dimensions=[0, 0], checker_width=50):
+        grid_cnt = int(max(*dimensions) // checker_width)
+        image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
+        image.fill(Qt.white)
+        painter = QPainter(image)
+        color = QColor(Qt.black)
+        color.setAlphaF(0.25)
+
+        for i in range(grid_cnt):
+            for j in range(grid_cnt):
+                color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+                painter.fillRect(QRect(
+                    i * checker_width, j * checker_width,
+                    checker_width, checker_width
+                ), color)
+
+        painter.end()
+
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
     def get_workspace_dimensions(self, event: QMouseEvent):
         # TODO: define pos and size on resize event
         scroll_area_size = self.ui.scrollArea.size()
