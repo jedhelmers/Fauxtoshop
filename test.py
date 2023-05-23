@@ -31,11 +31,11 @@ class MainWindow(QMainWindow):
         painter = QPainter(img)
         painter.save()
         brush_9 = QBrush(QColor(0, 0, 255, 100))
-        painter.setBackground(brush_9)
+        painter.setBackground (brush_9)
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
-        painter.drawPixmap(0, 0, img)
-        # painter.end()
-        painter.restore()
+        # painter.drawPixmap(0, 0, img)
+        painter.end()
+        # painter.restore()
 
         # Create rect
         rect = QGraphicsRectItem(0, 0, 200, 50)
@@ -59,6 +59,10 @@ class MainWindow(QMainWindow):
         scene.addItem(group)
         group.setFlag(QGraphicsItem.ItemIsMovable)
         group.setFlag(QGraphicsItem.ItemIsSelectable)
+
+        if scene.items():
+            print(scene.items()[1].toPlainText())
+            # text.toPlainText()
 
         # Create view with scene and add to layout
         view = QGraphicsView(scene)

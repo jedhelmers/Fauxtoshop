@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from PySide6.QtGui import QPainter
+from PySide6.QtWidgets import QWidgetItem
 from typing import List
 
 id = 0
@@ -72,6 +73,56 @@ class Layer:
         self.parent = parent
         self.effects = effects
         self.opacity = opacity
+
+
+class LayerBase(QWidgetItem):
+        def __init__(
+            self,
+            layer_id=None,
+            index=0,
+            color=None,
+            name=None,
+            alpha_lock=False,
+            lock=False,
+            show=True,
+            image=None,
+            masks=[],
+            position=[0.0, 0.0], # QPoint
+            scale=[1.0, 1.0], # qreal? Double I think.
+            mode='Normal',
+            mode_percent=1.0,
+            parent=None,
+            effects=[],
+            opacity=1.0,
+            ):
+            super().__init__(parent)
+            global id
+            self.index = index
+            if layer_id is None:
+                self.layer_id = id
+                id += 1
+            else:
+                self.layer_id = layer_id
+
+            self.color = color
+
+            if name:
+                self.name = name
+            else:
+                self.name = f'Layer {self.layer_id}'
+
+            self.alpha_lock = alpha_lock
+            self.lock = lock
+            self.show = show
+            self.image = image
+            self.masks = masks
+            self.position = position
+            self.scale = scale
+            self.mode = mode
+            self.mode_percent = mode_percent
+            self.parent = parent
+            self.effects = effects
+            self.opacity = opacity
 
 
 @dataclass

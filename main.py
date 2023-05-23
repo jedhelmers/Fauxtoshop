@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent,
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
-from datatypes.layer import Layer, LayerGroup, mode_mappings
+from datatypes.layer import Layer, LayerGroup, LayerBase, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
 from widgets.toolbar import ToolbarWidget
@@ -266,6 +266,10 @@ class MainWindow(QMainWindow):
         self.signaler.set_active_tool.connect(self.set_active_tool)
 
         # TEMP
+        layer_base = LayerBase(
+            image=QPixmap(QSize(100, 100)),
+            parent=self
+        )
         document_dimensions = [500, 700]
         offset_dimensions = [200, 200]
         absolute_dimensions = [
