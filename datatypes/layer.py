@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QWidgetItem
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from typing import List
 
 id = 0
@@ -75,55 +75,73 @@ class Layer:
         self.opacity = opacity
 
 
-class LayerBase(QWidgetItem):
-        def __init__(
-            self,
-            layer_id=None,
-            index=0,
-            color=None,
-            name=None,
-            alpha_lock=False,
-            lock=False,
-            show=True,
-            image=None,
-            masks=[],
-            position=[0.0, 0.0], # QPoint
-            scale=[1.0, 1.0], # qreal? Double I think.
-            mode='Normal',
-            mode_percent=1.0,
-            parent=None,
-            effects=[],
-            opacity=1.0,
-            ):
-            super().__init__(parent)
-            global id
-            self.index = index
-            if layer_id is None:
-                self.layer_id = id
-                id += 1
-            else:
-                self.layer_id = layer_id
+class LayerBase(QGraphicsRectItem):
+    def __init__(
+        self,
+        layer_id=None,
+        index=0,
+        color=None,
+        name=None,
+        alpha_lock=False,
+        lock=False,
+        show=True,
+        image=None,
+        masks=[],
+        position=[0.0, 0.0], # QPoint
+        scale=[1.0, 1.0], # qreal? Double I think.
+        mode='Normal',
+        mode_percent=1.0,
+        parent=None,
+        effects=[],
+        opacity=1.0,
+        ):
+        super().__init__(parent)
+        global id
+        self.index = index
+        if layer_id is None:
+            self.layer_id = id
+            id += 1
+        else:
+            self.layer_id = layer_id
 
-            self.color = color
+        self.color = color
 
-            if name:
-                self.name = name
-            else:
-                self.name = f'Layer {self.layer_id}'
+        if name:
+            self.name = name
+        else:
+            self.name = f'Layer {self.layer_id}'
 
-            self.alpha_lock = alpha_lock
-            self.lock = lock
-            self.show = show
-            self.image = image
-            self.masks = masks
-            self.position = position
-            self.scale = scale
-            self.mode = mode
-            self.mode_percent = mode_percent
-            self.parent = parent
-            self.effects = effects
-            self.opacity = opacity
+        self.alpha_lock = alpha_lock
+        self.lock = lock
+        self.show = show
+        self.image = image
+        self.masks = masks
+        self.position = position
+        self.scale = scale
+        self.mode = mode
+        self.mode_percent = mode_percent
+        self.parent = parent
+        self.effects = effects
+        self.opacity = opacity
+        self.setPos(10, 20)
+        self.setFlag(QGraphicsItem.ItemIsMovable)
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
 
+    @property
+    def is_selected(self):
+        return self._is_selected
+
+    @is_selected.setter
+    def is_selected(self, is_selected):
+        self._is_selected = is_selected
+
+    # def itemChange(self, e):
+    #     super().itemChange(e)
+    #     print('WEE', e)
+
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        print('WEEEEE', event)
 
 @dataclass
 class LayerGroup(Layer):
