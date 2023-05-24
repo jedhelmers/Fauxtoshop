@@ -99,14 +99,18 @@ class MainWindow(QMainWindow):
             # text.toPlainText()
 
         # Create view with scene and add to layout
-        i = QPixmap(QSize(300, 400))
+        i = QPixmap(QSize(600, 600))
         i.fill(Qt.transparent)
         p = QPainter(i)
         scene.render(p)
 
+        b = QBrush()
+        b.setTexture(i)
+        scene.setBackgroundBrush(b)
+
         view = QGraphicsView(scene)
         # view.setHidden(True)
-        view.setStyleSheet("opacity: 50")
+        # view.setStyleSheet("opacity: 50")
         view.setWindowOpacity(0.0)
         # view.setBackgroundBrush(brush_9)
         view.setMask(QRect(250, 50, 600, 300))
@@ -117,7 +121,7 @@ class MainWindow(QMainWindow):
         pix.fill(QColor(255, 255, 0, 100))
         label.setStyleSheet("margin: 0px; background: transparent")
         # label.setPixmap(pix)
-        label.setPixmap(i)
+        # label.setPixmap(i)
 
         self.ui.gridLayout_2.addWidget(label, 0, 0, 0, 0)
         self.ui.gridLayout_2.addWidget(view, 0, 0, 0, 0)
