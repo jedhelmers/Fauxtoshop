@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QPainter, QPixmap, QImage
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem, QStyleOptionGraphicsItem, QStyle
 from typing import List
 
 id = 0
@@ -135,13 +136,44 @@ class LayerBase(QGraphicsRectItem):
     def is_selected(self, is_selected):
         self._is_selected = is_selected
 
-    # def itemChange(self, e):
-    #     super().itemChange(e)
-    #     print('WEE', e)
+    def to_pixmap(self) -> QPixmap:
+        pixmap = QPixmap(self.boundingRect().size().toSize())
+        pixmap.fill(Qt.transparent)
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
+        style_option = QStyleOptionGraphicsItem()
+        # style_option.state = ~QStyle.State_None
+        self.paint(painter, style_option)
+        painter.end()
+
+        return pixmap
+
+    def def_add_image(self, layer: QPixmap, mode: str) -> QPixmap:
+        mode = mode_mappings(mode)
+
+        resultImage = QImage(self.boundingRect().size().toSize(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+
+        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.drawPixmap(0, 0, self.to_pixmap())
+        painter.setCompositionMode(mode)
+        painter.drawPixmap(0, 0, layer)
+        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        painter.fillRect(resultImage.rect(), Qt.transparent)
+        painter.end()
+
+        return self.image_to_pixmap(resultImage)
+
+    def image_to_pixmap(self, image) -> QPixmap:
+        # TODO: Utility
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
-        print('WEEEEE', event)
+        # print('WEEEEE', event)
 
 @dataclass
 class LayerGroup(Layer):
