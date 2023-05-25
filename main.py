@@ -247,6 +247,9 @@ class MainWindow(QMainWindow):
         self.settings = {}
         self.setStyleSheet(main_style())
 
+        # TEMP
+        self.old_way = False
+
         # Ruler
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
         self.y_line = QHLine(self.ui.verticalRulerWidget, thickness=2)
@@ -257,12 +260,15 @@ class MainWindow(QMainWindow):
         self.label = QLabel()
         self.label.setMouseTracking(True)
         self.scene = QGraphicsScene(self, 0, 0, 400, 400)
-        # self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
-        # self.scene.setForegroundBrush(QBrush(QColor(255, 255, 0, 100)))
+        self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
         self.view = QGraphicsView(self.scene)
         # self.view.setMask(QRect(200, 200, 400, 400))
-        self.ui.gridLayout_3.addWidget(self.view)
-        # self.ui.gridLayout_3.addWidget(self.label)
+
+        if self.old_way:
+            self.ui.gridLayout_3.addWidget(self.label)
+        else:
+            self.ui.gridLayout_3.addWidget(self.view)
+
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
@@ -320,8 +326,12 @@ class MainWindow(QMainWindow):
         self.initialize_document(new_file_information)
         self.draw_rulers()
         self.generate_window_panels()
-        # self.render()
-        self.render_new()
+
+        if self.old_way:
+            self.render()
+        else:
+            self.render_new()
+
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
 
