@@ -96,7 +96,7 @@ class LayerBase(QGraphicsRectItem):
         effects=[],
         opacity=1.0,
         ):
-        super().__init__(parent)
+        super().__init__()
         global id
         self.index = index
         if layer_id is None:
@@ -144,7 +144,7 @@ class LayerBase(QGraphicsRectItem):
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
         style_option = QStyleOptionGraphicsItem()
         # style_option.state = ~QStyle.State_None
-        self.paint(painter, style_option)
+        # self.paint(painter, style_option)
         painter.end()
 
         return pixmap
@@ -170,6 +170,10 @@ class LayerBase(QGraphicsRectItem):
     def image_to_pixmap(self, image) -> QPixmap:
         # TODO: Utility
         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
+    def paint(self, painter, options, widget):
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Screen)
+        super().paint(painter, options, widget)
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)

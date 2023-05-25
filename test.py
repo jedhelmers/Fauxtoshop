@@ -25,6 +25,8 @@ class MainWindow(QMainWindow):
         scene = QGraphicsScene(self, 0, 0, 400, 400)
         text = QGraphicsTextItem("Howdy, world!")
 
+        view = QGraphicsView(scene)
+
         style_option = QStyleOptionGraphicsItem()
         style_option.state = QStyle.State_None
         # TODO: Composition mode does not work
@@ -106,9 +108,9 @@ class MainWindow(QMainWindow):
 
         b = QBrush()
         b.setTexture(i)
-        scene.setBackgroundBrush(b)
+        p.end()
+        # scene.setBackgroundBrush(b)
 
-        view = QGraphicsView(scene)
         # view.setHidden(True)
         # view.setStyleSheet("opacity: 50")
         view.setWindowOpacity(0.0)
@@ -121,7 +123,7 @@ class MainWindow(QMainWindow):
         pix.fill(QColor(255, 255, 0, 100))
         label.setStyleSheet("margin: 0px; background: transparent")
         # label.setPixmap(pix)
-        # label.setPixmap(i)
+        label.setPixmap(i)
 
         self.ui.gridLayout_2.addWidget(label, 0, 0, 0, 0)
         self.ui.gridLayout_2.addWidget(view, 0, 0, 0, 0)

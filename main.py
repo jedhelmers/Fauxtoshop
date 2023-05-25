@@ -2,11 +2,12 @@ import json
 import random
 import sys
 from pathlib import Path
+from typing import Optional
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
-from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen, QBrush
+from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, LayerBase, mode_mappings
@@ -212,6 +213,19 @@ class MainSignaler(QtCore.QObject):
     set_active_tool = QtCore.Signal(str)
 
 
+class GraphicsRectItemBase(QGraphicsRectItem):
+    def __init__(self, mode='Normal', *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.mode = mode
+        self.setFlag(QGraphicsItem.ItemIsMovable)
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+
+    def paint(self, painter, object, widget):
+        painter.setCompositionMode(mode_mappings(self.mode))
+        super().paint(painter, object, widget)
+        print('PRINT!!!')
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -231,7 +245,13 @@ class MainWindow(QMainWindow):
         # UI
         self.label = QLabel()
         self.label.setMouseTracking(True)
-        self.ui.gridLayout_3.addWidget(self.label)
+        self.scene = QGraphicsScene(self, 0, 0, 400, 400)
+        self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
+        self.scene.setForegroundBrush(QBrush(QColor(255, 255, 0, 100)))
+        self.view = QGraphicsView(self.scene)
+        # self.view.setMask(QRect(200, 200, 400, 400))
+        self.ui.gridLayout_3.addWidget(self.view)
+        # self.ui.gridLayout_3.addWidget(self.label)
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
@@ -289,7 +309,8 @@ class MainWindow(QMainWindow):
         self.initialize_document(new_file_information)
         self.draw_rulers()
         self.generate_window_panels()
-        self.render()
+        # self.render()
+        self.render_new()
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
 
@@ -670,6 +691,23 @@ class MainWindow(QMainWindow):
 
         if res:
             self.label.setPixmap(res)
+
+    def render_new(self):
+        # Create rect
+        rect = GraphicsRectItemBase('Normal', 0, 0, 200, 50)
+        rect.setPos(50, 20)
+        brush = QBrush(QColor(10, 10, 255, 255))
+        rect.setPen(Qt.NoPen)
+        rect.setBrush(brush)
+        self.scene.addItem(rect)
+
+        rect2 = GraphicsRectItemBase('Multiply', 0, 0, 50, 200)
+        rect2.setPos(20, 50)
+        brush = QBrush(QColor(10, 10, 255, 255))
+        rect2.setPen(Qt.NoPen)
+        rect2.setBrush(brush)
+
+        self.scene.addItem(rect2)
 
 def main():
     app = QApplication(sys.argv)
