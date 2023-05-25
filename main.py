@@ -7,7 +7,7 @@ from typing import Optional
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen, QBrush
-from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QStyle, QStyleOptionGraphicsItem, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, LayerBase, mode_mappings
@@ -220,15 +220,21 @@ class GraphicsRectItemBase(QGraphicsRectItem):
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
 
-    def paint(self, painter, object, widget):
+    def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget):
+        style_object.state &= ~QStyle.State_Selected
+        color = QColor(Qt.white)
+
+        if self.isActive():
+            pen = QPen(color, 1.5, Qt.DashLine, Qt.RoundCap)
+            pen.setDashPattern([4.0, 4.0])
+            self.setPen(pen)
+        else:
+            pen = Qt.NoPen
+            self.setPen(pen)
+
         painter.setCompositionMode(mode_mappings(self.mode))
-        q = QWidget()
-        # q.
-        # print(widget.objectName())
-        # painter.fillRect(widget.rect(), Qt.transparent)
-        # painter.drawPixmap(0, 0, base_image)
-        super().paint(painter, object, widget)
-        print('PRINT!!!')
+        painter.setPen(pen)
+        super().paint(painter, style_object, widget)
 
 
 class MainWindow(QMainWindow):
@@ -251,8 +257,8 @@ class MainWindow(QMainWindow):
         self.label = QLabel()
         self.label.setMouseTracking(True)
         self.scene = QGraphicsScene(self, 0, 0, 400, 400)
-        self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
-        self.scene.setForegroundBrush(QBrush(QColor(255, 255, 0, 100)))
+        # self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
+        # self.scene.setForegroundBrush(QBrush(QColor(255, 255, 0, 100)))
         self.view = QGraphicsView(self.scene)
         # self.view.setMask(QRect(200, 200, 400, 400))
         self.ui.gridLayout_3.addWidget(self.view)
@@ -699,14 +705,18 @@ class MainWindow(QMainWindow):
 
     def render_new(self):
         # Create rect
+        brush = QBrush(QColor(255, 255, 255))
+        # self.scene.setBackgroundBrush(brush)
+
         rect = GraphicsRectItemBase('Normal', 0, 0, 200, 50)
+        rect.setRotation(45.0)
         rect.setPos(50, 20)
         brush = QBrush(QColor(255, 10, 10, 255))
         rect.setPen(Qt.NoPen)
         rect.setBrush(brush)
         self.scene.addItem(rect)
 
-        rect2 = GraphicsRectItemBase('Multiply', 0, 0, 50, 200)
+        rect2 = GraphicsRectItemBase('Screen', 0, 0, 50, 200)
         rect2.setPos(20, 50)
         brush = QBrush(QColor(10, 10, 255, 255))
         rect2.setPen(Qt.NoPen)
