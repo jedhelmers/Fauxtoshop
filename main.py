@@ -222,6 +222,11 @@ class GraphicsRectItemBase(QGraphicsRectItem):
 
     def paint(self, painter, object, widget):
         painter.setCompositionMode(mode_mappings(self.mode))
+        q = QWidget()
+        # q.
+        # print(widget.objectName())
+        # painter.fillRect(widget.rect(), Qt.transparent)
+        # painter.drawPixmap(0, 0, base_image)
         super().paint(painter, object, widget)
         print('PRINT!!!')
 
@@ -696,7 +701,7 @@ class MainWindow(QMainWindow):
         # Create rect
         rect = GraphicsRectItemBase('Normal', 0, 0, 200, 50)
         rect.setPos(50, 20)
-        brush = QBrush(QColor(10, 10, 255, 255))
+        brush = QBrush(QColor(255, 10, 10, 255))
         rect.setPen(Qt.NoPen)
         rect.setBrush(brush)
         self.scene.addItem(rect)
