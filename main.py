@@ -7,7 +7,7 @@ from typing import Optional
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen, QBrush
-from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QStyle, QStyleOptionGraphicsItem, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QGraphicsItemGroup, QStyle, QStyleOptionGraphicsItem, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, LayerBase, mode_mappings
@@ -221,7 +221,8 @@ class GraphicsRectItemBase(QGraphicsRectItem):
         super().__init__(*args, **kwargs)
         self.mode = mode
         self.name = name
-        # self.setSelected(False)
+
+        # Set flags
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
 
@@ -750,6 +751,21 @@ class MainWindow(QMainWindow):
         rect2.setSelected(False)
         self.scene.addItem(rect2)
 
+        l = ['Normal', 'Multiply', 'Screen']
+        group = QGraphicsItemGroup()
+        group.setFlag(QGraphicsItem.ItemIsMovable)
+        group.setFlag(QGraphicsItem.ItemIsSelectable)
+        for i in range(10):
+            print(f'{i} % 3 =', i % 3)
+            rect = GraphicsRectItemBase('Layer 2', l[i % 3], 0, 0, 40, 40)
+            rect.setPos(i * 40, 40)
+            brush = QBrush(QColor(255 // (i + 1), i * 20, i * 15, 255))
+            rect.setPen(Qt.NoPen)
+            rect.setBrush(brush)
+            # rect.setSelected(False)
+            group.addToGroup(rect)
+
+        self.scene.addItem(group)
         # self.scene.setSelected(None)
 
 def main():
