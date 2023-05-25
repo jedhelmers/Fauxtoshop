@@ -213,10 +213,15 @@ class MainSignaler(QtCore.QObject):
     set_active_tool = QtCore.Signal(str)
 
 
+# TODO: Extend graphics scene class
+
+
 class GraphicsRectItemBase(QGraphicsRectItem):
-    def __init__(self, mode='Normal', *args, **kwargs) -> None:
+    def __init__(self, name='Layer', mode='Normal', *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.mode = mode
+        self.name = name
+        # self.setSelected(False)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
 
@@ -224,7 +229,7 @@ class GraphicsRectItemBase(QGraphicsRectItem):
         style_object.state &= ~QStyle.State_Selected
         color = QColor(Qt.white)
 
-        if self.isActive():
+        if self.isSelected():
             pen = QPen(color, 1.5, Qt.DashLine, Qt.RoundCap)
             pen.setDashPattern([4.0, 4.0])
             self.setPen(pen)
@@ -329,8 +334,6 @@ class MainWindow(QMainWindow):
 
         if self.old_way:
             self.render()
-        else:
-            self.render_new()
 
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
@@ -343,7 +346,10 @@ class MainWindow(QMainWindow):
     @layers.setter
     def layers(self, layers):
         self._layers = layers
-        self.render()
+        if self.old_way:
+            self.render()
+        else:
+            self.render_new()
 
         # TODO: Handle this better
         if 'layers_widget'  in self.windows:
@@ -718,21 +724,33 @@ class MainWindow(QMainWindow):
         brush = QBrush(QColor(255, 255, 255))
         # self.scene.setBackgroundBrush(brush)
 
-        rect = GraphicsRectItemBase('Normal', 0, 0, 200, 50)
-        rect.setRotation(45.0)
-        rect.setPos(50, 20)
+        rect0 = GraphicsRectItemBase('Layer 0', 'Normal', 0, 0, 200, 50)
+        rect0.setRotation(45.0)
+        rect0.setPos(50, 20)
+        brush = QBrush(QColor(10, 255, 10, 255))
+        rect0.setPen(Qt.NoPen)
+        rect0.setBrush(brush)
+        self.scene.addItem(rect0)
+        # rect0.setSelected(False)
+
+        rect = GraphicsRectItemBase('Layer 1', 'Color Burn', 0, 0, 200, 50)
+        rect.setRotation(-45.0)
+        rect.setPos(10, 20)
         brush = QBrush(QColor(255, 10, 10, 255))
         rect.setPen(Qt.NoPen)
         rect.setBrush(brush)
         self.scene.addItem(rect)
+        # rect.setSelected(True)
 
-        rect2 = GraphicsRectItemBase('Screen', 0, 0, 50, 200)
+        rect2 = GraphicsRectItemBase('Layer 2', 'Screen', 0, 0, 50, 200)
         rect2.setPos(20, 50)
         brush = QBrush(QColor(10, 10, 255, 255))
         rect2.setPen(Qt.NoPen)
         rect2.setBrush(brush)
-
+        rect2.setSelected(False)
         self.scene.addItem(rect2)
+
+        # self.scene.setSelected(None)
 
 def main():
     app = QApplication(sys.argv)
