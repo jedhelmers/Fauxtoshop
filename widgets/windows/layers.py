@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QPoint, QRect
-from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QWidget, QMainWindow, QGraphicsScene, QGraphicsItemGroup, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen, QImage
 
 from datatypes.layer import Layer, modes, mode_mappings
@@ -19,7 +19,7 @@ class LayerSignaler(QtCore.QObject):
 class LayersWindowWidget(QWidget):
     def __init__(
             self,
-            layers,
+            layers: QGraphicsScene,
             current_layer,
             settings,
             signaler=None
@@ -228,33 +228,43 @@ class LayersWindowWidget(QWidget):
             child.setParent(None)
 
         # Add all layers to layout
-        for l in self.layers[1:]:
-            layer = LayerWidget(
-                parent=self.ui.verticalLayout_3.widget(),
-                main_signaler=self.main_signaler,
-                layer_signaler=self.signaler,
-                layer_id=l.layer_id,
-                layer={
-                    'is_selected': False,
-                    'hidden': not l.show,
-                    'name': l.name,
-                    'mode': l.mode
-                }
-            )
-            layer.setObjectName(l.name)
-            self.ui.verticalLayout_3.insertWidget(index, layer)
+        for item in self.layers.items(Qt.AscendingOrder):
+            # print(item)
+            if not isinstance(item, QGraphicsItemGroup):
+            #     print('GROUP', item, id(item))
+            # else:
+                # print('ITEM', id(item))
+            # for l in self.layers[1:]:
+                layer = LayerWidget(
+                    parent=self.ui.verticalLayout_3.widget(),
+                    main_signaler=self.main_signaler,
+                    layer_signaler=self.signaler,
+                    layer_id=id(item),
+                    layer={
+                        'is_selected': False,
+                        'hidden': False,
+                        'name': item.name,
+                        'mode': item.mode
+                    }
+                )
+                layer.setObjectName(item.name)
+                self.ui.verticalLayout_3.insertWidget(index, layer)
 
-            # Thumbnails
-            if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
-                layer.ui.thumbnailWidget.setFixedWidth(36 * self.settings['aspect_ratio'][0])
-            else:
-                layer.ui.thumbnailWidget.setFixedHeight(36 * self.settings['aspect_ratio'][1])
+                # Thumbnails
+                if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
+                    layer.ui.thumbnailWidget.setFixedWidth(36 * self.settings['aspect_ratio'][0])
+                else:
+                    layer.ui.thumbnailWidget.setFixedHeight(36 * self.settings['aspect_ratio'][1])
 
-            # Lock UI
-            if l.lock:
-                self.lock_layer_ui(layer)
+                # Lock UI
+                # if l.lock:
+                #     self.lock_layer_ui(layer)
 
-            # Add thumbnail to thumbnailwidget
-            thumb = QLabel(layer.ui.thumbnailWidget)
-            thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), l.image))
+                # Add thumbnail to thumbnailwidget
+                # self.layers.sceneRect
+                print(self.layers.sceneRect().size().toSize())
+                pixmap = item.to_pixmap(self.layers.sceneRect().size().toSize())
+                # pixmap.fill(Qt.white)
+                thumb = QLabel(layer.ui.thumbnailWidget)
+                thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), pixmap))
 

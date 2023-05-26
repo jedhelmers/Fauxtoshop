@@ -226,7 +226,33 @@ class GraphicsRectItemBase(QGraphicsRectItem):
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
 
-    def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget):
+    # static QPixmap QPixmapFromItem(QGraphicsItem *item){
+    #     QPixmap pixmap(item->boundingRect().size().toSize());
+    #     pixmap.fill(Qt::transparent);
+    #     QPainter painter(&pixmap);
+    #     painter.setRenderHint(QPainter::Antialiasing);
+    #     QStyleOptionGraphicsItem opt;
+    #     item->paint(&painter, &opt);
+    #     return pixmap;
+    # }
+    def to_pixmap(self, size) -> QPixmap:
+        pixmap = QPixmap(size)
+        # pixmap = QPixmap(self.boundingRect().size().toSize())
+        pixmap.fill(Qt.transparent)
+        
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
+        style_option = QStyleOptionGraphicsItem()
+        # style_option.state = ~QStyle.State_None
+        self.paint(painter, style_option)
+        # painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        return pixmap
+
+
+    def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         style_object.state &= ~QStyle.State_Selected
         color = QColor(Qt.white)
 
@@ -643,7 +669,7 @@ class MainWindow(QMainWindow):
             signaler=self.signaler,
             settings=self.settings,
             current_layer=self.current_layer,
-            layers=self.layers
+            layers=self.scene
         )
 
         layers_widget.setMouseTracking(True)
@@ -756,8 +782,7 @@ class MainWindow(QMainWindow):
         group.setFlag(QGraphicsItem.ItemIsMovable)
         group.setFlag(QGraphicsItem.ItemIsSelectable)
         for i in range(10):
-            print(f'{i} % 3 =', i % 3)
-            rect = GraphicsRectItemBase('Layer 2', l[i % 3], 0, 0, 40, 40)
+            rect = GraphicsRectItemBase(f'Layer {i + 3}', l[i % 3], 0, 0, 40, 40)
             rect.setPos(i * 40, 40)
             brush = QBrush(QColor(255 // (i + 1), i * 20, i * 15, 255))
             rect.setPen(Qt.NoPen)
@@ -768,11 +793,13 @@ class MainWindow(QMainWindow):
         self.scene.addItem(group)
         # self.scene.setSelected(None)
 
+
 def main():
     app = QApplication(sys.argv)
     settings_window = MainWindow()
     settings_window.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()
