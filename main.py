@@ -791,6 +791,8 @@ class MainWindow(QMainWindow):
             group.addToGroup(rect)
 
         self.scene.addItem(group)
+
+        rect.setSelected(True)
         # self.scene.setSelected(None)
 
 
