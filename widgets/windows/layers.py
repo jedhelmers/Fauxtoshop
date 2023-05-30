@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QSize, QPoint, QRect
 from PySide6.QtWidgets import QWidget, QMainWindow, QGraphicsScene, QGraphicsItemGroup, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen, QImage
 
-from datatypes.layer import Layer, modes, mode_mappings
+from datatypes.layer import Layer, modes, mode_mappings, GraphicsRectItemBase
 from styles.window_panel import window_panel_style
 from ui.windows import layerswindowui
 from widgets.windows.layer import LayerWidget
@@ -230,7 +230,7 @@ class LayersWindowWidget(QWidget):
         # Add all layers to layout
         for item in self.layers.items(Qt.AscendingOrder):
             # print(item)
-            if not isinstance(item, QGraphicsItemGroup):
+            if isinstance(item, GraphicsRectItemBase):
             #     print('GROUP', item, id(item))
             # else:
                 # print('ITEM', id(item))
