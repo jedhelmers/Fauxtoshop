@@ -139,7 +139,7 @@ class LayersWindowWidget(QWidget):
         layer = self.get_layer()
         if layer:
             self.update_layer_mode(layer.mode)
-        print(self.current_layer)
+        # print(self.current_layer)
 
     def update_selected_layer(self):
         self.update_layers_selected()
@@ -262,7 +262,7 @@ class LayersWindowWidget(QWidget):
 
                 # Add thumbnail to thumbnailwidget
                 # self.layers.sceneRect
-                print(self.layers.sceneRect().size().toSize())
+                # print(self.layers.sceneRect().size().toSize())
                 pixmap = item.to_pixmap(self.layers.sceneRect().size().toSize())
                 # pixmap.fill(Qt.white)
                 thumb = QLabel(layer.ui.thumbnailWidget)

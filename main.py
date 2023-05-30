@@ -55,7 +55,6 @@ class Tool(QWidget):
 
     @layer.setter
     def layer(self, layer):
-        print('78', layer)
         self._layer = layer
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
@@ -143,10 +142,8 @@ class Tool(QWidget):
     #     self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
-        print('self.layer')
         if self.layer and self.layer.image:
             # TODO: why is self.layer None?
-            print('brush')
             [x_offset, y_offset] = self.layer.position
 
             x = event.position().x() * self.drag_speed - x_offset
@@ -219,6 +216,9 @@ class MainWindow(QMainWindow):
         self.scene.setBackgroundBrush(QBrush(QColor(30, 30, 30)))
         self.view = QGraphicsView(self.scene)
         self.view.setMask(QRect(50, 50, 400, 400))
+
+        # Prevent scene from scrolling
+        self.scene.setSceneRect(self.view.rect())
 
         if self.old_way:
             self.ui.gridLayout_3.addWidget(self.label)
@@ -461,6 +461,23 @@ class MainWindow(QMainWindow):
         pix.setScale(0.5)
         self.scene.addItem(pix)
         self.scene.addItem(rect0)
+
+        group = QGraphicsItemGroup()
+        rect = GraphicsRectItemBase('Layer 1', 'Normal', 0, 0, 100, 100)
+        rect.setBrush(QBrush(QColor(50, 50, 50, 200)))
+        # group.addToGroup(rect)
+        self.scene.addItem(rect)
+
+        mask = GraphicsRectItemBase('Mask', 'Normal', 0, 0, 50, 50)
+        mask.setBrush(QBrush(QColor(250, 50, 50, 100)))
+        mask.setParentItem(pix)
+
+        for item in group.childItems():
+            print(type(item), item.group())
+
+        print('\n')
+        for item in self.scene.items():
+            print(type(item))
 
 
 def main():

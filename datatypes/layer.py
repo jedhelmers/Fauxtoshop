@@ -10,6 +10,7 @@ parent_id = 0
 
 class GraphicsItemBase:
     def __init__(self, mode=None, name=None):
+        # TODO: Set ALL non-text/non-path layers to Pixmap upon creation
         super().__init__()
         self.mode = mode
         self.name = name
@@ -97,7 +98,7 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
 
         painter.setCompositionMode(mode_mappings(self.mode))
         # painter.setPen(pen)
-        print('paint')
+        # print('paint')
         super().paint(painter, style_object, widget)
 
 
