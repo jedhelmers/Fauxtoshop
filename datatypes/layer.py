@@ -45,25 +45,29 @@ class ArtBoard(QGraphicsScene):
     def __init__(self):
         super().__init__()
 
-        pix = QGraphicsPixmapItem()
-        pix.setPixmap(self.generate_checkerboard(20))
-        self.addItem(pix)
+        # pix = QGraphicsPixmapItem()
+        # pix.setPixmap(self.generate_checkerboard(20))
+        # self.addItem(pix)
 
-        self.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
+        # self.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
+
+    def drawBackground(self, painter: QPainter, rect: QRectF | QRect) -> None:
+        # self.generate_checkerboard(painter, 20)
+        # print(painter)
+        return super().drawBackground(painter, rect)
 
     def drawForeground(self, painter: QPainter, rect: QRectF | QRect) -> None:
-        # self.painter(painter)
-        print('WEEEE')
-        self.draw_grid(painter, 20)
+        # self.draw_grid(painter, 20)
         return super().drawForeground(painter, rect)
 
-    def generate_checkerboard(self, checker_width=50) -> QPixmap:
+    def generate_checkerboard(self, checker_width=50) -> None:
         if self.settings:
             dimensions = self.settings['document_dimensions']
             grid_cnt = int(max(*dimensions) // checker_width)
             image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
             image.fill(Qt.white)
             painter = QPainter(image)
+
             color = QColor(Qt.black)
             color.setAlphaF(0.25)
 
@@ -75,12 +79,13 @@ class ArtBoard(QGraphicsScene):
                         checker_width, checker_width
                     ), color)
 
-            painter.end()
+            # painter.end()
 
+        # return painter
             return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
         return QPixmap()
 
-    def draw_grid(self, painter: QPainter, grid_width=50):
+    def draw_grid(self, painter: QPainter, grid_width=50) -> None:
         if self.settings:
             [w, h] = self.settings['document_dimensions']
 
@@ -105,14 +110,36 @@ class ArtBoard(QGraphicsScene):
                     painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
                 painter.drawLine(c * grid_width, 0, c * grid_width, h)
 
-            painter.end()
-
-        return painter
 
 class ArtBoardView(QGraphicsView):
+    settings = None
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def drawBackground(self, painter: QPainter, rect: QRectF | QRect) -> None:
+        self.generate_checkerboard(painter)
+        return super().drawBackground(painter, rect)
+
+    def generate_checkerboard(self, painter: QPainter, checker_width=50) -> None:
+        if self.settings:
+            grid_cnt = int(max(*self.settings['document_dimensions']) // checker_width)
+            # image = QImage(QSize(*self.settings['document_dimensions']), QImage.Format_ARGB32_Premultiplied)
+            # image.fill(Qt.white)
+            # painter = QPainter(image)
+
+            # color = QColor(Qt.white)
+            # color.setAlphaF(0.25)
+
+            for i in range(grid_cnt):
+                for j in range(grid_cnt):
+                    color = QColor(255, 255, 255, 30) if (i + j) % 2 != 0 else QColor(255, 255, 255, 255)
+                    rect = QRect(
+                        i * checker_width, j * checker_width,
+                        checker_width, checker_width
+                    )
+                    painter.drawRect(rect)
+                    painter.fillRect(rect, color)
+                    # painter.rect
 
 
 class GraphicsPixmapItem(GraphicsItemBase, QGraphicsPixmapItem):

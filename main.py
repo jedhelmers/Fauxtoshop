@@ -231,6 +231,7 @@ class MainWindow(QMainWindow):
         ArtBoard.settings = self.settings
         self.scene = ArtBoard()
         self.scene.setBackgroundBrush(QBrush(QColor(30, 30, 30)))
+        ArtBoardView.settings = self.settings
         self.view = ArtBoardView(self.scene)
         # self.scene.setSceneRect(0, 0, 100, 200)
         # self.view.setMask(QRect(50, 50, 400, 400))
