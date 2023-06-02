@@ -504,16 +504,13 @@ class MainWindow(QMainWindow):
         self.scene.addItem(pix)
         self.scene.addItem(rect0)
 
+        pix.index = 1.0
 
         group = QGraphicsItemGroup()
         rect = GraphicsRectItemBase('Layer 1', 'Normal', 0, 0, 100, 100)
         rect.setBrush(QBrush(QColor(50, 50, 50, 200)))
         # group.addToGroup(rect)
         self.scene.addItem(rect)
-
-        # mask = GraphicsRectItemBase('Mask', 'Normal', 0, 0, 50, 50)
-        # mask.setBrush(QBrush(QColor(250, 50, 50, 100)))
-        # mask.setParentItem(pix)
 
         for item in group.childItems():
             print(type(item), item.group())

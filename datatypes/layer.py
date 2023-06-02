@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from PySide6.QtCore import Qt, QSize, QRectF, QRect
 from PySide6.QtGui import QPainter, QRegion, QPixmap, QBrush, QBitmap, QPainterPath, QImage, QColor, QPen, QMouseEvent
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsSceneMouseEvent, QWidget, QStyleOptionGraphicsItem, QStyle
-from typing import List, Union
+from typing import Iterable, List, Union
 
 id = 0
 parent_id = 0
@@ -15,6 +15,7 @@ class GraphicsItemBase:
         super().__init__()
         self.mode = mode
         self.name = name
+        self.index = 0.0
         self.hidden = False
 
         # Set flags
@@ -25,8 +26,8 @@ class GraphicsItemBase:
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         style_object.state &= ~QStyle.State_Selected
 
-        self.clip(painter)
         painter.setCompositionMode(mode_mappings(self.mode))
+        self.setZValue(self.index)
         super().paint(painter, style_object, widget)
 
     def set_settings(self, settings):
@@ -45,9 +46,9 @@ class ArtBoard(QGraphicsScene):
     def __init__(self):
         super().__init__()
 
-        # pix = QGraphicsPixmapItem()
-        # pix.setPixmap(self.generate_checkerboard(20))
-        # self.addItem(pix)
+        pix = QGraphicsPixmapItem()
+        pix.setPixmap(self.generate_checkerboard(20))
+        self.addItem(pix)
 
         # self.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
 
@@ -55,6 +56,9 @@ class ArtBoard(QGraphicsScene):
         # self.generate_checkerboard(painter, 20)
         # print(painter)
         return super().drawBackground(painter, rect)
+
+    # def items(self, order):
+    #     super.items(order)
 
     def drawForeground(self, painter: QPainter, rect: QRectF | QRect) -> None:
         # self.draw_grid(painter, 20)
@@ -116,6 +120,10 @@ class ArtBoardView(QGraphicsView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def drawItems(self, painter: QPainter, items: Iterable, options: Iterable) -> None:
+        print('WEEEE')
+        return super().drawItems(painter, items, options)
+
     def drawBackground(self, painter: QPainter, rect: QRectF | QRect) -> None:
         self.generate_checkerboard(painter)
         return super().drawBackground(painter, rect)
@@ -146,34 +154,9 @@ class GraphicsPixmapItem(GraphicsItemBase, QGraphicsPixmapItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        # print('POS', event.pos())
-        return super().setSelected(True)
-
-    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        print('POS', event.pos().toPoint().x(), event.pos().toPoint().y())
-        return super().mouseMoveEvent(event)
-
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
-        color = QColor(Qt.white)
-
-        # print(self.isSelected())
-        if self.isSelected():
-            pen = QPen(color, 1.5, Qt.DashLine, Qt.RoundCap)
-            pen.setDashPattern([4.0, 4.0])
-            painter.setPen(pen)
-        else:
-            pen = Qt.NoPen
-            # painter.setPen(pen)
-
-        # # CLip to board
-        # path = QPainterPath()
-        # path.addRect(QRectF(*[-p for p in self.pos().toTuple()], 400, 400))
-        # painter.setClipPath(path)
-
-        painter.setCompositionMode(mode_mappings(self.mode))
-        # painter.setPen(pen)
         super().paint(painter, style_object, widget)
+
 
 class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
     def __init__(self, name='Layer', mode='Normal', x=0, y=0, w=0, h=0, *args, **kwargs) -> None:
@@ -181,16 +164,6 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
         self.setRect(x, y, w, h)
         self._rotation = 0.0
 
-
-    # static QPixmap QPixmapFromItem(QGraphicsItem *item){
-    #     QPixmap pixmap(item->boundingRect().size().toSize());
-    #     pixmap.fill(Qt::transparent);
-    #     QPainter painter(&pixmap);
-    #     painter.setRenderHint(QPainter::Antialiasing);
-    #     QStyleOptionGraphicsItem opt;
-    #     item->paint(&painter, &opt);
-    #     return pixmap;
-    # }
     def to_pixmap(self, size) -> QPixmap:
         pixmap = QPixmap(size)
         # pixmap = QPixmap(self.boundingRect().size().toSize())
@@ -207,14 +180,6 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
 
         return pixmap
 
-    # def mousePressEvent(self, event) -> None:
-    #     print('WEE')
-    #     return super().setSelected(selected)
-
-    def setRotation(self, angle: float) -> None:
-        self._rotation = angle
-        # return super().setRotation(angle)
-
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         color = QColor(Qt.white)
 
@@ -226,6 +191,7 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
             pen = Qt.NoPen
             # painter.setPen(pen)
 
+        self.clip(painter)
         painter.setCompositionMode(mode_mappings(self.mode))
         super().paint(painter, style_object, widget)
 
