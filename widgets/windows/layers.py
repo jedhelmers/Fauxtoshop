@@ -161,7 +161,7 @@ class LayersWindowWidget(QWidget):
         # TODO: Move this into a utils
         mode = QPainter.CompositionMode.CompositionMode_SourceOver
 
-        resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+        resultImage = QImage(QSize(*self.settings['document_dimensions']), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
         painter.setCompositionMode(QPainter.CompositionMode_Source)
         painter.fillRect(resultImage.rect(), Qt.transparent)
@@ -240,12 +240,7 @@ class LayersWindowWidget(QWidget):
                     main_signaler=self.main_signaler,
                     layer_signaler=self.signaler,
                     layer_id=id(item),
-                    layer={
-                        'is_selected': False,
-                        'hidden': False,
-                        'name': item.name,
-                        'mode': item.mode
-                    }
+                    layer=item
                 )
                 layer.setObjectName(item.name)
                 self.ui.verticalLayout_3.insertWidget(index, layer)

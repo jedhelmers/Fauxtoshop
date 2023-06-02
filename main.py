@@ -212,20 +212,19 @@ class MainWindow(QMainWindow):
         # UI
         self.label = QLabel()
         self.label.setMouseTracking(True)
-        self.scene = QGraphicsScene(self, 100, 100, 400, 400)
+        self.scene = QGraphicsScene(self, 0, 0, 0, 0)
         self.scene.setBackgroundBrush(QBrush(QColor(30, 30, 30)))
         self.view = QGraphicsView(self.scene)
-        self.view.setMask(QRect(50, 50, 400, 400))
+        # self.scene.setSceneRect(0, 0, 100, 200)
+        # self.view.setMask(QRect(50, 50, 400, 400))
 
         # Prevent scene from scrolling
-        self.scene.setSceneRect(self.view.rect())
+        # self.scene.setSceneRect(self.view.rect())
 
-        if self.old_way:
-            self.ui.gridLayout_3.addWidget(self.label)
-        else:
-            self.ui.gridLayout_3.addWidget(self.view)
+        self.ui.gridLayout_3.addChildWidget(self.view)
 
-        self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
+        self.ui.gridLayout_3.setAlignment(Qt.AlignHCenter)
+
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
 
@@ -260,7 +259,7 @@ class MainWindow(QMainWindow):
 
         # TEMP
         document_dimensions = [500, 700]
-        offset_dimensions = [200, 200]
+        offset_dimensions = [0, 0]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
             document_dimensions[1] + offset_dimensions[1],
@@ -279,12 +278,38 @@ class MainWindow(QMainWindow):
 
         self.generate_window_panels()
 
-        if self.old_way:
-            self.render()
+        # Initialize
+        self.scene.setSceneRect(
+            QRect(0, 0,
+                  *new_file_information['document_dimensions']
+            )
+        )
+
+        self.view.setMask(
+            QRect(0,0,
+                  *new_file_information['document_dimensions'])
+        )
+
+        checkboard = GraphicsPixmapItem('Checkboard', 'Normal')
+        # 
+        checkboard.setPos(0, 0)
+        checkboard.setPixmap(self.generate_checkerboard())
+        checkboard.setFlag(QGraphicsItem.ItemIsMovable, False)
+        checkboard.setFlag(QGraphicsItem.ItemIsSelectable, False)
+        self.scene.addItem(checkboard)
+
+        # Set scene dimensions
+        # self.view.setSceneRect(0, 0, *self.settings['document_dimensions'])
+        # self.view.setFixedSize(QSize(*self.settings['document_dimensions']))
+        print('MAX SIZE', self.ui.widget.size())
+        self.view.setFixedSize(QSize(502, 702))
+        # self.view.setEnabled(False)
+
+        # Render
+        self.render()
 
         # TODO: Initial scroll
-        self.ui.scrollArea.scroll(300, 300)
-
+        # self.ui.scrollArea.scroll(300, 300)
 
     @property
     def layers(self):
@@ -356,7 +381,7 @@ class MainWindow(QMainWindow):
 
         # Background layer
         background = Layer()
-        background.image = QPixmap(QSize(*new_file_information['absolute_dimensions']))
+        background.image = QPixmap(QSize(*new_file_information['document_dimensions']))
         background.image.fill(new_file_information['color'])
         background.name = 'Background'
         background.lock = True
@@ -372,12 +397,12 @@ class MainWindow(QMainWindow):
         # TODO: Create layer for QLabel that is always present when document is open.
         # Replace all references to self.layers[0]
         if None in self.settings:
-            [w, h] = self.settings['absolute_dimensions']
+            [w, h] = self.settings['document_dimensions']
 
             rows = int(h // grid_width)
             cols = int(w // grid_width)
 
-            resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+            resultImage = QImage(QSize(*self.settings['document_dimensions']), QImage.Format_ARGB32_Premultiplied)
             resultImage.fill(Qt.transparent)
             painter = QPainter(resultImage)
             color = QColor(Qt.transparent)
@@ -402,8 +427,9 @@ class MainWindow(QMainWindow):
 
             return self.image_to_pixmap(resultImage)
 
-    def generate_checkerboard(self, checker_width=50):
-        dimensions = self.settings['absolute_dimensions']
+    def generate_checkerboard(self, checker_width=50) -> QPixmap:
+        dimensions = self.settings['document_dimensions']
+        print(dimensions)
         grid_cnt = int(max(*dimensions) // checker_width)
         image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
         image.fill(Qt.white)

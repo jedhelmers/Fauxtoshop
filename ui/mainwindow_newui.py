@@ -17,8 +17,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QMainWindow,
-    QMenu, QMenuBar, QScrollArea, QSizePolicy,
-    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
+    QMenu, QMenuBar, QSizePolicy, QStatusBar,
+    QTabWidget, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -160,37 +160,19 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.horizontalRulerWidget)
 
-        self.scrollArea = QScrollArea(self.tab)
-        self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
-        self.scrollAreaWidgetContents = QWidget()
-        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 611, 497))
-        self.gridLayout_6 = QGridLayout(self.scrollAreaWidgetContents)
-        self.gridLayout_6.setSpacing(0)
-        self.gridLayout_6.setObjectName(u"gridLayout_6")
-        self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.widget = QWidget(self.scrollAreaWidgetContents)
+        self.widget = QWidget(self.tab)
         self.widget.setObjectName(u"widget")
-        self.widget.setStyleSheet(u"")
+        self.widget.setStyleSheet(u"background: pink")
         self.gridLayout_4 = QGridLayout(self.widget)
-        self.gridLayout_4.setSpacing(0)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setSpacing(0)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
 
         self.gridLayout_4.addLayout(self.gridLayout_3, 0, 0, 1, 1)
 
 
-        self.gridLayout_6.addWidget(self.widget, 0, 0, 1, 1)
-
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-
-        self.verticalLayout_6.addWidget(self.scrollArea)
+        self.verticalLayout_6.addWidget(self.widget)
 
 
         self.horizontalLayout_7.addLayout(self.verticalLayout_6)

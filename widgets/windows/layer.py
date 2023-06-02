@@ -4,13 +4,14 @@ from PySide6.QtWidgets import QWidget, QMainWindow, QDockWidget, QFrame, QLabel,
 from PySide6.QtGui import QIcon
 
 # from styles.window_panel import window_panel_style
+from datatypes.layer import GraphicsItemBase
 from ui.windows import layerui
 
 
 class LayerWidget(QWidget):
     def __init__(
             self,
-            layer,
+            layer: GraphicsItemBase,
             layer_id,
             parent=None,
             main_signaler=None,
@@ -19,9 +20,9 @@ class LayerWidget(QWidget):
         super().__init__()
         self.ui = layerui.Ui_LayerWidget()
         self.ui.setupUi(self)
-        self.objectName = layer['name']
+        self.objectName = layer.name
         self.layer_id = layer_id
-        self.mode = layer['mode']
+        self.mode = layer.mode
         self.main_signaler = main_signaler
         self.layer_signaler = layer_signaler
 
@@ -47,12 +48,12 @@ class LayerWidget(QWidget):
             }
         """)
 
-        self.hidden = layer['hidden']
-        self.is_selected = layer['is_selected']
+        self.hidden = layer.hidden
+        # self.is_selected = layer['is_selected']
         self.render()
 
         self.ui.hidePushButton.clicked.connect(self.show)
-        self.ui.layerNameLabel.setText(layer['name'])
+        self.ui.layerNameLabel.setText(layer.name)
 
     def mousePressEvent(self, event):
         self.main_signaler.set_current_layer.emit(self.objectName)

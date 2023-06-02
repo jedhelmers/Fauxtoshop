@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPainter, QRegion, QPixmap, QBitmap, QImage, QColor, QPen
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsRectItem, QWidget, QStyleOptionGraphicsItem, QStyle
+from PySide6.QtCore import Qt, QSize, QRectF
+from PySide6.QtGui import QPainter, QRegion, QPixmap, QBitmap, QPainterPath, QImage, QColor, QPen, QMouseEvent
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsSceneMouseEvent, QWidget, QStyleOptionGraphicsItem, QStyle
 from typing import List
 
 id = 0
@@ -14,6 +14,7 @@ class GraphicsItemBase:
         super().__init__()
         self.mode = mode
         self.name = name
+        self.hidden = False
 
         # Set flags
         self.setFlag(QGraphicsItem.ItemIsMovable)
@@ -22,6 +23,11 @@ class GraphicsItemBase:
 
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         style_object.state &= ~QStyle.State_Selected
+
+        # path = QPainterPath()
+        # path.addRect(QRectF(30, 30, 400, 400))
+        # painter.setClipPath(path)
+
         painter.setCompositionMode(mode_mappings(self.mode))
         super().paint(painter, style_object, widget)
 
@@ -30,14 +36,18 @@ class GraphicsPixmapItem(GraphicsItemBase, QGraphicsPixmapItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def mousePressEvent(self, event) -> None:
-        # print('WEE')
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        # print('POS', event.pos())
         return super().setSelected(True)
+
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        print('POS', event.pos().toPoint().x(), event.pos().toPoint().y())
+        return super().mouseMoveEvent(event)
 
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         color = QColor(Qt.white)
 
-        print(self.isSelected())
+        # print(self.isSelected())
         if self.isSelected():
             pen = QPen(color, 1.5, Qt.DashLine, Qt.RoundCap)
             pen.setDashPattern([4.0, 4.0])
