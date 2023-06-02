@@ -1,14 +1,15 @@
 from dataclasses import dataclass
-from PySide6.QtCore import Qt, QSize, QRectF
-from PySide6.QtGui import QPainter, QRegion, QPixmap, QBitmap, QPainterPath, QImage, QColor, QPen, QMouseEvent
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsSceneMouseEvent, QWidget, QStyleOptionGraphicsItem, QStyle
-from typing import List
+from PySide6.QtCore import Qt, QSize, QRectF, QRect
+from PySide6.QtGui import QPainter, QRegion, QPixmap, QBrush, QBitmap, QPainterPath, QImage, QColor, QPen, QMouseEvent
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QGraphicsRectItem, QGraphicsSceneMouseEvent, QWidget, QStyleOptionGraphicsItem, QStyle
+from typing import List, Union
 
 id = 0
 parent_id = 0
 
 
 class GraphicsItemBase:
+    settings = None
     def __init__(self, mode=None, name=None):
         # TODO: Set ALL non-text/non-path layers to Pixmap upon creation
         super().__init__()
@@ -24,12 +25,94 @@ class GraphicsItemBase:
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         style_object.state &= ~QStyle.State_Selected
 
-        # path = QPainterPath()
-        # path.addRect(QRectF(30, 30, 400, 400))
-        # painter.setClipPath(path)
-
+        self.clip(painter)
         painter.setCompositionMode(mode_mappings(self.mode))
         super().paint(painter, style_object, widget)
+
+    def set_settings(self, settings):
+        self.settings = settings
+
+    def clip(self, painter: QPainter):
+        # CLip to board
+        if self.settings:
+            path = QPainterPath()
+            path.addRect(QRectF(*[-p for p in self.pos().toTuple()], *self.settings['document_dimensions']))
+            painter.setClipPath(path)
+
+
+class ArtBoard(QGraphicsScene):
+    settings = None
+    def __init__(self):
+        super().__init__()
+
+        pix = QGraphicsPixmapItem()
+        pix.setPixmap(self.generate_checkerboard(20))
+        self.addItem(pix)
+
+        self.setItemIndexMethod(QGraphicsScene.BspTreeIndex)
+
+    def drawForeground(self, painter: QPainter, rect: QRectF | QRect) -> None:
+        # self.painter(painter)
+        print('WEEEE')
+        self.draw_grid(painter, 20)
+        return super().drawForeground(painter, rect)
+
+    def generate_checkerboard(self, checker_width=50) -> QPixmap:
+        if self.settings:
+            dimensions = self.settings['document_dimensions']
+            grid_cnt = int(max(*dimensions) // checker_width)
+            image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
+            image.fill(Qt.white)
+            painter = QPainter(image)
+            color = QColor(Qt.black)
+            color.setAlphaF(0.25)
+
+            for i in range(grid_cnt):
+                for j in range(grid_cnt):
+                    color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+                    painter.fillRect(QRect(
+                        i * checker_width, j * checker_width,
+                        checker_width, checker_width
+                    ), color)
+
+            painter.end()
+
+            return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+        return QPixmap()
+
+    def draw_grid(self, painter: QPainter, grid_width=50):
+        if self.settings:
+            [w, h] = self.settings['document_dimensions']
+
+            rows = int(h // grid_width)
+            cols = int(w // grid_width)
+
+            color = QColor(Qt.transparent)
+            color.setAlphaF(0.15)
+            painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+
+            for r in range(rows):
+                if r % 4 == 0:
+                    painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
+                else:
+                    painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+                painter.drawLine(0, r * grid_width, w, r * grid_width)
+
+            for c in range(cols):
+                if c % 4 == 0:
+                    painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
+                else:
+                    painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
+                painter.drawLine(c * grid_width, 0, c * grid_width, h)
+
+            painter.end()
+
+        return painter
+
+class ArtBoardView(QGraphicsView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 
 
 class GraphicsPixmapItem(GraphicsItemBase, QGraphicsPixmapItem):
@@ -56,6 +139,11 @@ class GraphicsPixmapItem(GraphicsItemBase, QGraphicsPixmapItem):
             pen = Qt.NoPen
             # painter.setPen(pen)
 
+        # # CLip to board
+        # path = QPainterPath()
+        # path.addRect(QRectF(*[-p for p in self.pos().toTuple()], 400, 400))
+        # painter.setClipPath(path)
+
         painter.setCompositionMode(mode_mappings(self.mode))
         # painter.setPen(pen)
         super().paint(painter, style_object, widget)
@@ -64,6 +152,7 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
     def __init__(self, name='Layer', mode='Normal', x=0, y=0, w=0, h=0, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setRect(x, y, w, h)
+        self._rotation = 0.0
 
 
     # static QPixmap QPixmapFromItem(QGraphicsItem *item){
@@ -79,7 +168,7 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
         pixmap = QPixmap(size)
         # pixmap = QPixmap(self.boundingRect().size().toSize())
         pixmap.fill(Qt.transparent)
-        
+
         painter = QPainter(pixmap)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
@@ -95,6 +184,10 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
     #     print('WEE')
     #     return super().setSelected(selected)
 
+    def setRotation(self, angle: float) -> None:
+        self._rotation = angle
+        # return super().setRotation(angle)
+
     def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget = None):
         color = QColor(Qt.white)
 
@@ -107,8 +200,6 @@ class GraphicsRectItemBase(GraphicsItemBase, QGraphicsRectItem):
             # painter.setPen(pen)
 
         painter.setCompositionMode(mode_mappings(self.mode))
-        # painter.setPen(pen)
-        # print('paint')
         super().paint(painter, style_object, widget)
 
 

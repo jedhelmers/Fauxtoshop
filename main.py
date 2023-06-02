@@ -10,7 +10,7 @@ from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent,
 from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QGraphicsItemGroup, QStyle, QStyleOptionGraphicsItem, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
-from datatypes.layer import Layer, LayerGroup, LayerBase, GraphicsRectItemBase, GraphicsPixmapItem, mode_mappings
+from datatypes.layer import Layer, LayerGroup, ArtBoardView, ArtBoard, LayerBase, GraphicsItemBase, GraphicsRectItemBase, GraphicsPixmapItem, mode_mappings
 from datatypes.utils import QHLine, QVLine
 from styles.main import main_style
 from ui import mainwindow_newui
@@ -201,7 +201,23 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(main_style())
 
         # TEMP
-        self.old_way = False
+        document_dimensions = [800, 500]
+        offset_dimensions = [100, 100]
+        absolute_dimensions = [
+            document_dimensions[0] + offset_dimensions[0],
+            document_dimensions[1] + offset_dimensions[1],
+        ]
+        new_file_information = {
+            'document_dimensions': document_dimensions,
+            'absolute_dimensions': absolute_dimensions,
+            'color': QColor(155, 245, 255, 255),
+            'offset_dimensions': offset_dimensions,
+            'aspect_ratio': [
+                document_dimensions[0] / document_dimensions[1],
+                document_dimensions[1] / document_dimensions[0],
+            ]
+        }
+        self.initialize_document(new_file_information)
 
         # Ruler
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
@@ -212,14 +228,15 @@ class MainWindow(QMainWindow):
         # UI
         self.label = QLabel()
         self.label.setMouseTracking(True)
-        self.scene = QGraphicsScene(self, 0, 0, 0, 0)
+        ArtBoard.settings = self.settings
+        self.scene = ArtBoard()
         self.scene.setBackgroundBrush(QBrush(QColor(30, 30, 30)))
-        self.view = QGraphicsView(self.scene)
+        self.view = ArtBoardView(self.scene)
         # self.scene.setSceneRect(0, 0, 100, 200)
         # self.view.setMask(QRect(50, 50, 400, 400))
 
         # Prevent scene from scrolling
-        # self.scene.setSceneRect(self.view.rect())
+        self.scene.setSceneRect(self.view.rect())
 
         self.ui.gridLayout_3.addChildWidget(self.view)
 
@@ -257,55 +274,45 @@ class MainWindow(QMainWindow):
         # self.signaler.update_layer_mode.connect(self.update_layer_mode)
         # self.signaler.set_active_tool.connect(self.set_active_tool)
 
-        # TEMP
-        document_dimensions = [500, 700]
-        offset_dimensions = [0, 0]
-        absolute_dimensions = [
-            document_dimensions[0] + offset_dimensions[0],
-            document_dimensions[1] + offset_dimensions[1],
-        ]
-        new_file_information = {
-            'document_dimensions': document_dimensions,
-            'absolute_dimensions': absolute_dimensions,
-            'color': QColor(155, 245, 255, 255),
-            'offset_dimensions': offset_dimensions,
-            'aspect_ratio': [
-                document_dimensions[0] / document_dimensions[1],
-                document_dimensions[1] / document_dimensions[0],
-            ]
-        }
-        self.initialize_document(new_file_information)
 
         self.generate_window_panels()
 
         # Initialize
-        self.scene.setSceneRect(
-            QRect(0, 0,
-                  *new_file_information['document_dimensions']
-            )
-        )
+        # self.scene.setSceneRect(
+        #     QRect(0, 0,
+        #           *new_file_information['document_dimensions']
+        #     )
+        # )
 
-        self.view.setMask(
-            QRect(0,0,
-                  *new_file_information['document_dimensions'])
-        )
+        # self.view.setMask(
+        #     QRect(0,0,
+        #           *new_file_information['document_dimensions'])
+        # )
 
-        checkboard = GraphicsPixmapItem('Checkboard', 'Normal')
-        # 
-        checkboard.setPos(0, 0)
-        checkboard.setPixmap(self.generate_checkerboard())
-        checkboard.setFlag(QGraphicsItem.ItemIsMovable, False)
-        checkboard.setFlag(QGraphicsItem.ItemIsSelectable, False)
-        self.scene.addItem(checkboard)
+        # self.scene.clip
+
+        # checkboard = GraphicsPixmapItem('Checkboard', 'Normal')
+        # #
+        # checkboard.setPos(0, 0)
+        # checkboard.setPixmap(self.generate_checkerboard())
+        # checkboard.setFlag(QGraphicsItem.ItemIsMovable, False)
+        # checkboard.setFlag(QGraphicsItem.ItemIsSelectable, False)
+        # self.scene.addItem(checkboard)
 
         # Set scene dimensions
         # self.view.setSceneRect(0, 0, *self.settings['document_dimensions'])
         # self.view.setFixedSize(QSize(*self.settings['document_dimensions']))
         print('MAX SIZE', self.ui.widget.size())
-        self.view.setFixedSize(QSize(502, 702))
+        # self.view.setFixedSize(QSize(502, 702))
+        # self.view.setFixedSize(1000, 1000)
+        # self.view.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.view.setFixedSize(self.ui.widget.size())
+        # self.ui.widget.setFixedSize(1000, 1000)
+        # self.ui.gridLayout_3.setGeometry(QRect(0, 0, 1000, 1000))
         # self.view.setEnabled(False)
 
         # Render
+        self.adjust_artboard()
         self.render()
 
         # TODO: Initial scroll
@@ -318,10 +325,7 @@ class MainWindow(QMainWindow):
     @layers.setter
     def layers(self, layers):
         self._layers = layers
-        if self.old_way:
-            self.render()
-        else:
-            self.render()
+        # self.render()
 
         # TODO: Handle this better
         if 'layers_widget'  in self.windows:
@@ -351,7 +355,7 @@ class MainWindow(QMainWindow):
         # self.get_workspace_dimensions(event)
         # print(event.windowPos(), self.ui.scrollArea.geometry())
         self.tool.draw(event)
-        self.render()
+        # self.render()
 
     def mouseReleaseEvent(self, event):
         self.tool.reset_mouse_pos()
@@ -362,15 +366,18 @@ class MainWindow(QMainWindow):
         toolbar_size = self.ui.toolbarWidget.size()
         print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
 
+        self.adjust_artboard()
+
     # INITIALIZATION
     def initialize_document(self, new_file_information):
         # Background layer
         self.settings = {**new_file_information, **self.settings}
+        GraphicsItemBase.settings = self.settings
         # Checkboard
-        checkerboard = Layer(
-            image=self.generate_checkerboard(20),
-            name='Checkerboard',
-        )
+        # checkerboard = Layer(
+        #     image=self.generate_checkerboard(20),
+        #     name='Checkerboard',
+        # )
 
         # Grid
         self.grid = Layer(
@@ -380,23 +387,31 @@ class MainWindow(QMainWindow):
         )
 
         # Background layer
-        background = Layer()
-        background.image = QPixmap(QSize(*new_file_information['document_dimensions']))
-        background.image.fill(new_file_information['color'])
-        background.name = 'Background'
-        background.lock = True
+        # background = Layer()
+        # background.image = QPixmap(QSize(*new_file_information['document_dimensions']))
+        # background.image.fill(new_file_information['color'])
+        # background.name = 'Background'
+        # background.lock = True
 
-        self.layers.append(checkerboard)
-        self.layers.append(background)
+        # self.layers.append(checkerboard)
+        # self.layers.append(background)
 
     # SCRAP
     # SCRAP END
 
     # UTILITIES
+    def adjust_artboard(self):
+        # Adjust graphics view on window resize
+        self.view.setFixedSize(self.ui.widget.size())
+
+    def image_to_pixmap(self, image) -> QPixmap:
+        # TODO: Utility
+        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+
     def draw_grid(self, grid_width=50):
         # TODO: Create layer for QLabel that is always present when document is open.
         # Replace all references to self.layers[0]
-        if None in self.settings:
+        if self.settings:
             [w, h] = self.settings['document_dimensions']
 
             rows = int(h // grid_width)
@@ -426,28 +441,28 @@ class MainWindow(QMainWindow):
             painter.end()
 
             return self.image_to_pixmap(resultImage)
+        return QPixmap()
+    # def generate_checkerboard(self, checker_width=50) -> QPixmap:
+    #     dimensions = self.settings['document_dimensions']
+    #     print(dimensions)
+    #     grid_cnt = int(max(*dimensions) // checker_width)
+    #     image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
+    #     image.fill(Qt.white)
+    #     painter = QPainter(image)
+    #     color = QColor(Qt.black)
+    #     color.setAlphaF(0.25)
 
-    def generate_checkerboard(self, checker_width=50) -> QPixmap:
-        dimensions = self.settings['document_dimensions']
-        print(dimensions)
-        grid_cnt = int(max(*dimensions) // checker_width)
-        image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
-        image.fill(Qt.white)
-        painter = QPainter(image)
-        color = QColor(Qt.black)
-        color.setAlphaF(0.25)
+    #     for i in range(grid_cnt):
+    #         for j in range(grid_cnt):
+    #             color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+    #             painter.fillRect(QRect(
+    #                 i * checker_width, j * checker_width,
+    #                 checker_width, checker_width
+    #             ), color)
 
-        for i in range(grid_cnt):
-            for j in range(grid_cnt):
-                color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
-                painter.fillRect(QRect(
-                    i * checker_width, j * checker_width,
-                    checker_width, checker_width
-                ), color)
+    #     painter.end()
 
-        painter.end()
-
-        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+    #     return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     # WINDOW PANELS
     def generate_window_panels(self):
@@ -471,7 +486,7 @@ class MainWindow(QMainWindow):
 
         brush = QBrush(QColor(255, 255, 255))
         rect0 = GraphicsRectItemBase('Layer 0', 'Normal', 0, 0, 200, 50)
-        rect0.setRotation(45.0)
+        # rect0.setRotation(45.0)
         brush = QBrush(QColor(10, 255, 10, 255))
         rect0.setPen(Qt.NoPen)
         rect0.setBrush(brush)
@@ -488,15 +503,16 @@ class MainWindow(QMainWindow):
         self.scene.addItem(pix)
         self.scene.addItem(rect0)
 
+
         group = QGraphicsItemGroup()
         rect = GraphicsRectItemBase('Layer 1', 'Normal', 0, 0, 100, 100)
         rect.setBrush(QBrush(QColor(50, 50, 50, 200)))
         # group.addToGroup(rect)
         self.scene.addItem(rect)
 
-        mask = GraphicsRectItemBase('Mask', 'Normal', 0, 0, 50, 50)
-        mask.setBrush(QBrush(QColor(250, 50, 50, 100)))
-        mask.setParentItem(pix)
+        # mask = GraphicsRectItemBase('Mask', 'Normal', 0, 0, 50, 50)
+        # mask.setBrush(QBrush(QColor(250, 50, 50, 100)))
+        # mask.setParentItem(pix)
 
         for item in group.childItems():
             print(type(item), item.group())
