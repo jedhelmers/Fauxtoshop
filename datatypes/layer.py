@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPainter, QPixmap, QImage
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem, QStyleOptionGraphicsItem, QStyle
+from PySide6.QtGui import QPainter
 from typing import List
 
 id = 0
@@ -75,109 +73,6 @@ class Layer:
         self.effects = effects
         self.opacity = opacity
 
-
-class LayerBase(QGraphicsRectItem):
-    def __init__(
-        self,
-        layer_id=None,
-        index=0,
-        color=None,
-        name=None,
-        alpha_lock=False,
-        lock=False,
-        show=True,
-        image=None,
-        masks=[],
-        position=[0.0, 0.0], # QPoint
-        scale=[1.0, 1.0], # qreal? Double I think.
-        mode='Normal',
-        mode_percent=1.0,
-        parent=None,
-        effects=[],
-        opacity=1.0,
-        ):
-        super().__init__()
-        global id
-        self.index = index
-        if layer_id is None:
-            self.layer_id = id
-            id += 1
-        else:
-            self.layer_id = layer_id
-
-        self.color = color
-
-        if name:
-            self.name = name
-        else:
-            self.name = f'Layer {self.layer_id}'
-
-        self.alpha_lock = alpha_lock
-        self.lock = lock
-        self.show = show
-        self.image = image
-        self.masks = masks
-        self.position = position
-        self.scale = scale
-        self.mode = mode
-        self.mode_percent = mode_percent
-        self.parent = parent
-        self.effects = effects
-        self.opacity = opacity
-        self.setPos(10, 20)
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
-
-    @property
-    def is_selected(self):
-        return self._is_selected
-
-    @is_selected.setter
-    def is_selected(self, is_selected):
-        self._is_selected = is_selected
-
-    def to_pixmap(self) -> QPixmap:
-        pixmap = QPixmap(self.boundingRect().size().toSize())
-        pixmap.fill(Qt.transparent)
-        painter = QPainter(pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Multiply)
-        style_option = QStyleOptionGraphicsItem()
-        # style_option.state = ~QStyle.State_None
-        # self.paint(painter, style_option)
-        painter.end()
-
-        return pixmap
-
-    def def_add_image(self, layer: QPixmap, mode: str) -> QPixmap:
-        mode = mode_mappings(mode)
-
-        resultImage = QImage(self.boundingRect().size().toSize(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-
-        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, self.to_pixmap())
-        painter.setCompositionMode(mode)
-        painter.drawPixmap(0, 0, layer)
-        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.end()
-
-        return self.image_to_pixmap(resultImage)
-
-    def image_to_pixmap(self, image) -> QPixmap:
-        # TODO: Utility
-        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
-
-    def paint(self, painter, options, widget):
-        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Screen)
-        super().paint(painter, options, widget)
-
-    def mouseMoveEvent(self, event):
-        super().mouseMoveEvent(event)
-        # print('WEEEEE', event)
 
 @dataclass
 class LayerGroup(Layer):

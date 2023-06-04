@@ -246,9 +246,9 @@ class LayersWindowWidget(QWidget):
 
             # Thumbnails
             if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
-                layer.ui.thumbnailWidget.setFixedWidth(36 * self.settings['aspect_ratio'][0])
+                layer.ui.thumbnailWidget.setFixedWidth(25 * self.settings['aspect_ratio'][0])
             else:
-                layer.ui.thumbnailWidget.setFixedHeight(36 * self.settings['aspect_ratio'][1])
+                layer.ui.thumbnailWidget.setFixedHeight(32 * self.settings['aspect_ratio'][1])
 
             # Lock UI
             if l.lock:

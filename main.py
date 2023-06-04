@@ -2,15 +2,14 @@ import json
 import random
 import sys
 from pathlib import Path
-from typing import Optional
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen, QBrush
-from PySide6.QtWidgets import QMainWindow, QFrame, QGraphicsView, QStyle, QStyleOptionGraphicsItem, QGraphicsRectItem, QGraphicsItem, QApplication, QTableWidgetItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
+from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
-from datatypes.layer import Layer, LayerGroup, LayerBase, mode_mappings
+from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
 from widgets.toolbar import ToolbarWidget
@@ -213,30 +212,6 @@ class MainSignaler(QtCore.QObject):
     set_active_tool = QtCore.Signal(str)
 
 
-class GraphicsRectItemBase(QGraphicsRectItem):
-    def __init__(self, mode='Normal', *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.mode = mode
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
-
-    def paint(self, painter: QPainter, style_object: QStyleOptionGraphicsItem, widget: QWidget):
-        style_object.state &= ~QStyle.State_Selected
-        color = QColor(Qt.white)
-
-        if self.isActive():
-            pen = QPen(color, 1.5, Qt.DashLine, Qt.RoundCap)
-            pen.setDashPattern([4.0, 4.0])
-            self.setPen(pen)
-        else:
-            pen = Qt.NoPen
-            self.setPen(pen)
-
-        painter.setCompositionMode(mode_mappings(self.mode))
-        painter.setPen(pen)
-        super().paint(painter, style_object, widget)
-
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -247,9 +222,6 @@ class MainWindow(QMainWindow):
         self.settings = {}
         self.setStyleSheet(main_style())
 
-        # TEMP
-        self.old_way = False
-
         # Ruler
         self.x_line = QVLine(self.ui.horizontalRulerWidget, thickness=2)
         self.y_line = QHLine(self.ui.verticalRulerWidget, thickness=2)
@@ -259,16 +231,7 @@ class MainWindow(QMainWindow):
         # UI
         self.label = QLabel()
         self.label.setMouseTracking(True)
-        self.scene = QGraphicsScene(self, 0, 0, 400, 400)
-        self.scene.setBackgroundBrush(QBrush(QColor(255, 255, 0, 100)))
-        self.view = QGraphicsView(self.scene)
-        # self.view.setMask(QRect(200, 200, 400, 400))
-
-        if self.old_way:
-            self.ui.gridLayout_3.addWidget(self.label)
-        else:
-            self.ui.gridLayout_3.addWidget(self.view)
-
+        self.ui.gridLayout_3.addWidget(self.label)
         self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
@@ -303,10 +266,6 @@ class MainWindow(QMainWindow):
         self.signaler.set_active_tool.connect(self.set_active_tool)
 
         # TEMP
-        layer_base = LayerBase(
-            image=QPixmap(QSize(100, 100)),
-            parent=self
-        )
         document_dimensions = [500, 700]
         offset_dimensions = [200, 200]
         absolute_dimensions = [
@@ -326,15 +285,9 @@ class MainWindow(QMainWindow):
         self.initialize_document(new_file_information)
         self.draw_rulers()
         self.generate_window_panels()
-
-        if self.old_way:
-            self.render()
-        else:
-            self.render_new()
-
+        self.render()
         # TODO: Initial scroll
         self.ui.scrollArea.scroll(300, 300)
-
 
     @property
     def layers(self):
@@ -712,27 +665,6 @@ class MainWindow(QMainWindow):
 
         if res:
             self.label.setPixmap(res)
-
-    def render_new(self):
-        # Create rect
-        brush = QBrush(QColor(255, 255, 255))
-        # self.scene.setBackgroundBrush(brush)
-
-        rect = GraphicsRectItemBase('Normal', 0, 0, 200, 50)
-        rect.setRotation(45.0)
-        rect.setPos(50, 20)
-        brush = QBrush(QColor(255, 10, 10, 255))
-        rect.setPen(Qt.NoPen)
-        rect.setBrush(brush)
-        self.scene.addItem(rect)
-
-        rect2 = GraphicsRectItemBase('Screen', 0, 0, 50, 200)
-        rect2.setPos(20, 50)
-        brush = QBrush(QColor(10, 10, 255, 255))
-        rect2.setPen(Qt.NoPen)
-        rect2.setBrush(brush)
-
-        self.scene.addItem(rect2)
 
 def main():
     app = QApplication(sys.argv)
