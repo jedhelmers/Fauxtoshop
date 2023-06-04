@@ -80,14 +80,6 @@ class Tool(QWidget):
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
 
-    def graphics_scene(self):
-        scene = QGraphicsScene(self.parent())
-        pixmap = QPixmap(QSize(400, 400))
-        pixmap.fill(qRgba(250, 50, 50, 50))
-        item = QGraphicsPixmapItem(pixmap)
-        scene.addItem(item)
-        return scene
-
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.position().x(), event.position().y()]
         self.up_mouse_pos = [event.position().x(), event.position().y()]
