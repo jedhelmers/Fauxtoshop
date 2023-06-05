@@ -23,7 +23,7 @@ class Tool(QWidget):
         super().__init__(parent)
         self._layer = None
         self.brush_color = qRgba(50, 50, 50, 50)
-        self.brush_size = 20
+        self.brush_size = 2
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
@@ -138,10 +138,11 @@ class Tool(QWidget):
         if self.layer and self.layer.image:
             # TODO: why is self.layer None?
             # print('brush')
-            [x_offset, y_offset] = self.layer.position
-
-            x = event.position().x() * self.drag_speed - x_offset
-            y = event.position().y() * self.drag_speed - y_offset
+            [x_offset, y_offset] = self.parent().pos().toTuple()
+            # p = QPoint()
+            # p.toTuple
+            x = event.position().x() * self.drag_speed - x_offset - 70
+            y = event.position().y() * self.drag_speed - y_offset - 40
 
             if self.last_x is None: # First event.
                 self.last_x = x
@@ -215,7 +216,7 @@ class MainWindow(QMainWindow):
         self.windows = {}
 
         # Tools
-        self.tool = Tool(self)
+        self.tool = Tool(self.label)
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
         toolbar = ToolbarWidget(
@@ -472,7 +473,7 @@ class MainWindow(QMainWindow):
         # painter.setCompositionMode(QPainter.CompositionMode_Source)
 
         # Fill with background color
-        painter.fillRect(resultImage.rect(), Qt.black)
+        painter.fillRect(resultImage.rect(), QColor('#101010'))
 
         # painter.scale(*layer.scale)
         # painter.translate(*layer.position)
