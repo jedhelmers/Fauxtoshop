@@ -390,6 +390,7 @@ class MainWindow(QMainWindow):
 
     def generate_checkerboard(self, checker_width=50):
         dimensions = self.settings['absolute_dimensions']
+        [w_off, h_off] = self.settings['offset_dimensions']
         grid_cnt = int(max(*dimensions) // checker_width)
         image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
         image.fill(Qt.white)
@@ -401,7 +402,7 @@ class MainWindow(QMainWindow):
             for j in range(grid_cnt):
                 color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
                 painter.fillRect(QRect(
-                    i * checker_width, j * checker_width,
+                    i * checker_width + w_off, j * checker_width + h_off,
                     checker_width, checker_width
                 ), color)
 
@@ -468,18 +469,20 @@ class MainWindow(QMainWindow):
 
         resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
         painter = QPainter(resultImage)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.setCompositionMode(QPainter.CompositionMode_Source)
+
+        # Fill with background color
+        painter.fillRect(resultImage.rect(), Qt.black)
 
         # painter.scale(*layer.scale)
-        painter.translate(*layer.position)
+        # painter.translate(*layer.position)
 
         # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
         painter.drawPixmap(0, 0, base_image)
         painter.setCompositionMode(mode)
         painter.drawPixmap(0, 0, layer.image)
-        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
+        # painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+        # painter.fillRect(resultImage.rect(), Qt.transparent)
         painter.end()
 
         return self.image_to_pixmap(resultImage)
@@ -644,6 +647,7 @@ class MainWindow(QMainWindow):
 
         if res:
             self.label.setPixmap(res)
+
 
 def main():
     app = QApplication(sys.argv)
