@@ -239,7 +239,7 @@ class MainWindow(QMainWindow):
 
         # TEMP
         document_dimensions = [500, 700]
-        offset_dimensions = [200, 200]
+        offset_dimensions = [250, 200]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
             document_dimensions[1] + offset_dimensions[1],
@@ -358,6 +358,7 @@ class MainWindow(QMainWindow):
         # Replace all references to self.layers[0]
         if 'absolute_dimensions' in self.settings:
             [w, h] = self.settings['absolute_dimensions']
+            [w_off, h_off] = self.settings['offset_dimensions']
 
             rows = int(h // grid_width)
             cols = int(w // grid_width)
@@ -374,14 +375,14 @@ class MainWindow(QMainWindow):
                     painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
                 else:
                     painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
-                painter.drawLine(0, r * grid_width, w, r * grid_width)
+                painter.drawLine(0, r * grid_width + h_off, w, r * grid_width + h_off)
 
             for c in range(cols):
                 if c % 4 == 0:
                     painter.setPen(QPen(color, 1, Qt.SolidLine, Qt.RoundCap))
                 else:
                     painter.setPen(QPen(color, 0.5, Qt.SolidLine, Qt.RoundCap))
-                painter.drawLine(c * grid_width, 0, c * grid_width, h)
+                painter.drawLine(c * grid_width + w_off, 0, c * grid_width + w_off, h)
 
             painter.end()
 
