@@ -12,31 +12,10 @@ from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
+from utils import QHLine, QVLine
 from widgets.toolbar import ToolbarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
-
-
-# RULER LINES
-# Create a Ruler class to handle all this.
-class QHLine(QFrame):
-    def __init__(self, parent, width=20, thickness=1):
-        super(QHLine, self).__init__(parent=parent)
-        self.setFrameShape(QFrame.HLine)
-        self.setFrameShadow(QFrame.Sunken)
-        self.setMaximumHeight(thickness)
-        self.setMaximumWidth(width)
-        self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
-
-
-class QVLine(QFrame):
-    def __init__(self, parent, height=20, thickness=1):
-        super(QVLine, self).__init__(parent=parent)
-        self.setFrameShape(QFrame.VLine)
-        self.setFrameShadow(QFrame.Sunken)
-        self.setMaximumWidth(thickness)
-        self.setMaximumHeight(height)
-        self.setStyleSheet('border-color: rgba(255, 255, 255, 0.1)')
 
 
 class Tool(QWidget):
@@ -155,10 +134,10 @@ class Tool(QWidget):
     #     self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
-        print('self.layer')
+        # print('self.layer')
         if self.layer and self.layer.image:
             # TODO: why is self.layer None?
-            print('brush')
+            # print('brush')
             [x_offset, y_offset] = self.layer.position
 
             x = event.position().x() * self.drag_speed - x_offset
@@ -224,7 +203,8 @@ class MainWindow(QMainWindow):
         self.label = QLabel()
         self.label.setMouseTracking(True)
         self.ui.gridLayout_3.addWidget(self.label)
-        self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
+        self.ui.gridLayout_3.setAlignment(Qt.AlignHCenter)
+        # self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
         self.zoom = 1.0
         self.scroll_area_size_pos = [0, 0, 0, 0]
 
@@ -336,7 +316,11 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
         toolbar_size = self.ui.toolbarWidget.size()
-        print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
+        # print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
+
+        # Set focus to label widget
+        # self.ui.scrollArea.ensureWidgetVisible(self.label, 0, 0)
+        print(self.label.pos())
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
@@ -446,7 +430,7 @@ class MainWindow(QMainWindow):
                     0,
                     *self.settings['absolute_dimensions']
                 ),
-                QColor(20, 24, 30, 100)
+                Qt.transparent
             )
 
             # TODO: Move to new_file_information dict.
@@ -591,61 +575,63 @@ class MainWindow(QMainWindow):
 
     # RULERS
     def draw_rulers(self):
-        # TODO: Extend entire length/height of application
-        self.draw_v_ruler()
-        self.draw_h_ruler()
+        print()
+    # def draw_rulers(self):
+    #     # TODO: Extend entire length/height of application
+    #     self.draw_v_ruler()
+    #     self.draw_h_ruler()
 
-    def draw_h_ruler(self):
-        ruler_dimensions = self.settings['absolute_dimensions']
-        for i in range(int(ruler_dimensions[0] // 100)):
-            # self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
-            self.draw_h_unit(i - (self.settings['offset_dimensions'][1] // 100), i * 100)
+    # def draw_h_ruler(self):
+    #     ruler_dimensions = self.settings['absolute_dimensions']
+    #     for i in range(int(ruler_dimensions[0] // 100)):
+    #         # self.draw_v_unit(i - self.settings['workspace_spillover'], inch_to_pixel(i))
+    #         self.draw_h_unit(i - (self.settings['offset_dimensions'][1] // 100), i * 100)
 
-    def draw_h_unit(self, index, h_offset=0):
-        # TODO: create dynamically
-        inch_ticks = [
-            16, 14, 16, 0
-        ]
-        label = QLabel(self.ui.horizontalRulerWidget)
-        label.setText(str(index))
-        label.move(h_offset + 4, -6)
-        tick_width = 94 / len(inch_ticks)
+    # def draw_h_unit(self, index, h_offset=0):
+    #     # TODO: create dynamically
+    #     inch_ticks = [
+    #         16, 14, 16, 0
+    #     ]
+    #     label = QLabel(self.ui.horizontalRulerWidget)
+    #     label.setText(str(index))
+    #     label.move(h_offset + 4, -6)
+    #     tick_width = 94 / len(inch_ticks)
 
-        for i, v_offset in enumerate(inch_ticks):
-            line = QVLine(self.ui.horizontalRulerWidget, 20 - v_offset)
-            line.move(((i + 1) * tick_width + h_offset) * (self.zoom/100.0), v_offset)
+    #     for i, v_offset in enumerate(inch_ticks):
+    #         line = QVLine(self.ui.horizontalRulerWidget, 20 - v_offset)
+    #         line.move(((i + 1) * tick_width + h_offset) * (self.zoom/100.0), v_offset)
 
-    def draw_v_unit(self, index, v_offset=0):
-        # TODO: create dynamically
-        inch_ticks = [
-            16, 14, 16, 0
-        ]
-        label = QLabel(self.ui.verticalRulerWidget)
-        label.setText(str(index))
-        label.move(4, v_offset - 6)
-        tick_height = 94 / len(inch_ticks)
+    # def draw_v_unit(self, index, v_offset=0):
+    #     # TODO: create dynamically
+    #     inch_ticks = [
+    #         16, 14, 16, 0
+    #     ]
+    #     label = QLabel(self.ui.verticalRulerWidget)
+    #     label.setText(str(index))
+    #     label.move(4, v_offset - 6)
+    #     tick_height = 94 / len(inch_ticks)
 
-        for i, h_offset in enumerate(inch_ticks):
-            line = QHLine(self.ui.verticalRulerWidget, 20 - h_offset)
-            line.move(h_offset, ((i + 1) * tick_height + v_offset) * (self.zoom/100.0))
+    #     for i, h_offset in enumerate(inch_ticks):
+    #         line = QHLine(self.ui.verticalRulerWidget, 20 - h_offset)
+    #         line.move(h_offset, ((i + 1) * tick_height + v_offset) * (self.zoom/100.0))
 
-    def draw_v_ruler(self):
-        ruler_group = range(self.ui.verticalRulerWidget.layout().count())
-        ruler_dimensions = self.settings['absolute_dimensions']
+    # def draw_v_ruler(self):
+    #     ruler_group = range(self.ui.verticalRulerWidget.layout().count())
+    #     ruler_dimensions = self.settings['absolute_dimensions']
 
-        for widget_index in ruler_group:
-            widget = self.ui.verticalRulerWidget.layout().itemAt(
-                widget_index).widget()
-            if widget:
-                widget.setParent(None)
+    #     for widget_index in ruler_group:
+    #         widget = self.ui.verticalRulerWidget.layout().itemAt(
+    #             widget_index).widget()
+    #         if widget:
+    #             widget.setParent(None)
 
-        # Pixel to mm
-        # TODO: Make versatile
-        # TODO: Fix lines
-        for i in range(int(ruler_dimensions[1] // 100)):
-            # print(self.zoom, type(self.zoom))
-            # self.draw_v_unit(i - self.settings['offset_dimensions'][0], i)
-            self.draw_v_unit(i - (self.settings['offset_dimensions'][0] // 100), i * 100)
+    #     # Pixel to mm
+    #     # TODO: Make versatile
+    #     # TODO: Fix lines
+    #     for i in range(int(ruler_dimensions[1] // 100)):
+    #         # print(self.zoom, type(self.zoom))
+    #         # self.draw_v_unit(i - self.settings['offset_dimensions'][0], i)
+    #         self.draw_v_unit(i - (self.settings['offset_dimensions'][0] // 100), i * 100)
 
     # MAIN RENDER
     def render(self):
