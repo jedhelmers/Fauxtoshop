@@ -14,7 +14,7 @@ class ToolIcon():
 
     def __init__(
             self,
-            name: str="pointer",
+            name: str="brush",
             path: str="",
             hotPoints: List=[-1, -1],
             size: List=[28, 28]

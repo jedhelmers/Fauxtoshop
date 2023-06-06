@@ -72,9 +72,23 @@ class Tool(QWidget):
 
     def draw_cursor(self):
         tool = get_tool_icon(self.active_tool)
-        self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
-        self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
-        self.parent().setCursor(self.cursor)
+        print('BUTTS', tool.name)
+        if tool.name == "brush":
+            b = QPixmap(15, 15)
+            b.fill(Qt.transparent)
+            p = QPainter(b)
+            p.drawEllipse(QPoint(0, 0), 30, 30)
+            pen = QPen(Qt.white)
+            pen.setWidth(10)
+            p.setPen(pen)
+            
+            p.end()
+            self.cursor = QtGui.QCursor(b, 0, 0)
+            self.parent().setCursor(self.cursor)
+        else:
+            self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
+            self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
+            self.parent().setCursor(self.cursor)
 
     def draw(self, event):
         # TODO: Figure out why the brush is offset
@@ -239,7 +253,7 @@ class MainWindow(QMainWindow):
         self.signaler.set_active_tool.connect(self.set_active_tool)
 
         # TEMP
-        document_dimensions = [500, 700]
+        document_dimensions = [800, 700]
         offset_dimensions = [250, 200]
         absolute_dimensions = [
             document_dimensions[0] + offset_dimensions[0],
@@ -259,8 +273,9 @@ class MainWindow(QMainWindow):
         self.draw_rulers()
         self.generate_window_panels()
         self.render()
-        # TODO: Initial scroll
-        self.ui.scrollArea.scroll(300, 300)
+
+        # Set focus to label widget
+        self.ui.scrollArea.ensureWidgetVisible(self.label, 0, 0)
 
     @property
     def layers(self):
@@ -300,6 +315,7 @@ class MainWindow(QMainWindow):
     # Overrides
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
+        # print(event)
         # self.get_workspace_dimensions(event)
         # print(event.windowPos(), self.ui.scrollArea.geometry())
         self.tool.draw(event)
@@ -318,9 +334,6 @@ class MainWindow(QMainWindow):
         final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
         toolbar_size = self.ui.toolbarWidget.size()
         # print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
-
-        # Set focus to label widget
-        # self.ui.scrollArea.ensureWidgetVisible(self.label, 0, 0)
         print(self.label.pos())
 
     # INITIALIZATION
