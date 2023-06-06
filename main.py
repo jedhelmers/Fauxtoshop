@@ -12,7 +12,7 @@ from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
 from ui import mainwindow_newui
-from utils import QHLine, QVLine
+from utils import QHLine, QVLine, set_dpi, inch_to_pixel, pixel_to_inch
 from widgets.toolbar import ToolbarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
@@ -277,6 +277,8 @@ class MainWindow(QMainWindow):
         # Set focus to label widget
         self.ui.scrollArea.ensureWidgetVisible(self.label, 0, 0)
 
+        pixel_to_inch(12345)
+
     @property
     def layers(self):
         return self._layers
@@ -334,7 +336,8 @@ class MainWindow(QMainWindow):
         final_button = [c.pos().y() for c in self.ui.toolbarWidget.findChildren(QPushButton)].pop()
         toolbar_size = self.ui.toolbarWidget.size()
         # print(event.size().height(), final_button + 69, toolbar_size.height() + 33)
-        print(self.label.pos())
+        # print(self.label.pos())
+        self.draw_rulers()
 
     # INITIALIZATION
     def initialize_document(self, new_file_information):
@@ -593,7 +596,21 @@ class MainWindow(QMainWindow):
 
     # RULERS
     def draw_rulers(self):
-        print()
+        [x, y] = self.label.pos().toTuple()
+        [w_offset, h_offset] = self.settings['offset_dimensions']
+        w = self.label.rect().width()
+        h = self.label.rect().height()
+
+        width_to_label = x + w_offset
+        height_to_label = y + h_offset
+
+        full_width = width_to_label + w
+        full_height = h + height_to_label
+        print(full_width, full_height)
+
+        for i in range(full_width):
+            if i % 50 == 0:
+                print(pixel_to_inch(i - width_to_label))
     # def draw_rulers(self):
     #     # TODO: Extend entire length/height of application
     #     self.draw_v_ruler()
@@ -665,6 +682,11 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+
+    # Get and set DPI
+    dpi = app.screens()[0].physicalDotsPerInch()
+    set_dpi(dpi)
+
     settings_window = MainWindow()
     settings_window.show()
     sys.exit(app.exec())

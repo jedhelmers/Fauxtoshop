@@ -1,13 +1,19 @@
 import json
 import math
 import os
+import sys
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QImage, QIcon, qRgba, QPixmap
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 
 SETTINGS_PATH = './settings.json'
+DPI = 96
 
+def set_dpi(dpi):
+    global DPI
+    DPI = dpi
 
 def image_to_pixmap(image) -> QPixmap:
     return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
@@ -41,13 +47,13 @@ def unit_conversion(unit, value):
     return value
 
 def inch_to_pixel(inches):
-    return inches * 96
+    return inches * DPI
 
 def pixel_to_inch(pixels):
     """
     Pixels to inches. Round up to nearest inch
     """
-    return math.ceil(pixels / 96)
+    return pixels / DPI
 
 
 # RULER LINES
