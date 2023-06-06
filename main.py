@@ -75,29 +75,38 @@ class Tool(QWidget):
         print('BUTTS', tool.name)
         if tool.name == "brush":
             size = 600
+
             scale = 0.8
-            half_size = (size // 2)
+            half_size = (size // 2) - 50
+            hardness_size = half_size // 8
             scaled_size = half_size ** scale
-            points = scaled_size ** 0.66
+
             b = QPixmap(size, size)
             b.fill(Qt.transparent)
+
             p = QPainter(b)
-            # p.scale(scale, scale)
             p.setRenderHint(QPainter.Antialiasing, True)
+
             pen = QPen()
             pen.setColor(QColor(0, 0, 0, 200))
-            # p.setCompositionMode(mode_mappings('Normal'))
             pen.setWidth(2 / scale)
             p.setPen(pen)
-            p.drawEllipse(QPoint(half_size + 1, half_size + 1), half_size - 4, half_size - 4)
-            print('scaled_size', scaled_size)
+
+            # Move painter
+            p.translate(half_size, half_size + 100)
+            # Outer
+            p.drawEllipse(QPoint(0, 0), half_size, half_size)
+            # Inner
+            p.drawEllipse(QPoint(0, 0), hardness_size, hardness_size)
             p.end()
+
             b = b.scaled(
                 QSize(scaled_size, scaled_size),
                 Qt.IgnoreAspectRatio,
                 Qt.SmoothTransformation
             )
-            self.cursor = QtGui.QCursor(b, scaled_size // 1.45, points)
+            # (-1, -1) centers hotX and hotY
+            self.cursor = QtGui.QCursor(b, -1, -1)
         else:
             self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
             self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
