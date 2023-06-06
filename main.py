@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QBrush, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
+from PySide6.QtGui import QIcon, QPixmap, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
@@ -23,7 +23,7 @@ class Tool(QWidget):
         super().__init__(parent)
         self._layer = None
         self.brush_color = qRgba(50, 50, 50, 50)
-        self.brush_size = 2
+        self.brush_size = 10
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
@@ -74,7 +74,7 @@ class Tool(QWidget):
         tool = get_tool_icon(self.active_tool)
         print('BUTTS', tool.name)
         if tool.name == "brush":
-            size = 600
+            size = 800
 
             scale = 0.8
             half_size = (size // 2) - 50
@@ -198,8 +198,19 @@ class Tool(QWidget):
             pen.setStyle(Qt.SolidLine)
             pen.setCapStyle(Qt.RoundCap)
             pen.setCosmetic(True)
+
+            brush = QBrush()
+            grad = QRadialGradient(QPoint(0, 0), 10)
+            grad.setColorAt(0.0, Qt.black)
+            grad.setColorAt(1.0, Qt.transparent)
+            painter.fillRect(QRect(0, 0, 200, 200), grad)
+            # # painter.setClipRegion(QEl)
+            # brush.setStyle(grad)
+
+            # pen.setStyle(grad)
             painter.setPen(pen)
-            painter.fillRect(resultImage.rect(), Qt.transparent)
+            painter.setBrush(brush)
+            painter.fillRect(resultImage.rect(), grad)
             painter.drawPixmap(0, 0, self.layer.image)
             painter.setCompositionMode(self._mode)
             painter.drawLine(self.last_x, self.last_y, x, y)
