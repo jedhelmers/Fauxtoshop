@@ -5,7 +5,7 @@ from pathlib import Path
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
+from PySide6.QtGui import QIcon, QPixmap, QBrush, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
@@ -74,21 +74,28 @@ class Tool(QWidget):
         tool = get_tool_icon(self.active_tool)
         print('BUTTS', tool.name)
         if tool.name == "brush":
-            b = QPixmap(15, 15)
+            b = QImage(42, 42)
             b.fill(Qt.transparent)
             p = QPainter(b)
-            p.drawEllipse(QPoint(0, 0), 30, 30)
-            pen = QPen(Qt.white)
-            pen.setWidth(10)
+            p.setRenderHint(QPainter.Antialiasing, True)
+            pen = QPen()
+            pen.setColor(Qt.white)
+            p.setCompositionMode(mode_mappings('Screen'))
+            # brush = QBrush(Qt.white)
+            # brush.setColor(Qt.white)
+            # p.setBrush(brush)
+            # p.setBrush(Qt.red)
+            pen.setWidth(1)
             p.setPen(pen)
-            
+            p.drawEllipse(QPoint(20, 20), 20, 20)
+
             p.end()
-            self.cursor = QtGui.QCursor(b, 0, 0)
-            self.parent().setCursor(self.cursor)
+            self.cursor = QtGui.QCursor(b, 27, 13)
         else:
             self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
             self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
-            self.parent().setCursor(self.cursor)
+
+        self.parent().setCursor(self.cursor)
 
     def draw(self, event):
         # TODO: Figure out why the brush is offset
