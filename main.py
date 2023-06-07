@@ -19,8 +19,9 @@ from widgets.toolsidebar import ToolSidebarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
 
-# from widgets.butts import ButtsWidget
-# import butts
+# import roman
+# print('ROMAN', roman.int_to_roman_string(4))
+# print('ROMAN', roman.ButtsWidget)
 
 # SIGNALS
 class MainSignaler(QtCore.QObject):
@@ -36,6 +37,7 @@ class MainSignaler(QtCore.QObject):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
         # SETUP
         self.ui = mainwindow_newui.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -52,6 +54,9 @@ class MainWindow(QMainWindow):
         # UI
         self.label = QLabel()
         self.label.setMouseTracking(True)
+        # bs = roman.ButtsWidget()
+        # bs.ui.label.setText('WEEE')
+        # self.ui.gridLayout_3.addWidget(bs)
         self.ui.gridLayout_3.addWidget(self.label)
         self.ui.gridLayout_3.setAlignment(Qt.AlignHCenter)
         # self.ui.gridLayout_3.setAlignment(Qt.AlignTop)
