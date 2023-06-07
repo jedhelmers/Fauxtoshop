@@ -240,8 +240,18 @@ class Tool(QWidget):
             bytesPerLine = 3 * width
             qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
 
-            self.layer.image = self.image_to_pixmap(qImg)
+            # self.layer.image = self.image_to_pixmap(qImg)
 
+
+            # cv::Mat qimage_to_mat_cpy(QImage const &img, int format) {
+            #     return cv::Mat(img.height(), img.width(), format,
+            #                 const_cast<uchar*>(img.bits()),
+            #                 img.bytesPerLine()).clone();
+            # }
+
+            # img = cv2.Mat(width, height, QImage.Format_RGB888, resultImage, bytesPerLine)
+
+            # cv2.createMat()
             # temp = resultImage.copy()
             # image = cv2.CreateMat(temp.height(),temp.width(), cv2.CV_8UC3, temp.bits(),temp.bytesPerLine())
             # cv2.cvtColor(image, image, cv2.CV_BGR2RGB)
