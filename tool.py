@@ -247,4 +247,3 @@ class Tool(QWidget):
             # cv2.cvtColor(image, image, cv2.CV_BGR2RGB)
             # cv::Mat res(temp.height(),temp.width(),CV_8UC3,(uchar*)temp.bits(),temp.bytesPerLine());
             # cvtColor(res, res,CV_BGR2RGB);
-
