@@ -7,6 +7,12 @@ from datatypes.layer import Layer, modes, mode_mappings
 from ui.tools import brushui
 
 
+def normalize_float_input(val):
+    return re.match(
+        '[0-9.]*',
+        re.sub('[^0-9.]', '', val)
+    ).group()
+
 class BrushOptionsWidget(QWidget):
     def __init__(
             self,
@@ -34,8 +40,9 @@ class BrushOptionsWidget(QWidget):
         self.ui.opacityComboBox.currentTextChanged.connect(self.update_opacity)
         self.ui.flowComboBox.currentTextChanged.connect(self.update_flow)
 
+        # self.ui.opacityComboBox.textActivated.connect(print)
         self.ui.opacityComboBox.setCurrentText(f'{self.tool.opacity * 100}%')
-        self.ui.flowComboBox.setCurrentText(f'{self.tool.opacity * 100}%')
+        self.ui.flowComboBox.setCurrentText(f'{self.tool.flow * 100}%')
 
     def keyPressEvent(self, event):
         if event.key() == 16777220: # Enter
@@ -45,7 +52,11 @@ class BrushOptionsWidget(QWidget):
         self.tool.mode = mode
 
     def update_opacity(self, opacity):
-        self.tool.opacity = float(re.sub('\D', '', opacity)) / 100
+        opacity = normalize_float_input(opacity)
+        self.ui.opacityComboBox.setCurrentText(f'{self.tool.opacity * 100}%')
+        self.tool.opacity = float(opacity) / 100
 
     def update_flow(self, flow):
-        self.tool.flow = float(re.sub('\D', '', flow)) / 100
+        flow = normalize_float_input(flow)
+        self.ui.flowComboBox.setCurrentText(f'{self.tool.flow * 100}%')
+        self.tool.flow = float(flow) / 100

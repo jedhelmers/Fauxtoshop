@@ -39,7 +39,8 @@ class Tool(QWidget):
 
     @opacity.setter
     def opacity(self, opacity: float):
-        self.brush_color.setAlpha(255 * (opacity / 100))
+        print(self.brush_color.alpha(), int(255 * opacity))
+        self.brush_color.setAlpha(255 * opacity)
         self._opacity = opacity
 
     @property
@@ -48,7 +49,7 @@ class Tool(QWidget):
 
     @flow.setter
     def flow(self, flow: float):
-        self.brush_color.setAlpha(255 * (flow / 100))
+        self.brush_color.setAlpha(255 * flow)
         self._flow = flow
 
     @property
