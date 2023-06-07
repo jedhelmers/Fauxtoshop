@@ -65,7 +65,10 @@ class MainWindow(QMainWindow):
         self.windows = {}
 
         # Tools
-        self.tool = Tool(self.label)
+        self.tool = Tool(
+            self.ui.scrollArea,
+            self.label,
+        )
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
         toolbar = ToolSidebarWidget(
@@ -144,7 +147,6 @@ class MainWindow(QMainWindow):
         print('current_layer', current_layer)
         self._current_layer = current_layer
         layer = self.get_layer()
-        print('layer', layer)
         self.tool.layer = layer
 
     @property
@@ -448,11 +450,12 @@ class MainWindow(QMainWindow):
 
         full_width = width_to_label + w
         full_height = h + height_to_label
-        print(full_width, full_height)
+        # print(full_width, full_height)
 
         for i in range(full_width):
             if i % 50 == 0:
-                print(pixel_to_inch(i - width_to_label))
+                # print(pixel_to_inch(i - width_to_label))
+                pass
     # def draw_rulers(self):
     #     # TODO: Extend entire length/height of application
     #     self.draw_v_ruler()

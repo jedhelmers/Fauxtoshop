@@ -8,12 +8,24 @@ from datatypes.layer import Layer, mode_mappings
 from utils import image_to_pixmap
 
 class Tool(QWidget):
-    def __init__(self, parent) -> None:
+    def __init__(
+            self,
+            canvas: QScrollArea,
+            parent
+        ) -> None:
         super().__init__(parent)
+        self.canvas = canvas
         self._layer = None
+
+        # Brush settings
         self.brush_color = QColor(150, 50, 50, 50)
         self.brush_size = 80
         self.hardness = 0.20
+        self.opacity = 1.0
+        self.flow = 1.0
+        self.mode = 'Normal'
+
+        # Mouse stuff
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
@@ -22,7 +34,26 @@ class Tool(QWidget):
         self.snap_to = 30 # CANNOT BE ZERO
 
     @property
+    def opacity(self):
+        return self._opacity
+
+    @opacity.setter
+    def opacity(self, opacity: float):
+        self.brush_color.setAlpha(255 * (opacity / 100))
+        self._opacity = opacity
+
+    @property
+    def flow(self):
+        return self._flow
+
+    @flow.setter
+    def flow(self, flow: float):
+        self.brush_color.setAlpha(255 * (flow / 100))
+        self._flow = flow
+
+    @property
     def active_tool(self):
+        # print('active_tool', self._active_tool)
         return self._active_tool
 
     @active_tool.setter
@@ -156,8 +187,8 @@ class Tool(QWidget):
     def brush(self, event):
         if self.layer and self.layer.image:
             # TODO: why is self.layer None?
-            scroll_offset_x = self.parent().parent().parent().parent().parent().horizontalScrollBar().value()
-            scroll_offset_y = self.parent().parent().parent().parent().parent().verticalScrollBar().value()
+            scroll_offset_x = self.canvas.horizontalScrollBar().value()
+            scroll_offset_y = self.canvas.verticalScrollBar().value()
 
             [x_offset, y_offset] = self.parent().pos().toTuple()
             x = scroll_offset_x + event.position().x() * self.drag_speed - x_offset - 70
@@ -186,7 +217,7 @@ class Tool(QWidget):
             painter.setPen(pen)
 
             painter.drawPixmap(0, 0, self.layer.image)
-            painter.setCompositionMode(self._mode)
+            painter.setCompositionMode(mode_mappings(self.mode))
             painter.drawLine(self.last_x, self.last_y, x, y)
             painter.end()
 
