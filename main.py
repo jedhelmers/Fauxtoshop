@@ -3,6 +3,8 @@ import random
 import sys
 from pathlib import Path
 
+import cv2
+import numpy as np
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
@@ -22,6 +24,12 @@ from workspace import WorkspaceWidget
 # import roman
 # print('ROMAN', roman.int_to_roman_string(4))
 # print('ROMAN', roman.ButtsWidget)
+
+def create_mask():
+    im = cv2.imread("spectacles.png", cv2.IMREAD_UNCHANGED)
+    _, mask = cv2.threshold(im[:, :, 3], 0, 255, cv2.THRESH_BINARY)
+    cv2.imwrite('mask.jpg', mask)
+
 
 # SIGNALS
 class MainSignaler(QtCore.QObject):

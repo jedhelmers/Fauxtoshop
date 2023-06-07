@@ -1,7 +1,10 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
+from PySide6.QtGui import QIcon, QPixmap, QColorSpace, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+
+import cv2
+import numpy as np
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, mode_mappings
@@ -226,3 +229,22 @@ class Tool(QWidget):
             self.last_y = y
 
             self.layer.image = self.image_to_pixmap(resultImage)
+
+            image = cv2.imread('images/example.png')
+
+            # Set blue, green and red channels to red channel
+            image[:, :, 0] = image[:, :, 2]
+            # image[:, :, 1] = image[:, :, 2]
+
+            height, width, channel = image.shape
+            bytesPerLine = 3 * width
+            qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
+
+            self.layer.image = self.image_to_pixmap(qImg)
+
+            # temp = resultImage.copy()
+            # image = cv2.CreateMat(temp.height(),temp.width(), cv2.CV_8UC3, temp.bits(),temp.bytesPerLine())
+            # cv2.cvtColor(image, image, cv2.CV_BGR2RGB)
+            # cv::Mat res(temp.height(),temp.width(),CV_8UC3,(uchar*)temp.bits(),temp.bytesPerLine());
+            # cvtColor(res, res,CV_BGR2RGB);
+
