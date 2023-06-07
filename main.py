@@ -6,7 +6,7 @@ from pathlib import Path
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
-from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
@@ -203,15 +203,17 @@ class Tool(QWidget):
         self.layer.image = self.image_to_pixmap(resultImage)
 
     def brush(self, event):
-        # print('self.layer')
         if self.layer and self.layer.image:
             # TODO: why is self.layer None?
             # print('brush')
+            scroll_offset_x = self.parent().parent().parent().parent().parent().horizontalScrollBar().value()
+            scroll_offset_y = self.parent().parent().parent().parent().parent().verticalScrollBar().value()
+            print("SCROLL", scroll_offset_x, scroll_offset_y)
             [x_offset, y_offset] = self.parent().pos().toTuple()
             # p = QPoint()
             # p.toTuple
-            x = event.position().x() * self.drag_speed - x_offset - 70
-            y = event.position().y() * self.drag_speed - y_offset - 40
+            x = scroll_offset_x + event.position().x() * self.drag_speed - x_offset - 70
+            y = scroll_offset_y + event.position().y() * self.drag_speed - y_offset - 40
 
             if self.last_x is None: # First event.
                 self.last_x = x
@@ -226,7 +228,6 @@ class Tool(QWidget):
 
             gradient = QRadialGradient(QPoint(x, y), self.brush_size / 2)
             gradient.setCenter(x, y)
-            # gradient.setAngle(90)
             gradient.setColorAt(0.0, QColor(0, 0, 0, self.hardness * 255))
             gradient.setColorAt(self.hardness, QColor(0, 0, 0, self.hardness * 255))
             gradient.setColorAt(1.0, Qt.transparent)
