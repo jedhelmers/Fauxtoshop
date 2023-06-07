@@ -10,7 +10,7 @@ from PySide6.QtOpenGL import *
 
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from tool import Tool
-from tool import ToolBase
+# from tool import ToolBase
 from typing import List
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel

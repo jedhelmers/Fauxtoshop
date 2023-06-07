@@ -11,242 +11,17 @@ from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QT
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from styles.main import main_style
+from tool import Tool
 from ui import mainwindow_newui
 from utils import QHLine, QVLine, set_dpi, inch_to_pixel, pixel_to_inch
-from widgets.toolbar import ToolbarWidget
+from widgets.tool_options import ToolOptionsWidget
+from widgets.toolsidebar import ToolSidebarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
 
 # from widgets.butts import ButtsWidget
 # import butts
 
-class Tool(QWidget):
-    def __init__(self, parent) -> None:
-        super().__init__(parent)
-        self._layer = None
-        self.brush_color = qRgba(50, 50, 50, 50)
-        self.brush_size = 80
-        self.hardness = 0.20
-        self.last_x = None
-        self.last_y = None
-        self.drag_speed  = 1.0
-        self.down_mouse_pos = [0, 0]
-        self.up_mouse_pos = [0, 0]
-        self.snap_to = 30 # CANNOT BE ZERO
-
-    @property
-    def active_tool(self):
-        return self._active_tool
-
-    @active_tool.setter
-    def active_tool(self, active_tool):
-        self._active_tool = active_tool
-        self.draw_cursor()
-
-    @property
-    def brush_size(self):
-        return self._brush_size
-
-    @brush_size.setter
-    def brush_size(self, brush_size):
-        self._brush_size = brush_size
-
-    @property
-    def layer(self):
-        return self._layer
-
-    @layer.setter
-    def layer(self, layer):
-        print('78', layer)
-        self._layer = layer
-        # TODO: Brush mode
-        self._mode = mode_mappings(layer.mode) if layer else None
-
-    def mousePressEvent(self, event):
-        self.down_mouse_pos = [event.position().x(), event.position().y()]
-        self.up_mouse_pos = [event.position().x(), event.position().y()]
-
-    def quantize(self, num):
-        return num - (num % self.snap_to)
-
-    def reset_mouse_pos(self):
-        self.last_x = None
-        self.last_y = None
-
-    def draw_cursor(self):
-        tool = get_tool_icon(self.active_tool)
-        print('BUTTS', tool.name)
-        if tool.name == "brush":
-            size = self.brush_size
-            box_size = size * 1.3
-
-            scale = 1
-            half_size = size * 0.35
-            hardness_size = half_size * self.hardness
-            scaled_size = half_size * scale
-
-            b = QPixmap(box_size, box_size)
-            b.fill(Qt.transparent)
-
-            p = QPainter(b)
-            # p.setRenderHint(QPainter.Antialiasing, True)
-
-            pen = QPen()
-            pen.setColor(QColor(0, 0, 0, 200))
-            pen.setWidth(1)
-            p.setPen(pen)
-
-            # Move painter
-            p.translate(half_size, half_size)
-            # Outer
-            p.drawEllipse(QPoint(0, 0), half_size, half_size)
-            # Inner
-            p.drawEllipse(QPoint(0, 0), hardness_size, hardness_size)
-            p.end()
-
-            # b = b.scaled(
-            #     QSize(scaled_size, scaled_size),
-            #     Qt.IgnoreAspectRatio,
-            #     Qt.SmoothTransformation
-            # )
-            # (-1, -1) centers hotX and hotY
-            self.cursor = QtGui.QCursor(b, -1, -1)
-        else:
-            self.icon = QtGui.QIcon(tool.path).pixmap(QSize(15, 15))
-            self.cursor = QtGui.QCursor(self.icon, *tool.hotPoints)
-
-        self.parent().setCursor(self.cursor)
-
-    def draw(self, event):
-        # TODO: Figure out why the brush is offset
-        # print(self.active_tool)
-        switch = {
-            # 'pen': self.pen,
-            'brush': self.brush,
-            # 'erase': self.erase,
-            # 'clone': self.clone,
-            'move': self.move
-        }
-
-        if self.layer and self.active_tool in switch:
-            switch[self.active_tool](event)
-
-    def image_to_pixmap(self, image) -> QPixmap:
-        if image:
-            return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
-
-    def move(self, event):
-        self.down_mouse_pos = [
-            self.quantize(event.x()),
-            self.quantize(event.y())]
-
-        [x, y] = self.layer.position
-        [x1, y1] = self.down_mouse_pos
-        [x2, y2] = self.up_mouse_pos
-        dx = ((x1 - x2) * self.drag_speed) + x
-        dy = ((y1 - y2) * self.drag_speed) + y
-
-        # # Snap to
-        # if self.snap_to:
-        #     if dx % self.snap_to != 0:
-        #         dx = x
-        #     if dy % self.snap_to != 0:
-        #         dy = y
-
-        self.layer.position = [dx, dy]
-        self.up_mouse_pos = self.down_mouse_pos
-
-    # def move(self, event):
-    #     [x_offset, y_offset] = self.layer.position
-
-    #     x = event.position().x() * self.drag_speed - x_offset
-    #     y = event.position().y() * self.drag_speed - y_offset
-
-    #     if self.last_x is None: # First event.
-    #         self.last_x = x
-    #         self.last_y = y
-
-    #     resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-    #     painter = QPainter(resultImage)
-    #     painter.fillRect(resultImage.rect(), Qt.transparent)
-    #     # painter.translate(self.last_x, self.last_y)
-    #     painter.drawPixmap(x, y, self.layer.image)
-    #     painter.end()
-    #     self.layer.image = self.image_to_pixmap(resultImage)
-
-    def _brush(self, event):
-        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        line = QLineF(QPointF(40, 40), QPointF(0, 0))
-        # QPainter painter(this);
-		# auto line = QLineF(QPointF(rect().x() + 5, rect().center().y()), QPointF(rect().width() - 10, rect().center().y()));
-
-        gradient = QConicalGradient()
-        gradient.setCenter(20, 20)
-        gradient.setAngle(90)
-        gradient.setColorAt(1.0, Qt.black)
-        gradient.setColorAt(0.0, Qt.red)
-
-        pen = QPen(gradient, 4.0)
-        painter.setPen(pen)
-        painter.drawLine(line)
-        painter.end()
-		# QConicalGradient gradient;
-		# gradient.setCenter(rect().center());
-		# gradient.setAngle(90);
-		# gradient.setColorAt(1.0, Qt::black);
-		# gradient.setColorAt(0.0, palette().background().color());
-
-		# auto p = QPen(gradient, 4.0);
-		# painter.setPen(p);
-		# painter.drawLine(line);
-        self.layer.image = self.image_to_pixmap(resultImage)
-
-    def brush(self, event):
-        if self.layer and self.layer.image:
-            # TODO: why is self.layer None?
-            # print('brush')
-            scroll_offset_x = self.parent().parent().parent().parent().parent().horizontalScrollBar().value()
-            scroll_offset_y = self.parent().parent().parent().parent().parent().verticalScrollBar().value()
-            print("SCROLL", scroll_offset_x, scroll_offset_y)
-            [x_offset, y_offset] = self.parent().pos().toTuple()
-            # p = QPoint()
-            # p.toTuple
-            x = scroll_offset_x + event.position().x() * self.drag_speed - x_offset - 70
-            y = scroll_offset_y + event.position().y() * self.drag_speed - y_offset - 40
-
-            if self.last_x is None: # First event.
-                self.last_x = x
-                self.last_y = y
-
-                return # Ignore the first time.
-
-            resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
-            painter = QPainter(resultImage)
-            painter.setCompositionMode(QPainter.CompositionMode_Source)
-            painter.fillRect(resultImage.rect(), Qt.transparent)
-
-            gradient = QRadialGradient(QPoint(x, y), self.brush_size / 2)
-            gradient.setCenter(x, y)
-            gradient.setColorAt(0.0, QColor(0, 0, 0, self.hardness * 255))
-            gradient.setColorAt(self.hardness, QColor(0, 0, 0, self.hardness * 255))
-            gradient.setColorAt(1.0, Qt.transparent)
-
-            pen = QPen(gradient, self.brush_size)
-            pen.setStyle(Qt.SolidLine)
-            pen.setCapStyle(Qt.RoundCap)
-            painter.setPen(pen)
-
-            painter.drawPixmap(0, 0, self.layer.image)
-            painter.setCompositionMode(self._mode)
-            painter.drawLine(self.last_x, self.last_y, x, y)
-            painter.end()
-
-            self.last_x = x
-            self.last_y = y
-
-            self.layer.image = self.image_to_pixmap(resultImage)
-# pip install -e /Users/jhelmers/Test_Library/dist/UNKNOWN-0.2.3.tar.gz --force-reinstall
 # SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
@@ -293,11 +68,18 @@ class MainWindow(QMainWindow):
         self.tool = Tool(self.label)
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
-        toolbar = ToolbarWidget(
+        toolbar = ToolSidebarWidget(
             main_signaler=self.signaler,
             tool=self.tool
         )
         self.ui.toolbarWidget.layout().addWidget(toolbar)
+
+        # Tool Options
+        tool_options = ToolOptionsWidget(
+            main_signaler=self.signaler,
+            tool=self.tool
+        )
+        self.ui.toolOptionsWidget.layout().addWidget(tool_options)
 
         # DATA
         self.layers = []

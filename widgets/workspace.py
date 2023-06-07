@@ -10,7 +10,7 @@ from PySide6.QtOpenGL import *
 
 from datatypes.layer import Layer, LayerGroup, mode_mappings
 from tool import Tool
-from tool import ToolBase
+# from tool import ToolBase
 from typing import List
 from ui import workspaceui
 from utils import load_settings, unit_conversion, pixel_to_inch, inch_to_pixel
@@ -89,7 +89,8 @@ class WorkspaceWidget(QWidget):
         self.main_signaler = signaler
 
         self._current_layer = None
-        self.tool = ToolBase(parent=self._parent, layer=self.current_layer)
+        # self.tool = ToolBase(parent=self._parent, layer=self.current_layer)
+        self.tool = None
 
         self.signaler = WorkspaceSignaler()
         self.new_file_info = new_file_info

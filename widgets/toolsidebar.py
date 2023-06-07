@@ -9,7 +9,7 @@ from widgets.new_file import NewFileWidget
 from widgets.tools.text_options import TextOptionsWidget
 
 
-class ToolbarWidget(QWidget):
+class ToolSidebarWidget(QWidget):
     def __init__(self, main_signaler, tool):
         # TODO: Clean this thing up
         super().__init__()

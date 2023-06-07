@@ -15,7 +15,7 @@ from ui import mainwindowui
 from widgets.new_file import NewFileWidget
 import widgets.tools as Tools
 from widgets.tools.text_options import TextOptionsWidget
-from widgets.toolbar import ToolbarWidget
+from widgets.toolsidebar import ToolSidebarWidget
 from widgets.windowbar import WindowsWidget
 from widgets.window_panel import WindowPanelWidget
 from widgets.workspace import WorkspaceWidget
@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
         self.current_tab = None
         self.layers = []
 
-        toolbar = ToolbarWidget(signaler=self.signaler)
+        toolbar = ToolSidebarWidget(signaler=self.signaler)
         self.ui.toolbarWidget.layout().addWidget(toolbar)
 
         windows = WindowsWidget(signaler=self.signaler)
