@@ -4,8 +4,8 @@ import sys
 from pathlib import Path
 
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import QSize, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
-from PySide6.QtGui import QIcon, QPixmap, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
+from PySide6.QtCore import QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
+from PySide6.QtGui import QIcon, QPixmap, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
@@ -17,13 +17,16 @@ from widgets.toolbar import ToolbarWidget
 from widgets.windows.layers import LayersWindowWidget
 from workspace import WorkspaceWidget
 
+# from widgets.butts import ButtsWidget
+# import butts
 
 class Tool(QWidget):
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self._layer = None
         self.brush_color = qRgba(50, 50, 50, 50)
-        self.brush_size = 10
+        self.brush_size = 80
+        self.hardness = 0.20
         self.last_x = None
         self.last_y = None
         self.drag_speed  = 1.0
@@ -74,37 +77,38 @@ class Tool(QWidget):
         tool = get_tool_icon(self.active_tool)
         print('BUTTS', tool.name)
         if tool.name == "brush":
-            size = 800
+            size = self.brush_size
+            box_size = size * 1.3
 
-            scale = 0.8
-            half_size = (size // 2) - 50
-            hardness_size = half_size // 8
-            scaled_size = half_size ** scale
+            scale = 1
+            half_size = size * 0.35
+            hardness_size = half_size * self.hardness
+            scaled_size = half_size * scale
 
-            b = QPixmap(size, size)
+            b = QPixmap(box_size, box_size)
             b.fill(Qt.transparent)
 
             p = QPainter(b)
-            p.setRenderHint(QPainter.Antialiasing, True)
+            # p.setRenderHint(QPainter.Antialiasing, True)
 
             pen = QPen()
             pen.setColor(QColor(0, 0, 0, 200))
-            pen.setWidth(2 / scale)
+            pen.setWidth(1)
             p.setPen(pen)
 
             # Move painter
-            p.translate(half_size, half_size + 100)
+            p.translate(half_size, half_size)
             # Outer
             p.drawEllipse(QPoint(0, 0), half_size, half_size)
             # Inner
             p.drawEllipse(QPoint(0, 0), hardness_size, hardness_size)
             p.end()
 
-            b = b.scaled(
-                QSize(scaled_size, scaled_size),
-                Qt.IgnoreAspectRatio,
-                Qt.SmoothTransformation
-            )
+            # b = b.scaled(
+            #     QSize(scaled_size, scaled_size),
+            #     Qt.IgnoreAspectRatio,
+            #     Qt.SmoothTransformation
+            # )
             # (-1, -1) centers hotX and hotY
             self.cursor = QtGui.QCursor(b, -1, -1)
         else:
@@ -170,6 +174,34 @@ class Tool(QWidget):
     #     painter.end()
     #     self.layer.image = self.image_to_pixmap(resultImage)
 
+    def _brush(self, event):
+        resultImage = QImage(self.layer.image.size(), QImage.Format_ARGB32_Premultiplied)
+        painter = QPainter(resultImage)
+        line = QLineF(QPointF(40, 40), QPointF(0, 0))
+        # QPainter painter(this);
+		# auto line = QLineF(QPointF(rect().x() + 5, rect().center().y()), QPointF(rect().width() - 10, rect().center().y()));
+
+        gradient = QConicalGradient()
+        gradient.setCenter(20, 20)
+        gradient.setAngle(90)
+        gradient.setColorAt(1.0, Qt.black)
+        gradient.setColorAt(0.0, Qt.red)
+
+        pen = QPen(gradient, 4.0)
+        painter.setPen(pen)
+        painter.drawLine(line)
+        painter.end()
+		# QConicalGradient gradient;
+		# gradient.setCenter(rect().center());
+		# gradient.setAngle(90);
+		# gradient.setColorAt(1.0, Qt::black);
+		# gradient.setColorAt(0.0, palette().background().color());
+
+		# auto p = QPen(gradient, 4.0);
+		# painter.setPen(p);
+		# painter.drawLine(line);
+        self.layer.image = self.image_to_pixmap(resultImage)
+
     def brush(self, event):
         # print('self.layer')
         if self.layer and self.layer.image:
@@ -192,25 +224,18 @@ class Tool(QWidget):
             painter.setCompositionMode(QPainter.CompositionMode_Source)
             painter.fillRect(resultImage.rect(), Qt.transparent)
 
-            pen = QPen()
-            pen.setWidth(self.brush_size)
-            pen.setColor(self.brush_color)
+            gradient = QRadialGradient(QPoint(x, y), self.brush_size / 2)
+            gradient.setCenter(x, y)
+            # gradient.setAngle(90)
+            gradient.setColorAt(0.0, QColor(0, 0, 0, self.hardness * 255))
+            gradient.setColorAt(self.hardness, QColor(0, 0, 0, self.hardness * 255))
+            gradient.setColorAt(1.0, Qt.transparent)
+
+            pen = QPen(gradient, self.brush_size)
             pen.setStyle(Qt.SolidLine)
             pen.setCapStyle(Qt.RoundCap)
-            pen.setCosmetic(True)
-
-            brush = QBrush()
-            grad = QRadialGradient(QPoint(0, 0), 10)
-            grad.setColorAt(0.0, Qt.black)
-            grad.setColorAt(1.0, Qt.transparent)
-            painter.fillRect(QRect(0, 0, 200, 200), grad)
-            # # painter.setClipRegion(QEl)
-            # brush.setStyle(grad)
-
-            # pen.setStyle(grad)
             painter.setPen(pen)
-            painter.setBrush(brush)
-            painter.fillRect(resultImage.rect(), grad)
+
             painter.drawPixmap(0, 0, self.layer.image)
             painter.setCompositionMode(self._mode)
             painter.drawLine(self.last_x, self.last_y, x, y)
@@ -220,7 +245,7 @@ class Tool(QWidget):
             self.last_y = y
 
             self.layer.image = self.image_to_pixmap(resultImage)
-
+# pip install -e /Users/jhelmers/Test_Library/dist/UNKNOWN-0.2.3.tar.gz --force-reinstall
 # SIGNALS
 class MainSignaler(QtCore.QObject):
     new_layer = QtCore.Signal(Layer)
