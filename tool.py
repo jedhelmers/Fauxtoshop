@@ -266,7 +266,7 @@ class Tool(QWidget):
 
             # img = cv2.Mat(width, height, QImage.Format_RGB888, resultImage, bytesPerLine)
             # resultImage.format(Qt.RGB888)
-            print(resultImage.scanLine(0))
+            # print(resultImage.scanLine(0))
             # img = cv2.Mat(resultImage.pixelFormat, cv2.COLOR_BGR2RGB)
             # cv2.createMat()
             # temp = resultImage.copy()
