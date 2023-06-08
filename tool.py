@@ -22,12 +22,15 @@ class Tool(QWidget):
 
         # Brush settings
         self.brush_color = QColor(150, 50, 50, 50)
-        self.brush_size = 80
         self.hardness = 0.20
+        self.brush_size = 80
         self.opacity = 1.0
         self.flow = 1.0
         self.mode = 'Normal'
 
+        self.gradient = None
+        self.set_brush_shape()
+    
         # Mouse stuff
         self.last_x = None
         self.last_y = None
@@ -45,6 +48,7 @@ class Tool(QWidget):
         print(self.brush_color.alpha(), int(255 * opacity))
         self.brush_color.setAlpha(255 * opacity)
         self._opacity = opacity
+        self.set_brush_shape()
 
     @property
     def flow(self):
@@ -54,6 +58,7 @@ class Tool(QWidget):
     def flow(self, flow: float):
         self.brush_color.setAlpha(255 * flow)
         self._flow = flow
+        self.set_brush_shape()
 
     @property
     def active_tool(self):
@@ -72,6 +77,7 @@ class Tool(QWidget):
     @brush_size.setter
     def brush_size(self, brush_size):
         self._brush_size = brush_size
+        self.set_brush_shape()
 
     @property
     def layer(self):
@@ -83,6 +89,14 @@ class Tool(QWidget):
         self._layer = layer
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
+
+    def set_brush_shape(self):
+        self.gradient = QRadialGradient(QPoint(0, 0), self.brush_size / 2)
+
+        # if hasattr(self, 'hardness') and self.brush_color:
+        self.gradient.setColorAt(0.0, self.brush_color)
+        self.gradient.setColorAt(self.hardness, self.brush_color)
+        self.gradient.setColorAt(1.0, Qt.transparent)
 
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.position().x(), event.position().y()]
@@ -209,13 +223,14 @@ class Tool(QWidget):
             painter.setCompositionMode(QPainter.CompositionMode_Source)
             painter.fillRect(resultImage.rect(), Qt.transparent)
 
-            gradient = QRadialGradient(QPoint(x, y), self.brush_size / 2)
-            gradient.setCenter(x, y)
-            gradient.setColorAt(0.0, self.brush_color)
-            gradient.setColorAt(self.hardness, self.brush_color)
-            gradient.setColorAt(1.0, Qt.transparent)
+            # gradient = QRadialGradient(QPoint(x, y), self.brush_size / 2)
+            self.gradient.setCenter(x, y)
+            self.gradient.setFocalPoint(x, y)
+            # gradient.setColorAt(0.0, self.brush_color)
+            # gradient.setColorAt(self.hardness, self.brush_color)
+            # gradient.setColorAt(1.0, Qt.transparent)
 
-            pen = QPen(gradient, self.brush_size)
+            pen = QPen(self.gradient, self.brush_size)
             pen.setStyle(Qt.SolidLine)
             pen.setCapStyle(Qt.RoundCap)
             painter.setPen(pen)
@@ -230,15 +245,15 @@ class Tool(QWidget):
 
             self.layer.image = self.image_to_pixmap(resultImage)
 
-            image = cv2.imread('images/example.png')
+            # image = cv2.imread('images/example.png')
 
-            # Set blue, green and red channels to red channel
-            image[:, :, 0] = image[:, :, 2]
-            # image[:, :, 1] = image[:, :, 2]
+            # # Set blue, green and red channels to red channel
+            # image[:, :, 0] = image[:, :, 2]
+            # # image[:, :, 1] = image[:, :, 2]
 
-            height, width, channel = image.shape
-            bytesPerLine = 3 * width
-            qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
+            # height, width, channel = image.shape
+            # bytesPerLine = 3 * width
+            # qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
 
             # self.layer.image = self.image_to_pixmap(qImg)
 
@@ -250,7 +265,9 @@ class Tool(QWidget):
             # }
 
             # img = cv2.Mat(width, height, QImage.Format_RGB888, resultImage, bytesPerLine)
-
+            # resultImage.format(Qt.RGB888)
+            print(resultImage.scanLine(0))
+            # img = cv2.Mat(resultImage.pixelFormat, cv2.COLOR_BGR2RGB)
             # cv2.createMat()
             # temp = resultImage.copy()
             # image = cv2.CreateMat(temp.height(),temp.width(), cv2.CV_8UC3, temp.bits(),temp.bytesPerLine())

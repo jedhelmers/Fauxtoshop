@@ -1,6 +1,6 @@
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtWidgets import QWidget, QFrame, QLabel, QPushButton
+from PySide6.QtCore import Qt, QSize, QRect
+from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QFrame, QLabel, QPushButton
 from PySide6.QtGui import QIcon
 
 from functions import new_file
@@ -23,6 +23,21 @@ class ToolSidebarWidget(QWidget):
 
         # UI
         self.ui.toolbarWidget.layout().setAlignment(Qt.AlignTop)
+
+        # Color Front/Back
+        view = QGraphicsView(self)
+        scene = QGraphicsScene(view)
+        front = QGraphicsRectItem()
+        front.setRect(QRect(0, 0, 19, 19))
+
+        back = QGraphicsRectItem()
+        back.setRect(QRect(10, 10, 19, 19))
+
+        scene.addItem(front)
+        scene.addItem(back)
+
+        self.ui.verticalLayout.insertWidget(0,view)
+
 
         self.render()
 
