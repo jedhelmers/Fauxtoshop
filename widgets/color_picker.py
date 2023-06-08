@@ -1,5 +1,5 @@
-from PySide6.QtCore import QRect, QSize
-from PySide6.QtGui import Qt, QLinearGradient, QGradient, QColor, QPen, QBrush, QMouseEvent, QPixmap, QPainter, QImage
+from PySide6.QtCore import QRect, QSize, QPointF
+from PySide6.QtGui import Qt, QPolygonF, QLinearGradient, QGradient, QColor, QPen, QBrush, QMouseEvent, QPixmap, QPainter, QImage
 from PySide6.QtWidgets import QDialog, QGraphicsSceneMouseEvent, QGraphicsPolygonItem, QGraphicsItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
 
 from styles.window_panel import window_panel_style
@@ -9,10 +9,31 @@ from ui.color_pickerui import Ui_ColorPicker
 class ColorScaleSelectionPolygonItem(QGraphicsPolygonItem):
     def __init__(self):
         super().__init__()
+        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+
+        self.left_path = QPolygonF()
+        self.left_path.push_back(QPointF(10.2, 20.5))
+        self.left_path.push_back(QPointF(0, 30.2))
+        self.left_path.push_back(QPointF(0, 10.8))
+        self.setPolygon(self.left_path)
+
+        # Flags
+        self.is_pressed = False
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        self.is_pressed = True
         return super().mousePressEvent(event)
 
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        self.is_pressed = False
+        return super().mouseReleaseEvent(event)
+
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        print(event.pos().y())
+        if self.is_pressed:
+            self.left_path.translate(0, event.pos().y())
+            event.pos().setX(0)
+            return super().mouseMoveEvent(event)
 
 class ColorPaletteSelectionEllipseItem(QGraphicsEllipseItem):
     def __init__(self):
@@ -123,6 +144,10 @@ class ColorPickerWidget(QDialog):
         self.hue_scene.addItem(self.hue_pix)
         self.ui.colorScaleGridLayout.addWidget(self.hue_view)
         self.draw_scale()
+
+        # Hue Scale selector
+        self.hue_selector = ColorScaleSelectionPolygonItem()
+        self.hue_scene.addItem(self.hue_selector)
 
         self.palette_tool = ColorPaletteSelectionEllipseItem()
         self.palette_scene.addItem(self.palette_tool)
