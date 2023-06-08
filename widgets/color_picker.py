@@ -1,6 +1,6 @@
 from PySide6.QtCore import QRect, QSize
 from PySide6.QtGui import Qt, QLinearGradient, QGradient, QColor, QBrush, QMouseEvent, QPixmap, QPainter, QImage
-from PySide6.QtWidgets import QDialog, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PySide6.QtWidgets import QDialog, QGraphicsItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
 
 from styles.window_panel import window_panel_style
 from ui.color_pickerui import Ui_ColorPicker
@@ -9,6 +9,9 @@ from ui.color_pickerui import Ui_ColorPicker
 class ColorPaletteSelectionEllipseItem(QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
+
+        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        # self.setFlag(QGraphicsItem.ItemIsSelectable, True)
 
         self.setRect(20, 20, 10, 10)
         self.setBrush(Qt.white)
