@@ -1,3 +1,4 @@
+from typing import Any
 from PySide6.QtCore import QRect, QSize, QPointF
 from PySide6.QtGui import Qt, QPolygonF, QLinearGradient, QGradient, QColor, QPen, QBrush, QMouseEvent, QPixmap, QPainter, QImage
 from PySide6.QtWidgets import QDialog, QGraphicsSceneMouseEvent, QGraphicsPolygonItem, QGraphicsItem, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
@@ -35,9 +36,11 @@ class ColorScaleSelectionPolygonItem(QGraphicsPolygonItem):
             event.pos().setX(0)
             return super().mouseMoveEvent(event)
 
+
 class ColorPaletteSelectionEllipseItem(QGraphicsEllipseItem):
-    def __init__(self):
+    def __init__(self, set_color_pos):
         super().__init__()
+        self.set_color_pos = set_color_pos
 
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         # self.setFlag(QGraphicsItem.ItemIsSelectable, True)
@@ -51,11 +54,18 @@ class ColorPaletteSelectionEllipseItem(QGraphicsEllipseItem):
         # for item in self.scene().items():
         #     print(type(item))
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        # print('ITEM', event.pos().x(), event.pos().y())
-        # color = self.pixmap().toImage().pixelColor(event.pos().x(), event.pos().y()).toRgb()
-        # print(color)
-        return super().mousePressEvent(event)
+    def sceneEvent(self, event) -> bool:
+        print('sceneEvent')
+        return super().sceneEvent(event)
+
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        print("MOUSE MOVE")
+        return super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        if self.set_color_pos:
+            self.set_color_pos(event.pos())
+        return super().mouseReleaseEvent(event)
 
 
 class ColorPalettePixmapItem(QGraphicsPixmapItem):
@@ -91,7 +101,7 @@ class ColorPaletteView(QGraphicsView):
 
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        print(event.pos())
+        # print(event.pos())
         return super().mousePressEvent(event)
 
     def get_color(self, event):
@@ -101,7 +111,7 @@ class ColorPaletteView(QGraphicsView):
                 item.setPos(event.pos().x(), event.pos().y())
             elif isinstance(item, ColorPalettePixmapItem):
                 spot_color = item.pixmap().toImage().pixelColor(event.pos().x(), event.pos().y())
-                print(spot_color)
+                # print(spot_color)
 
 
 class ColorPaletteScene(QGraphicsScene):
@@ -111,9 +121,13 @@ class ColorPaletteScene(QGraphicsScene):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         # print('SCENE', event.pos().x(), event.pos().y())
-        # for item in self.items():
-        #     print(type(item))
-
+        for item in self.items():
+            if isinstance(item, ColorPaletteSelectionEllipseItem):
+                print(type(item))
+                print('WEE')
+                # self.sendEvent(item, ColorPaletteSelectionEllipseItem.mousePressEvent)
+        # self.update(QRect(0, 0, 250, 250))
+        # self.sendEvent()
         return super().mousePressEvent(event)
 
 class ColorPickerWidget(QDialog):
@@ -122,6 +136,7 @@ class ColorPickerWidget(QDialog):
         self.ui = Ui_ColorPicker()
         self.ui.setupUi(self)
 
+        self.color_pos = QPointF(0, 0)
         self.currentHue = QColor(255, 0, 0)
 
         # Color Palette
@@ -149,8 +164,12 @@ class ColorPickerWidget(QDialog):
         self.hue_selector = ColorScaleSelectionPolygonItem()
         self.hue_scene.addItem(self.hue_selector)
 
-        self.palette_tool = ColorPaletteSelectionEllipseItem()
+        self.palette_tool = ColorPaletteSelectionEllipseItem(self.set_color_pos)
         self.palette_scene.addItem(self.palette_tool)
+
+    def set_color_pos(self, pos: QPointF):
+        print('WEEE', pos)
+        self.color_pos = pos
 
     def set_color_palette(self):
         # A colored background based on hue
@@ -219,7 +238,7 @@ class ColorPickerWidget(QDialog):
         painter.fillRect(p.rect(), colorGradient)
         painter.end()
 
-        print('COLOR AT', p.toImage().pixelColor(10, 100).toRgb())
+        # print('COLOR AT', p.toImage().pixelColor(10, 100).toRgb())
 
 
         self.hue_pix.setPixmap(p)
