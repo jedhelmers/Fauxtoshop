@@ -5,6 +5,7 @@ from PySide6.QtGui import QIcon
 
 from functions import new_file
 from ui import toolbarui
+from widgets.color_picker import ColorPickerWidget
 from widgets.new_file import NewFileWidget
 from widgets.tools.text_options import TextOptionsWidget
 
@@ -101,6 +102,8 @@ class ToolSidebarWidget(QWidget):
 
     def set_color(self, color):
         print(color)
+        color_picker = ColorPickerWidget(self)
+        color_picker.show()
 
     def on_toolbar_icon_click(self, name):
         self.current_tool = name
