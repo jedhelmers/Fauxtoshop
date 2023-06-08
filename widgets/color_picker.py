@@ -1,9 +1,37 @@
 from PySide6.QtCore import QRect, QSize
 from PySide6.QtGui import Qt, QLinearGradient, QGradient, QColor, QBrush, QMouseEvent, QPixmap, QPainter, QImage
-from PySide6.QtWidgets import QDialog, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PySide6.QtWidgets import QDialog, QGraphicsEllipseItem, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
 
 from styles.window_panel import window_panel_style
 from ui.color_pickerui import Ui_ColorPicker
+
+
+class ColorPaletteSelectionEllipseItem(QGraphicsEllipseItem):
+    def __init__(self):
+        super().__init__()
+
+        self.setRect(20, 20, 10, 10)
+        self.setBrush(Qt.white)
+        print(self.scene())
+        # for item in self.scene().items():
+        #     print(type(item))
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        # print('ITEM', event.pos().x(), event.pos().y())
+        # color = self.pixmap().toImage().pixelColor(event.pos().x(), event.pos().y()).toRgb()
+        # print(color)
+        return super().mousePressEvent(event)
+
+
+class ColorPalettePixmapItem(QGraphicsPixmapItem):
+    def _init__(self):
+        super().__init__()
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        # print('ITEM', event.pos().x(), event.pos().y())
+        color = self.pixmap().toImage().pixelColor(event.pos().x(), event.pos().y()).toRgb()
+        print(color)
+        return super().mousePressEvent(event)
 
 
 class ColorPaletteScene(QGraphicsScene):
@@ -11,7 +39,10 @@ class ColorPaletteScene(QGraphicsScene):
         super().__init__()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        # print(self)
+        # print('SCENE', event.pos().x(), event.pos().y())
+        # for item in self.items():
+        #     print(type(item))
+
         return super().mousePressEvent(event)
 
 class ColorPickerWidget(QDialog):
@@ -26,11 +57,14 @@ class ColorPickerWidget(QDialog):
         self.palette_view = QGraphicsView()
         self.palette_scene = ColorPaletteScene()
         self.palette_view.setScene(self.palette_scene)
-        self.palette_pix = QGraphicsPixmapItem()
+        self.palette_pix = ColorPalettePixmapItem()
         self.palette_pix.setPixmap(QPixmap(255, 255))
         self.palette_scene.addItem(self.palette_pix)
         self.ui.colorRangeWidget.layout().addWidget(self.palette_view)
         self.set_color_palette()
+
+        self.palette_tool = ColorPaletteSelectionEllipseItem()
+        self.palette_scene.addItem(self.palette_tool)
 
     def set_color_palette(self):
         # A colored background based on hue
