@@ -1,12 +1,42 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QRect
-from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QFrame, QLabel, QPushButton
+from PySide6.QtWidgets import QWidget, QGraphicsSceneMouseEvent, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QFrame, QLabel, QPushButton
 from PySide6.QtGui import QIcon
 
 from functions import new_file
 from ui import toolbarui
 from widgets.new_file import NewFileWidget
 from widgets.tools.text_options import TextOptionsWidget
+
+
+class ColorSwatch(QGraphicsRectItem):
+    def __init__(self, callback):
+        super().__init__()
+        self.callback = callback
+
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        # Call callback function
+        # TODO: maybe turn this into a signal
+        if self.callback:
+            self.callback(self.brush().color())
+
+        # Set z value so swatch is on top
+        self.setZValue(1)
+        
+        return super().mousePressEvent(event)
+
+
+class ColorSwatches(QGraphicsScene):
+    def __init__(self):
+        super().__init__()
+        self.setBackgroundBrush(Qt.transparent)
+
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        # Reset ALL z values to 0
+        for child in self.items():
+            child.setZValue(0)
+
+        return super().mousePressEvent(event)
 
 
 class ToolSidebarWidget(QWidget):
@@ -24,22 +54,29 @@ class ToolSidebarWidget(QWidget):
         # UI
         self.ui.toolbarWidget.layout().setAlignment(Qt.AlignTop)
 
+        # Render icons
+        self.render()
+
         # Color Front/Back
-        view = QGraphicsView(self)
-        scene = QGraphicsScene(view)
-        front = QGraphicsRectItem()
+        view = QGraphicsView()
+        view.setMaximumHeight(40)
+        view.setMaximumWidth(40)
+        view.setStyleSheet('background: transparent;')
+        scene = ColorSwatches()
+        view.setScene(scene)
+        front = ColorSwatch(self.set_color)
+        front.setBrush(Qt.white)
         front.setRect(QRect(0, 0, 19, 19))
 
-        back = QGraphicsRectItem()
+        back = ColorSwatch(self.set_color)
         back.setRect(QRect(10, 10, 19, 19))
+        back.setBrush(Qt.black)
 
         scene.addItem(front)
         scene.addItem(back)
 
-        self.ui.verticalLayout.insertWidget(0,view)
+        self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count(), view)
 
-
-        self.render()
 
     @property
     def current_tool(self):
@@ -61,6 +98,9 @@ class ToolSidebarWidget(QWidget):
 
         self._current_tool = tool
         self.select_tool()
+
+    def set_color(self, color):
+        print(color)
 
     def on_toolbar_icon_click(self, name):
         self.current_tool = name
