@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Color Picker</string>
   </property>
   <widget class="QCheckBox" name="onlyWebColorsCheckBox">
    <property name="geometry">
@@ -31,11 +31,14 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>287</width>
+     <width>297</width>
      <height>257</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <property name="spacing">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QWidget" name="colorRangeWidget" native="true">
       <property name="minimumSize">
@@ -79,18 +82,18 @@
      <widget class="QWidget" name="hueScaleWidget" native="true">
       <property name="minimumSize">
        <size>
-        <width>20</width>
+        <width>30</width>
         <height>255</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>20</width>
-        <height>16777215</height>
+        <width>30</width>
+        <height>255</height>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background: rgba(255, 255, 255, 100)</string>
+       <string notr="true">background: transparent;</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <property name="leftMargin">
@@ -109,7 +112,11 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="colorScaleGridLayout"/>
+        <layout class="QGridLayout" name="colorScaleGridLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+        </layout>
        </item>
       </layout>
      </widget>

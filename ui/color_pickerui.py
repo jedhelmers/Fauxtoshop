@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'color_picker.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -29,8 +29,9 @@ class Ui_ColorPicker(object):
         self.onlyWebColorsCheckBox.setGeometry(QRect(10, 290, 281, 20))
         self.layoutWidget = QWidget(ColorPicker)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(10, 30, 287, 257))
+        self.layoutWidget.setGeometry(QRect(10, 30, 297, 257))
         self.horizontalLayout_4 = QHBoxLayout(self.layoutWidget)
+        self.horizontalLayout_4.setSpacing(0)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.colorRangeWidget = QWidget(self.layoutWidget)
@@ -52,14 +53,15 @@ class Ui_ColorPicker(object):
 
         self.hueScaleWidget = QWidget(self.layoutWidget)
         self.hueScaleWidget.setObjectName(u"hueScaleWidget")
-        self.hueScaleWidget.setMinimumSize(QSize(20, 255))
-        self.hueScaleWidget.setMaximumSize(QSize(20, 16777215))
-        self.hueScaleWidget.setStyleSheet(u"background: rgba(255, 255, 255, 100)")
+        self.hueScaleWidget.setMinimumSize(QSize(30, 255))
+        self.hueScaleWidget.setMaximumSize(QSize(30, 255))
+        self.hueScaleWidget.setStyleSheet(u"background: transparent;")
         self.gridLayout_3 = QGridLayout(self.hueScaleWidget)
         self.gridLayout_3.setSpacing(0)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.colorScaleGridLayout = QGridLayout()
+        self.colorScaleGridLayout.setSpacing(0)
         self.colorScaleGridLayout.setObjectName(u"colorScaleGridLayout")
 
         self.gridLayout_3.addLayout(self.colorScaleGridLayout, 0, 0, 1, 1)
@@ -456,7 +458,7 @@ class Ui_ColorPicker(object):
     # setupUi
 
     def retranslateUi(self, ColorPicker):
-        ColorPicker.setWindowTitle(QCoreApplication.translate("ColorPicker", u"Form", None))
+        ColorPicker.setWindowTitle(QCoreApplication.translate("ColorPicker", u"Color Picker", None))
         self.onlyWebColorsCheckBox.setText(QCoreApplication.translate("ColorPicker", u"Only Web Colors", None))
         self.radioButton.setText(QCoreApplication.translate("ColorPicker", u"H:", None))
         self.label_2.setText(QCoreApplication.translate("ColorPicker", u"\u00ba", None))
