@@ -221,16 +221,33 @@ class ColorPickerWidget(QDialog):
         height = 250
         width = 20
 
+        scale = [
+            [255, 0, 0],
+            [255, 0, 255],
+            [0, 0, 255],
+            [0, 255, 255],
+            [0, 255, 0],
+            [255, 255, 0],
+            [255, 0, 0]
+        ]
+
+
         self.hue_scene.setSceneRect(QRect(0, 0, width * 0.8, height))
 
         colorGradient = QLinearGradient(0, 0, 0, self.hue_scene.size)
         colorGradient.setSpread(QGradient.RepeatSpread)
-        colorGradient.setColorAt(0, QColor(0, 255, 0))
-        colorGradient.setColorAt(0.2, QColor(255, 255, 0))
-        colorGradient.setColorAt(0.4, QColor(0, 0, 255))
-        colorGradient.setColorAt(0.6, QColor(255, 0, 255))
-        colorGradient.setColorAt(0.8, QColor(255, 0, 0))
-        colorGradient.setColorAt(1, QColor(0, 255, 255))
+        for index, step in enumerate(scale):
+            i = index / (len(scale) - 1)
+            print(i)
+            colorGradient.setColorAt(i, QColor(*step))
+        # colorGradient.setColorAt(0.8, QColor(255, 0, 0))
+        # colorGradient.setColorAt(0.6, QColor(255, 0, 255))
+        # colorGradient.setColorAt(0, QColor(0, 255, 0))
+        # colorGradient.setColorAt(0.2, QColor(255, 255, 0))
+        # colorGradient.setColorAt(0.4, QColor(0, 0, 255))
+        # # colorGradient.setColorAt(0.6, QColor(255, 0, 255))
+        # # colorGradient.setColorAt(0.8, QColor(255, 0, 0))
+        # colorGradient.setColorAt(1, QColor(0, 255, 255))
 
         p = QPixmap(width, height)
         p.fill(Qt.white)
