@@ -13,6 +13,7 @@ from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QT
 
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, LayerGroup, mode_mappings
+from keymappings import key_mappings
 from styles.main import main_style
 from tool import Tool
 from ui import mainwindow_newui
@@ -53,6 +54,8 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.signaler = MainSignaler()
         self.settings = {}
+        self.keylist = []
+        self.firstrelease = True
         self.setStyleSheet(main_style())
 
         # Ruler
@@ -86,11 +89,11 @@ class MainWindow(QMainWindow):
         )
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
-        toolbar = ToolSidebarWidget(
+        self.toolbar = ToolSidebarWidget(
             main_signaler=self.signaler,
             tool=self.tool
         )
-        self.ui.toolbarWidget.layout().addWidget(toolbar)
+        self.ui.toolbarWidget.layout().addWidget(self.toolbar)
 
         # Tool Options
         tool_options = ToolOptionsWidget(
@@ -175,6 +178,23 @@ class MainWindow(QMainWindow):
         self.tool.active_tool = self.active_tool
 
     # Overrides
+    def keyPressEvent(self, event):
+        print(event)
+        self.firstrelease = True
+        astr = event.key()
+        self.keylist.append(astr)
+
+    def keyReleaseEvent(self, event):
+        if self.firstrelease == True:
+            self.processmultikeys(self.keylist)
+
+        self.firstrelease = False
+
+        try:
+            del self.keylist[-1]
+        except:
+            pass
+
     def mouseMoveEvent(self, event: QMouseEvent):
         # print(self.get_workspace_dimensions(event))
         # print(event)
@@ -230,6 +250,32 @@ class MainWindow(QMainWindow):
     # SCRAP END
 
     # UTILITIES
+    def processmultikeys(self, keyspressed):
+        _keyspressed = [*keyspressed]
+        _keyspressed.sort()
+        command = '_'.join([str(k) for k in _keyspressed])
+        name = key_mappings(command)
+
+        if name == 'SWAP_SWATCHES':
+            self.toolbar.color_swatches.flip_active()
+            self.keylist = []
+            
+        # if name == 'NEW_FILE':
+        #     # new_file_widget = NewFileWidget(
+        #     #     self,
+        #     #     save=self.new_file,
+        #     # )
+        #     # new_file_widget.setModal(True)
+        #     # new_file_widget.show()
+        #     print('NEW FILE')
+        #     self.keylist = []
+        # elif name == 'HIDE_RULERS':
+        #     current_tab = self.ui.workspaceTabWidget.currentWidget()
+        #     current_tab.toggle_rulers()
+        # else:
+        #     # self.on_toolbar_icon_click(name)
+        #     self.keylist = []
+
     def draw_grid(self, grid_width=50):
         # TODO: Create layer for QLabel that is always present when document is open.
         # Replace all references to self.layers[0]

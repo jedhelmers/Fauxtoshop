@@ -11,9 +11,11 @@ from widgets.tools.text_options import TextOptionsWidget
 
 
 class ColorSwatch(QGraphicsRectItem):
-    def __init__(self, callback):
+    def __init__(self, callback, index, set_active):
         super().__init__()
         self.callback = callback
+        self.index = index
+        self.set_active = set_active
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         # Call callback function
@@ -22,7 +24,8 @@ class ColorSwatch(QGraphicsRectItem):
             self.callback(self.brush().color(), self)
 
         # Set z value so swatch is on top
-        self.setZValue(1)
+        # self.setZValue(1)
+        # self.set_active(self.index)
         
         return super().mousePressEvent(event)
 
@@ -31,32 +34,57 @@ class ColorSwatch(QGraphicsRectItem):
 
 
 class ColorSwatches(QGraphicsScene):
-    def __init__(self, set_color):
-        super().__init__()
+    def __init__(self, parent, set_color):
+        super().__init__(parent=parent)
         self.set_color = set_color
+        self.active_swatch = None
+
         self.setBackgroundBrush(Qt.transparent)
         self.background_color = QColor(255, 255, 255)
         self.foreground_color = QColor(0, 0, 0)
 
         # view.setScene(scene)
-        front = ColorSwatch(self.set_color)
-        front.setBrush(self.background_color)
-        front.setRect(QRect(0, 0, 19, 19))
+        self.front = ColorSwatch(self.set_color, 0, self.set_active)
+        self.front.setBrush(self.background_color)
+        self.front.setRect(QRect(0, 0, 19, 19))
 
-        back = ColorSwatch(self.set_color)
-        back.setRect(QRect(10, 10, 19, 19))
-        back.setBrush(self.foreground_color)
+        self.back = ColorSwatch(self.set_color, 1, self.set_active)
+        self.back.setRect(QRect(10, 10, 19, 19))
+        self.back.setBrush(self.foreground_color)
 
-        self.addItem(front)
-        self.addItem(back)
+        self.addItem(self.back)
+        self.addItem(self.front)
+
+        self.active_swatch = self.front
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        # self.reset_z_index()
+
+        if self.set_color:
+            self.set_color(self.active_swatch.brush().color(), self)
+
+        return super().mousePressEvent(event)
+
+    def reset_z_index(self):
         # Reset ALL z values to 0
         for child in self.items():
             child.setZValue(0)
 
-        return super().mousePressEvent(event)
+    def flip_active(self):
+        current_index = self.active_swatch.index
+        self.reset_z_index()
+        self.set_active(abs(current_index - 1))
+        self.active_swatch.setZValue(1)
+        self.parent().tool.brush_color =  self.active_swatch.brush().color()
+        print('SWATCH COLOR', self.active_swatch.brush().color())
 
+    def set_active(self, index):
+        self.reset_z_index()
+
+        if index == 0:
+            self.active_swatch = self.front
+        else:
+            self.active_swatch = self.back
 
 
 class ToolSidebarWidget(QWidget):
@@ -82,8 +110,8 @@ class ToolSidebarWidget(QWidget):
         view.setMaximumHeight(40)
         view.setMaximumWidth(40)
         view.setStyleSheet('background: transparent;')
-        self.front_back_scene = ColorSwatches(self.set_color)
-        view.setScene(self.front_back_scene)
+        self.color_swatches = ColorSwatches(self, self.set_color)
+        view.setScene(self.color_swatches)
 
         self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count(), view)
 
@@ -117,7 +145,7 @@ class ToolSidebarWidget(QWidget):
 
         if color_picker.exec() == QDialog.Accepted:
             self.main_signaler.update_tool_property.emit({'key': 'brush_color', 'value': color_picker.new_color})
-            self.front_back_scene.foreground_color(color_picker.new_color)
+            self.color_swatches.active_swatch.set_color(color_picker.new_color)
             # self.main_signaler.update_tool_property.emit({'key': 'opacity', 'value': 0.10})
             pass
         else:
