@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QRect
-from PySide6.QtWidgets import QWidget, QGraphicsSceneMouseEvent, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QFrame, QLabel, QPushButton
-from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QWidget, QDialog, QGraphicsSceneMouseEvent, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QFrame, QLabel, QPushButton
+from PySide6.QtGui import QIcon, QColor
 
 from functions import new_file
 from ui import toolbarui
@@ -19,18 +19,36 @@ class ColorSwatch(QGraphicsRectItem):
         # Call callback function
         # TODO: maybe turn this into a signal
         if self.callback:
-            self.callback(self.brush().color())
+            self.callback(self.brush().color(), self)
 
         # Set z value so swatch is on top
         self.setZValue(1)
         
         return super().mousePressEvent(event)
 
+    def set_color(self, color):
+        self.setBrush(color)
+
 
 class ColorSwatches(QGraphicsScene):
-    def __init__(self):
+    def __init__(self, set_color):
         super().__init__()
+        self.set_color = set_color
         self.setBackgroundBrush(Qt.transparent)
+        self.background_color = QColor(255, 255, 255)
+        self.foreground_color = QColor(0, 0, 0)
+
+        # view.setScene(scene)
+        front = ColorSwatch(self.set_color)
+        front.setBrush(self.background_color)
+        front.setRect(QRect(0, 0, 19, 19))
+
+        back = ColorSwatch(self.set_color)
+        back.setRect(QRect(10, 10, 19, 19))
+        back.setBrush(self.foreground_color)
+
+        self.addItem(front)
+        self.addItem(back)
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         # Reset ALL z values to 0
@@ -38,6 +56,7 @@ class ColorSwatches(QGraphicsScene):
             child.setZValue(0)
 
         return super().mousePressEvent(event)
+
 
 
 class ToolSidebarWidget(QWidget):
@@ -63,18 +82,8 @@ class ToolSidebarWidget(QWidget):
         view.setMaximumHeight(40)
         view.setMaximumWidth(40)
         view.setStyleSheet('background: transparent;')
-        scene = ColorSwatches()
-        view.setScene(scene)
-        front = ColorSwatch(self.set_color)
-        front.setBrush(Qt.white)
-        front.setRect(QRect(0, 0, 19, 19))
-
-        back = ColorSwatch(self.set_color)
-        back.setRect(QRect(10, 10, 19, 19))
-        back.setBrush(Qt.black)
-
-        scene.addItem(front)
-        scene.addItem(back)
+        self.front_back_scene = ColorSwatches(self.set_color)
+        view.setScene(self.front_back_scene)
 
         self.ui.verticalLayout.insertWidget(self.ui.verticalLayout.count(), view)
 
@@ -100,10 +109,19 @@ class ToolSidebarWidget(QWidget):
         self._current_tool = tool
         self.select_tool()
 
-    def set_color(self, color):
-        print(color)
-        color_picker = ColorPickerWidget(self)
-        color_picker.show()
+    def set_color(self, color, swatch):
+        current_color = color
+        color_picker = ColorPickerWidget(self, current_color)
+        color_picker.setWindowFlags(Qt.Tool)
+        color_picker.setModal(True)
+
+        if color_picker.exec() == QDialog.Accepted:
+            self.main_signaler.update_tool_property.emit({'key': 'brush_color', 'value': color_picker.new_color})
+            self.front_back_scene.foreground_color(color_picker.new_color)
+            # self.main_signaler.update_tool_property.emit({'key': 'opacity', 'value': 0.10})
+            pass
+        else:
+            print('WOO')
 
     def on_toolbar_icon_click(self, name):
         self.current_tool = name

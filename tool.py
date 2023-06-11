@@ -21,7 +21,7 @@ class Tool(QWidget):
         self._layer = None
 
         # Brush settings
-        self.brush_color = QColor(150, 50, 50, 50)
+        self._brush_color = QColor(150, 50, 50, 50)
         self.hardness = 0.20
         self.brush_size = 80
         self.opacity = 1.0
@@ -45,7 +45,6 @@ class Tool(QWidget):
 
     @opacity.setter
     def opacity(self, opacity: float):
-        print(self.brush_color.alpha(), int(255 * opacity))
         self.brush_color.setAlpha(255 * opacity)
         self._opacity = opacity
         self.set_brush_shape()
@@ -85,10 +84,19 @@ class Tool(QWidget):
 
     @layer.setter
     def layer(self, layer):
-        print('78', layer)
         self._layer = layer
         # TODO: Brush mode
         self._mode = mode_mappings(layer.mode) if layer else None
+
+    @property
+    def brush_color(self):
+        return self._brush_color
+
+    @brush_color.setter
+    def brush_color(self, brush_color):
+        print('COLOR', brush_color)
+        self._brush_color = brush_color
+        self.set_brush_shape()
 
     def set_brush_shape(self):
         self.gradient = QRadialGradient(QPoint(0, 0), self.brush_size / 2)

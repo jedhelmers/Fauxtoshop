@@ -2,6 +2,7 @@ import json
 import random
 import sys
 from pathlib import Path
+from typing import Any
 
 import cv2
 import numpy as np
@@ -40,6 +41,7 @@ class MainSignaler(QtCore.QObject):
     update_layer_mode = QtCore.Signal(int, str)
     set_current_layer = QtCore.Signal(str)
     set_active_tool = QtCore.Signal(str)
+    update_tool_property = QtCore.Signal(dict)
 
 
 class MainWindow(QMainWindow):
@@ -109,6 +111,7 @@ class MainWindow(QMainWindow):
         self.signaler.hide_layer.connect(self.hide_layer)
         self.signaler.update_layer_mode.connect(self.update_layer_mode)
         self.signaler.set_active_tool.connect(self.set_active_tool)
+        self.signaler.update_tool_property.connect(self.update_tool_property)
 
         # TEMP
         document_dimensions = [800, 700]
@@ -291,6 +294,13 @@ class MainWindow(QMainWindow):
         self.scroll_area_size_pos = [*scroll_area_size, *scroll_area_point]
         # print(scroll_area_size, scroll_area_point)
         return [0, 0]
+    
+    # SIGNALS
+    def update_tool_property(self, obj: dict):
+        if obj['key'] == 'brush_color':
+            self.tool.brush_color = obj['value']
+        elif obj['key'] == 'opacity':
+            self.tool.opacity = obj['value']
 
     def set_active_tool(self, tool):
         self.active_tool = tool
