@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'color_picker.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.0
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,19 +15,21 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QRadioButton, QSizePolicy,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout,
+    QLabel, QLineEdit, QPushButton, QRadioButton,
+    QSizePolicy, QVBoxLayout, QWidget)
 
-class Ui_Form(object):
-    def setupUi(self, Form):
-        if not Form.objectName():
-            Form.setObjectName(u"Form")
-        Form.resize(546, 347)
-        self.onlyWebColorsCheckBox = QCheckBox(Form)
+class Ui_ColorPicker(object):
+    def setupUi(self, ColorPicker):
+        if not ColorPicker.objectName():
+            ColorPicker.setObjectName(u"ColorPicker")
+        ColorPicker.resize(546, 347)
+        ColorPicker.setMinimumSize(QSize(546, 347))
+        ColorPicker.setMaximumSize(QSize(546, 347))
+        self.onlyWebColorsCheckBox = QCheckBox(ColorPicker)
         self.onlyWebColorsCheckBox.setObjectName(u"onlyWebColorsCheckBox")
         self.onlyWebColorsCheckBox.setGeometry(QRect(10, 290, 281, 20))
-        self.widget = QWidget(Form)
+        self.widget = QWidget(ColorPicker)
         self.widget.setObjectName(u"widget")
         self.widget.setGeometry(QRect(10, 30, 287, 257))
         self.horizontalLayout_4 = QHBoxLayout(self.widget)
@@ -37,7 +39,17 @@ class Ui_Form(object):
         self.colorRangeWidget.setObjectName(u"colorRangeWidget")
         self.colorRangeWidget.setMinimumSize(QSize(255, 255))
         self.colorRangeWidget.setMaximumSize(QSize(255, 255))
-        self.colorRangeWidget.setStyleSheet(u"background: rgba(255, 255, 255, 100)")
+        self.colorRangeWidget.setStyleSheet(u"background: transparent")
+        self.gridLayout_4 = QGridLayout(self.colorRangeWidget)
+        self.gridLayout_4.setSpacing(0)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.colorGridLayout = QGridLayout()
+        self.colorGridLayout.setSpacing(0)
+        self.colorGridLayout.setObjectName(u"colorGridLayout")
+
+        self.gridLayout_4.addLayout(self.colorGridLayout, 0, 0, 1, 1)
+
 
         self.horizontalLayout_4.addWidget(self.colorRangeWidget)
 
@@ -45,11 +57,20 @@ class Ui_Form(object):
         self.hueScaleWidget.setObjectName(u"hueScaleWidget")
         self.hueScaleWidget.setMinimumSize(QSize(20, 255))
         self.hueScaleWidget.setMaximumSize(QSize(20, 16777215))
-        self.hueScaleWidget.setStyleSheet(u"background: rgba(255, 255, 255, 100)")
+        self.hueScaleWidget.setStyleSheet(u"background: transparent")
+        self.gridLayout_6 = QGridLayout(self.hueScaleWidget)
+        self.gridLayout_6.setSpacing(0)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.gridLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.colorScaleGridLayout = QGridLayout()
+        self.colorScaleGridLayout.setObjectName(u"colorScaleGridLayout")
+
+        self.gridLayout_6.addLayout(self.colorScaleGridLayout, 0, 0, 1, 1)
+
 
         self.horizontalLayout_4.addWidget(self.hueScaleWidget)
 
-        self.widget1 = QWidget(Form)
+        self.widget1 = QWidget(ColorPicker)
         self.widget1.setObjectName(u"widget1")
         self.widget1.setGeometry(QRect(309, 140, 221, 192))
         self.horizontalLayout_16 = QHBoxLayout(self.widget1)
@@ -369,7 +390,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_16.addLayout(self.verticalLayout_2)
 
-        self.widget2 = QWidget(Form)
+        self.widget2 = QWidget(ColorPicker)
         self.widget2.setObjectName(u"widget2")
         self.widget2.setGeometry(QRect(310, 30, 62, 98))
         self.verticalLayout_3 = QVBoxLayout(self.widget2)
@@ -387,6 +408,15 @@ class Ui_Form(object):
         self.newColorWidget.setMinimumSize(QSize(60, 32))
         self.newColorWidget.setMaximumSize(QSize(60, 32))
         self.newColorWidget.setStyleSheet(u"background: white")
+        self.gridLayout = QGridLayout(self.newColorWidget)
+        self.gridLayout.setSpacing(0)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.newColorLabel = QLabel(self.newColorWidget)
+        self.newColorLabel.setObjectName(u"newColorLabel")
+
+        self.gridLayout.addWidget(self.newColorLabel, 0, 0, 1, 1)
+
 
         self.verticalLayout_3.addWidget(self.newColorWidget)
 
@@ -395,6 +425,15 @@ class Ui_Form(object):
         self.currentColorWidget.setMinimumSize(QSize(60, 32))
         self.currentColorWidget.setMaximumSize(QSize(60, 32))
         self.currentColorWidget.setStyleSheet(u"background: black")
+        self.gridLayout_2 = QGridLayout(self.currentColorWidget)
+        self.gridLayout_2.setSpacing(0)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.currentColorLabel = QLabel(self.currentColorWidget)
+        self.currentColorLabel.setObjectName(u"currentColorLabel")
+
+        self.gridLayout_2.addWidget(self.currentColorLabel, 0, 0, 1, 1)
+
 
         self.verticalLayout_3.addWidget(self.currentColorWidget)
 
@@ -404,7 +443,7 @@ class Ui_Form(object):
 
         self.verticalLayout_3.addWidget(self.label_18)
 
-        self.widget3 = QWidget(Form)
+        self.widget3 = QWidget(ColorPicker)
         self.widget3.setObjectName(u"widget3")
         self.widget3.setGeometry(QRect(400, 10, 145, 134))
         self.verticalLayout_4 = QVBoxLayout(self.widget3)
@@ -432,43 +471,45 @@ class Ui_Form(object):
         self.verticalLayout_4.addWidget(self.colorLibrariesPushButton)
 
 
-        self.retranslateUi(Form)
+        self.retranslateUi(ColorPicker)
 
-        QMetaObject.connectSlotsByName(Form)
+        QMetaObject.connectSlotsByName(ColorPicker)
     # setupUi
 
-    def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.onlyWebColorsCheckBox.setText(QCoreApplication.translate("Form", u"Only Web Colors", None))
-        self.radioButton.setText(QCoreApplication.translate("Form", u"H:", None))
-        self.label_2.setText(QCoreApplication.translate("Form", u"\u00ba", None))
-        self.radioButton_2.setText(QCoreApplication.translate("Form", u"S:", None))
-        self.label_3.setText(QCoreApplication.translate("Form", u"%", None))
-        self.radioButton_3.setText(QCoreApplication.translate("Form", u"B:", None))
-        self.label_4.setText(QCoreApplication.translate("Form", u"%", None))
-        self.radioButton_4.setText(QCoreApplication.translate("Form", u"R:", None))
-        self.label_5.setText(QCoreApplication.translate("Form", u"\u00ba", None))
-        self.radioButton_5.setText(QCoreApplication.translate("Form", u"G:", None))
-        self.label_6.setText(QCoreApplication.translate("Form", u"\u00ba", None))
-        self.radioButton_6.setText(QCoreApplication.translate("Form", u"B:", None))
-        self.label_7.setText(QCoreApplication.translate("Form", u"\u00ba", None))
-        self.label_16.setText(QCoreApplication.translate("Form", u"#", None))
-        self.radioButton_12.setText(QCoreApplication.translate("Form", u"L:", None))
-        self.radioButton_9.setText(QCoreApplication.translate("Form", u"a:", None))
-        self.radioButton_10.setText(QCoreApplication.translate("Form", u"b:", None))
-        self.label_13.setText(QCoreApplication.translate("Form", u"C:", None))
-        self.label_8.setText(QCoreApplication.translate("Form", u"%", None))
-        self.label_11.setText(QCoreApplication.translate("Form", u"M:", None))
-        self.label_9.setText(QCoreApplication.translate("Form", u"%", None))
-        self.label_10.setText(QCoreApplication.translate("Form", u"Y:", None))
-        self.label_12.setText(QCoreApplication.translate("Form", u"%", None))
-        self.label_14.setText(QCoreApplication.translate("Form", u"K:", None))
-        self.label_15.setText(QCoreApplication.translate("Form", u"%", None))
-        self.label_17.setText(QCoreApplication.translate("Form", u"new", None))
-        self.label_18.setText(QCoreApplication.translate("Form", u"current", None))
-        self.okPushButton.setText(QCoreApplication.translate("Form", u"OK", None))
-        self.cancelPushButton.setText(QCoreApplication.translate("Form", u"Cancel", None))
-        self.addToSwatchesPushButton.setText(QCoreApplication.translate("Form", u"Add to Swatches", None))
-        self.colorLibrariesPushButton.setText(QCoreApplication.translate("Form", u"Color Libraries", None))
+    def retranslateUi(self, ColorPicker):
+        ColorPicker.setWindowTitle(QCoreApplication.translate("ColorPicker", u"Form", None))
+        self.onlyWebColorsCheckBox.setText(QCoreApplication.translate("ColorPicker", u"Only Web Colors", None))
+        self.radioButton.setText(QCoreApplication.translate("ColorPicker", u"H:", None))
+        self.label_2.setText(QCoreApplication.translate("ColorPicker", u"\u00ba", None))
+        self.radioButton_2.setText(QCoreApplication.translate("ColorPicker", u"S:", None))
+        self.label_3.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.radioButton_3.setText(QCoreApplication.translate("ColorPicker", u"B:", None))
+        self.label_4.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.radioButton_4.setText(QCoreApplication.translate("ColorPicker", u"R:", None))
+        self.label_5.setText(QCoreApplication.translate("ColorPicker", u"\u00ba", None))
+        self.radioButton_5.setText(QCoreApplication.translate("ColorPicker", u"G:", None))
+        self.label_6.setText(QCoreApplication.translate("ColorPicker", u"\u00ba", None))
+        self.radioButton_6.setText(QCoreApplication.translate("ColorPicker", u"B:", None))
+        self.label_7.setText(QCoreApplication.translate("ColorPicker", u"\u00ba", None))
+        self.label_16.setText(QCoreApplication.translate("ColorPicker", u"#", None))
+        self.radioButton_12.setText(QCoreApplication.translate("ColorPicker", u"L:", None))
+        self.radioButton_9.setText(QCoreApplication.translate("ColorPicker", u"a:", None))
+        self.radioButton_10.setText(QCoreApplication.translate("ColorPicker", u"b:", None))
+        self.label_13.setText(QCoreApplication.translate("ColorPicker", u"C:", None))
+        self.label_8.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.label_11.setText(QCoreApplication.translate("ColorPicker", u"M:", None))
+        self.label_9.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.label_10.setText(QCoreApplication.translate("ColorPicker", u"Y:", None))
+        self.label_12.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.label_14.setText(QCoreApplication.translate("ColorPicker", u"K:", None))
+        self.label_15.setText(QCoreApplication.translate("ColorPicker", u"%", None))
+        self.label_17.setText(QCoreApplication.translate("ColorPicker", u"new", None))
+        self.newColorLabel.setText("")
+        self.currentColorLabel.setText("")
+        self.label_18.setText(QCoreApplication.translate("ColorPicker", u"current", None))
+        self.okPushButton.setText(QCoreApplication.translate("ColorPicker", u"OK", None))
+        self.cancelPushButton.setText(QCoreApplication.translate("ColorPicker", u"Cancel", None))
+        self.addToSwatchesPushButton.setText(QCoreApplication.translate("ColorPicker", u"Add to Swatches", None))
+        self.colorLibrariesPushButton.setText(QCoreApplication.translate("ColorPicker", u"Color Libraries", None))
     # retranslateUi
 

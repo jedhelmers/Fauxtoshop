@@ -253,10 +253,11 @@ class Tool(QWidget):
 
             self.layer.image = image_to_pixmap(resultImage)
 
+            # cv2.Mat()
             # image = cv2.Mat(resultImage)
             # image = cv2.imread('images/example.png')
             # image = cv2.Mat(resultImage.width(), resultImage.height(), cv2.CV_16SC3, resultImage)
-            
+            # cv2.zeros(resultImage.width(), resultImage.height(), cv2.CV_32F)
             # class QImage(
             #     data: bytes,
             #     width: int,
