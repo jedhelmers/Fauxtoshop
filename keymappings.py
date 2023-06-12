@@ -24,6 +24,7 @@ def key_mappings(key):
         # MAIN FUNCTIONS
         '78_16777249': 'NEW_FILE',
         '88': 'SWAP_SWATCHES',
+        '39_16777249': 'GRID',
         # WORKSPACE
         '82_16777249': 'HIDE_RULERS',
         '78_16777248_16777249': 'NEW_LAYER',

@@ -167,9 +167,9 @@ class Tool(QWidget):
         if self.layer and self.active_tool in switch:
             switch[self.active_tool](event)
 
-    def image_to_pixmap(self, image) -> QPixmap:
-        if image:
-            return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+    # def image_to_pixmap(self, image) -> QPixmap:
+    #     if image:
+    #         return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
     def move(self, event):
         self.down_mouse_pos = [
@@ -208,7 +208,7 @@ class Tool(QWidget):
     #     # painter.translate(self.last_x, self.last_y)
     #     painter.drawPixmap(x, y, self.layer.image)
     #     painter.end()
-    #     self.layer.image = self.image_to_pixmap(resultImage)
+    #     self.layer.image = image_to_pixmap(resultImage)
 
     def brush(self, event):
         if self.layer and self.layer.image:
@@ -251,19 +251,40 @@ class Tool(QWidget):
             self.last_x = x
             self.last_y = y
 
-            self.layer.image = self.image_to_pixmap(resultImage)
+            self.layer.image = image_to_pixmap(resultImage)
 
+            # image = cv2.Mat(resultImage)
             # image = cv2.imread('images/example.png')
-
+            # image = cv2.Mat(resultImage.width(), resultImage.height(), cv2.CV_16SC3, resultImage)
+            
+            # class QImage(
+            #     data: bytes,
+            #     width: int,
+            #     height: int,
+            #     bytesPerLine: int,
+            #     format: Format,
+            #     cleanupFunction: ((...) -> Any) | None = ...,
+            #     cleanupInfo: int | None = ...
+            # )
             # # Set blue, green and red channels to red channel
             # image[:, :, 0] = image[:, :, 2]
-            # # image[:, :, 1] = image[:, :, 2]
+            # image[:, :, 1] = image[:, :, 2]
+            # image[:, :, 0] = image[:, :, 0] / 5
+
+            # a = image[:, :, 1]
+            # b = 255 - (255 - image[:, :, 0]) / a
+
+            # image[:, :, 0] = b
+            # image[:, :, :] = 255 - image[:, :, :]
+
+            # # final = 
+            # # print(image)
 
             # height, width, channel = image.shape
             # bytesPerLine = 3 * width
             # qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
 
-            # self.layer.image = self.image_to_pixmap(qImg)
+            # self.layer.image = image_to_pixmap(qImg)
 
 
             # cv::Mat qimage_to_mat_cpy(QImage const &img, int format) {

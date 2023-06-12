@@ -229,12 +229,8 @@ class MainWindow(QMainWindow):
             name='Checkerboard',
         )
 
-        # Grid
-        self.grid = Layer(
-            image=self.draw_grid(20),
-            name='Grid',
-            mode='Multiply'
-        )
+        # Draw Grid
+        # self.create_grid()
 
         # Background layer
         background = Layer()
@@ -250,16 +246,33 @@ class MainWindow(QMainWindow):
     # SCRAP END
 
     # UTILITIES
+    def create_grid(self):
+        # Grid
+        self.grid = Layer(
+            image=self.draw_grid(20),
+            name='Grid',
+            mode='Multiply'
+        )
+
     def processmultikeys(self, keyspressed):
         _keyspressed = [*keyspressed]
         _keyspressed.sort()
         command = '_'.join([str(k) for k in _keyspressed])
         name = key_mappings(command)
 
+        print(command)
+
         if name == 'SWAP_SWATCHES':
             self.toolbar.color_swatches.flip_active()
             self.keylist = []
-            
+        elif name == 'GRID':
+            if self.grid:
+                self.grid = None
+            else:
+                self.grid = self.draw_grid()
+        elif name == 'INVERT_IMAGE':
+            if self.current_layer:
+                pass
         # if name == 'NEW_FILE':
         #     # new_file_widget = NewFileWidget(
         #     #     self,
@@ -395,28 +408,30 @@ class MainWindow(QMainWindow):
         return self.image_to_pixmap(resultImage)
 
     def def_add_image(self, base_image: QPixmap=None, layer: Layer=None) -> QPixmap:
-        mode = mode_mappings(layer.mode)
+        if hasattr(layer, 'mode'):
+            mode = mode_mappings(layer.mode)
+            resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
 
-        resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        # painter.setCompositionMode(QPainter.CompositionMode_Source)
+            painter = QPainter(resultImage)
+            # painter.setCompositionMode(QPainter.CompositionMode_Source)
 
-        # Fill with background color
-        painter.fillRect(resultImage.rect(), QColor('#101010'))
+            # Fill with background color
+            painter.fillRect(resultImage.rect(), QColor('#101010'))
 
-        # painter.scale(*layer.scale)
-        # painter.translate(*layer.position)
+            # painter.scale(*layer.scale)
+            # painter.translate(*layer.position)
 
-        # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, base_image)
-        painter.setCompositionMode(mode)
-        painter.drawPixmap(0, 0, layer.image)
-        # painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        # painter.fillRect(resultImage.rect(), Qt.transparent)
-        painter.end()
+            # painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+            painter.drawPixmap(0, 0, base_image)
+            painter.setCompositionMode(mode)
+            painter.drawPixmap(0, 0, layer.image)
+            # painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+            # painter.fillRect(resultImage.rect(), Qt.transparent)
+            painter.end()
 
-        return self.image_to_pixmap(resultImage)
-        # return QPixmap(base_image.size()).fromImage(resultImage, Qt.ColorOnly)
+            return self.image_to_pixmap(resultImage)
+        else:
+            return base_image
 
     def new_layer(self, layer):
         self.layers += [layer]
