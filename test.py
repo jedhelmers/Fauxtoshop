@@ -1,40 +1,51 @@
 import numpy as np
-import cv2 as cv
+import cv2
+
+btn_down = False
+
+def get_points(im):
+    # Set up data to send to mouse handler
+    data = {}
+    data['im'] = im.copy()
+    data['lines'] = []
+
+    # Set the callback function for any mouse event
+    cv2.imshow("Image", im)
+    cv2.setMouseCallback("Image", mouse_handler, data)
+    cv2.waitKey(0)
+
+    # Convert array to np.array in shape n,2,2
+    points = np.uint16(data['lines'])
+
+    return points, data['im']
+
+def mouse_handler(event, x, y, flags, data):
+    global btn_down, points
+
+    if event == cv2.EVENT_LBUTTONUP and btn_down:
+        #if you release the button, finish the line
+        btn_down = False
+        data['lines'][0].append((x, y)) #append the seconf point
+        cv2.circle(data['im'], (x, y), 3, (0, 0, 255),5)
+        cv2.line(data['im'], data['lines'][0][0], data['lines'][0][1], (0,0,255), 2)
+        cv2.imshow("Image", data['im'])
+
+    elif event == cv2.EVENT_MOUSEMOVE and btn_down:
+        #thi is just for a ine visualization
+        image = data['im'].copy()
+        cv2.line(image, data['lines'][0][0], (x, y), (0,0,0), 1)
+        cv2.imshow("Image", image)
+
+    elif event == cv2.EVENT_LBUTTONDOWN and len(data['lines']) < 2:
+        btn_down = True
+        data['lines'].insert(0,[(x, y)]) #prepend the point
+        cv2.circle(data['im'], (x, y), 3, (0, 0, 255), 5, 16)
+        cv2.imshow("Image", data['im'])
 
 
-# https://docs.opencv.org/4.x/db/d5b/tutorial_py_mouse_handling.html
-
-
-drawing = False # true if mouse is pressed
-mode = True # if True, draw rectangle. Press 'm' to toggle to curve
-ix,iy = -1,-1
-# mouse callback function
-def draw_circle(event,x,y,flags,param):
-    global ix,iy,drawing,mode
-    if event == cv.EVENT_LBUTTONDOWN:
-        drawing = True
-        ix,iy = x,y
-    elif event == cv.EVENT_MOUSEMOVE:
-        if drawing == True:
-            if mode == True:
-                cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
-            else:
-                cv.circle(img,(x,y),5,(0,0,255),-1)
-    elif event == cv.EVENT_LBUTTONUP:
-        drawing = False
-        if mode == True:
-            cv.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
-        else:
-            cv.circle(img,(x,y),5,(0,0,255),-1)
-
-img = np.zeros((512,512,3), np.uint8)
-cv.namedWindow('image')
-cv.setMouseCallback('image',draw_circle)
-while(1):
-    cv.imshow('image',img)
-    k = cv.waitKey(1) & 0xFF
-    if k == ord('m'):
-        mode = not mode
-    elif k == 27:
-        break
-cv.destroyAllWindows()
+# Running the code
+img = cv2.imread('./images/example.png', 1)
+pts, final_image = get_points(img)
+cv2.imshow('Image', final_image)
+print(pts)
+cv2.waitKey(0)
