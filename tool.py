@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
+from PySide6.QtCore import QBuffer, QIODevice, QByteArray, QSize, QLineF, QPointF, Qt, QEvent, QPoint, QObject, QCoreApplication, QRect
 from PySide6.QtGui import QIcon, QPixmap, QColorSpace, QConicalGradient, QBrush, QRadialGradient, QImage, QPainter, QColor, QMouseEvent, qRgba, QPen
 from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
@@ -9,6 +9,8 @@ import numpy as np
 from datas.tools import get_tool_icon
 from datatypes.layer import Layer, mode_mappings
 from utils import image_to_pixmap
+
+BYTES_PER_LINE = 1
 
 class Tool(QWidget):
     def __init__(
@@ -119,7 +121,7 @@ class Tool(QWidget):
 
     def draw_cursor(self):
         tool = get_tool_icon(self.active_tool)
-        print('BUTTS', tool.name)
+        # print('BUTTS', tool.name)
         if tool.name == "brush":
             size = self.brush_size
             box_size = size * 1.3
@@ -253,56 +255,41 @@ class Tool(QWidget):
 
             self.layer.image = image_to_pixmap(resultImage)
 
-            # cv2.Mat()
-            # image = cv2.Mat(resultImage)
+            
             # image = cv2.imread('images/example.png')
-            # image = cv2.Mat(resultImage.width(), resultImage.height(), cv2.CV_16SC3, resultImage)
-            # cv2.zeros(resultImage.width(), resultImage.height(), cv2.CV_32F)
-            # class QImage(
-            #     data: bytes,
-            #     width: int,
-            #     height: int,
-            #     bytesPerLine: int,
-            #     format: Format,
-            #     cleanupFunction: ((...) -> Any) | None = ...,
-            #     cleanupInfo: int | None = ...
-            # )
-            # # Set blue, green and red channels to red channel
-            # image[:, :, 0] = image[:, :, 2]
-            # image[:, :, 1] = image[:, :, 2]
-            # image[:, :, 0] = image[:, :, 0] / 5
-
-            # a = image[:, :, 1]
-            # b = 255 - (255 - image[:, :, 0]) / a
-
-            # image[:, :, 0] = b
-            # image[:, :, :] = 255 - image[:, :, :]
-
-            # # final = 
-            # # print(image)
-
             # height, width, channel = image.shape
             # bytesPerLine = 3 * width
             # qImg = QImage(image.data, width, height, bytesPerLine, QImage.Format_RGB888).rgbSwapped()
 
             # self.layer.image = image_to_pixmap(qImg)
+            
 
+            def pixmap_to_mat(pixmap: QPixmap) -> cv2.Mat:
+                image = pixmap.toImage()
+                data = image.constBits()
+                arr = np.array(data).reshape(image.height(), image.width(), 4)
+                arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2BGR)
+                return cv2.Mat(arr)
 
-            # cv::Mat qimage_to_mat_cpy(QImage const &img, int format) {
-            #     return cv::Mat(img.height(), img.width(), format,
-            #                 const_cast<uchar*>(img.bits()),
-            #                 img.bytesPerLine()).clone();
-            # }
+            def mat_to_pixmap(mat: cv2.Mat) -> QPixmap:
+                # mat[:, :, 0] = mat[:, :, 2]
+                # mat[:, :, 1] = mat[:, :, 2]
+                # mat[:, :, 0] = mat[:, :, 0] / 5
 
-            # img = cv2.Mat(width, height, QImage.Format_RGB888, resultImage, bytesPerLine)
-            # resultImage.format(Qt.RGB888)
-            # print(resultImage.scanLine(0))
-            # img = cv2.Mat(resultImage.pixelFormat, cv2.COLOR_BGR2RGB)
-            # cv2.createMat()
-            # temp = resultImage.copy()
-            # image = cv2.CreateMat(temp.height(),temp.width(), cv2.CV_8UC3, temp.bits(),temp.bytesPerLine())
-            # cv2.cvtColor(image, image, cv2.CV_BGR2RGB)
-            # cv::Mat res(temp.height(),temp.width(),CV_8UC3,(uchar*)temp.bits(),temp.bytesPerLine());
-            # cvtColor(res, res,CV_BGR2RGB);
+                mat[:, :, 0] = mat[:, :, 0] * 0.99999
+                # mat[:, :, 1] = mat[:, :, 1] * 0.9999
+                # mat[:, :, 0] = mat[:, :, 0] * 1.01
+                # mat[:, :, 1] = mat[:, :, 1] * 1.01
+
+                height, width, channel = mat.shape
+                bytesPerLine = channel * width
+                qImg = QImage(mat.data, width, height, bytesPerLine, QImage.Format_RGB888)
+                return QPixmap.fromImage(qImg)
+
+            try:
+                thing = pixmap_to_mat(self.layer.image)
+                self.layer.image = mat_to_pixmap(thing)
+            except Exception as e:
+                print(e)
 
             # https://www.geeksforgeeks.org/opencv-alpha-blending-and-masking-of-images/#
