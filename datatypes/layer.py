@@ -1,9 +1,137 @@
 from dataclasses import dataclass
-from PySide6.QtGui import QPainter
 from typing import List
+
+import numpy as np
+import cv2
+from PySide6.QtGui import QPainter, QPixmap, QImage
+
 
 id = 0
 parent_id = 0
+
+class Layer:
+    pass
+
+@dataclass
+class ArtBoard:
+    def __init__(self):
+        self.width = 600
+        self.height = 600
+        self.channels = 4
+        self.layers: list[Layer] = []
+
+        self.initialize()
+        self.add_layer()
+        # self.add_layer()
+ 
+    def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
+        image = pixmap.toImage()
+        data = image.constBits()
+        arr = np.array(data).reshape(image.height(), image.width(), 4)
+        arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2BGR)
+        return cv2.Mat(arr)
+
+    def mat_to_pixmap(self, mat: cv2.Mat) -> QPixmap:
+        height, width, channel = mat.shape
+        bytesPerLine = channel * width
+        qImg = QImage(mat.data, width, height, bytesPerLine, QImage.Format_RGBA8888)
+        return QPixmap.fromImage(qImg)
+
+    def initialize(self):
+        background = np.zeros((self.width,self.height,self.channels), np.uint8)
+        background.fill(255)
+
+        self.layers.append(
+            Layer(
+                name='Background',
+                image=background
+            )
+        )
+
+    def add_layer(self):
+        image = np.zeros((self.width,self.height,self.channels), np.uint8)
+        image.fill(255)
+        image[:, :, 1] = image[:, :, 1] = 0
+        image[:, :, 3] = 0.25
+
+        height, width, channel = image.shape
+
+        image = cv2.circle(image, [height // 2, width // 2], 100, [255, 255, 255], -1)
+
+        self.layers.append(
+            Layer(
+                image=image,
+                opacity=0.25
+            )
+        )
+
+    def add_layers(self, front: Layer, background: cv2. Mat) -> cv2.Mat:
+        result = cv2.addWeighted(
+            front.image[..., :3],
+            front.opacity,
+            background[..., :3],
+            0.5,
+            0
+        )
+
+        try:
+            alphas = front.image[..., 3] + background[..., 3]
+            print('FRONT SHAPE', front.image[..., 3].shape)
+            print('BACK SHAPE', background[..., 3].shape)
+            # print(background[..., :3])
+            result[..., 3] = np.where(
+                alphas == 0,
+                0,
+                (
+                    front.image[..., 3] * 255 + background[..., 3] * 255 - front.image[..., 3] * background[..., 3]
+                ) / alphas
+            )
+        except Exception as e:
+            print(e)
+
+        return result
+
+    def composite_layers(self) -> cv2.Mat:
+        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
+        composite.fill(255)
+        composite[:, :, 3] = 1
+        # composite[:, :, 1] = composite[:, :, 1] / 2
+        # composite[:, :, 0] = 190
+        # composite[:, :, 2] = 190
+        # composite[:, :, 3] = 100
+        for layer in self.layers:
+            # layer.image[layer.image[:, :, 1:].all(axis=-1)] = 0
+            # composite[composite[:, :, 1:].all(axis=-1)] = 0
+            # composite = composite & layer.image
+
+            composite[:, :, 1] = composite[:, :, 1] * layer.opacity
+            composite[:, :, 0] = composite[:, :, 0] * layer.opacity
+            composite[:, :, 2] = composite[:, :, 2] * layer.opacity
+
+            # layer.image[:, :, 1] = layer.image[:, :, 1] * layer.opacity
+            # layer.image[:, :, 0] = layer.image[:, :, 0] * layer.opacity
+            # layer.image[:, :, 2] = layer.image[:, :, 2] * layer.opacity
+
+            composite = cv2.addWeighted(
+                layer.image,
+                1.0,
+                composite,
+                1.0,
+                0
+            )
+
+            # composite = (composite * 1) + (layer.image * layer.opacity)
+            # composite = self.add_layers(layer, composite)
+            pass
+        # composite = cv2.imread('images/example.png')
+        # composite = cv2.cvtColor(composite, cv2.COLOR_RGBA2BGR)
+        return composite
+
+
+    def render(self) -> QPixmap:
+        
+        return self.mat_to_pixmap(self.composite_layers())
+
 
 @dataclass
 class Layer:
@@ -44,7 +172,7 @@ class Layer:
             parent=None,
             effects=[],
             opacity=1.0,
-            ):
+        ):
         global id
         self.index = index
         if layer_id is None:

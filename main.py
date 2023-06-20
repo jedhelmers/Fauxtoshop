@@ -12,7 +12,7 @@ from PySide6.QtGui import QIcon, QPixmap, QConicalGradient, QBrush, QRadialGradi
 from PySide6.QtWidgets import QMainWindow, QScrollArea, QFrame, QApplication, QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem, QPushButton, QWidget, QGridLayout, QLabel
 
 from datas.tools import get_tool_icon
-from datatypes.layer import Layer, LayerGroup, mode_mappings
+from datatypes.layer import ArtBoard, Layer, LayerGroup, mode_mappings
 from keymappings import key_mappings
 from styles.main import main_style
 from tool import Tool
@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
         self.ui.toolOptionsWidget.layout().addWidget(tool_options)
 
         # DATA
+        self.artboard = ArtBoard()
         self.layers = []
         self.current_layer = None
 
@@ -481,7 +482,7 @@ class MainWindow(QMainWindow):
 
     def set_current_layer(self, layer):
         self.current_layer = layer
-        print('480 layer', layer)
+        # print('480 layer', layer)
         self.windows['layers_widget'].current_layer = self.current_layer
 
     def render_layers(self):
@@ -599,14 +600,15 @@ class MainWindow(QMainWindow):
 
     # MAIN RENDER
     def render(self):
-        res = self.render_layers()
-        res = self.crop_workspace(res)
+        # res = self.render_layers()
+        # res = self.crop_workspace(res)
 
-        if self.grid:
-            res = self.def_add_image(res, self.grid)
+        # if self.grid:
+        #     res = self.def_add_image(res, self.grid)
 
-        if res:
-            self.label.setPixmap(res)
+        # if res:
+        #     self.label.setPixmap(res)
+        self.label.setPixmap(self.artboard.render())
 
 
 def main():
