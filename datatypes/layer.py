@@ -21,7 +21,9 @@ class ArtBoard:
         self.layers: list[Layer] = []
 
         self.initialize()
-        self.add_layer()
+        self.layers.append(
+            self.new_layer()
+        )
         # self.add_layer()
 
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
@@ -48,11 +50,11 @@ class ArtBoard:
             )
         )
 
-    def add_layer(self):
+    def new_layer(self):
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = image[:, :, 1] = 0
-        image[:, :, 3] = 0.25
+        image[:, :, 3] = 0.25 * 255
 
         height, width, channel = image.shape
 
@@ -60,12 +62,10 @@ class ArtBoard:
 
         image = self.add_circle_mask(image)
 
-        self.layers.append(
-            Layer(
+        return Layer(
                 image=image,
                 opacity=0.25
             )
-        )
 
     def add_circle_mask(self, img):
         # Get the dimensions of the image
@@ -123,14 +123,14 @@ class ArtBoard:
         norm_alpha2 = alpha2 / 255.0
 
         # Combine the images with varying opacities
-        result = cv2.addWeighted(img1, norm_alpha1, img2, norm_alpha2, 0)
+        result = cv2.addWeighted(img1, norm_alpha1, img2, norm_alpha2, 1)
 
         return result
 
     def composite_layers(self) -> cv2.Mat:
         composite = np.zeros((self.width,self.height,self.channels), np.uint8)
         composite.fill(255)
-        # composite[:, :, 3] = 1
+        composite[:, :, 3] = 255
         # composite[:, :, 1] = composite[:, :, 1] / 2
         # composite[:, :, 0] = 190
         # composite[:, :, 2] = 190
@@ -152,21 +152,22 @@ class ArtBoard:
             # composite[:, :, 3] = ~mask
 
             # composite = cv2.addWeighted(
-            #     layer.image,
-            #     1.0,
             #     composite,
-            #     1.0,
+            #     (1.0 - layer.opacity),
+            #     layer.image,
+            #     layer.opacity,
             #     0
             # )
 
-            # composite = np.add(~layer.image, composite)
-            composite = self.composite_images(layer.image, composite, 100, 205)
+            composite = np.bitwise_and(layer.image, composite)
+            # composite = self.composite_images(layer.image, composite, layer.opacity * 255, 255 - (layer.opacity * 255))
 
             # composite = (composite * 1) + (layer.image * layer.opacity)
             # composite = self.add_layers(layer, composite)
             pass
         # composite = cv2.imread('images/example.png')
         # composite = cv2.cvtColor(composite, cv2.COLOR_RGBA2BGR)
+        # return self.new_layer().image
         return composite
 
 
