@@ -23,7 +23,7 @@ class ArtBoard:
         self.initialize()
         self.add_layer()
         # self.add_layer()
- 
+
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
         image = pixmap.toImage()
         data = image.constBits()
@@ -56,7 +56,9 @@ class ArtBoard:
 
         height, width, channel = image.shape
 
-        image = cv2.circle(image, [height // 2, width // 2], 100, [255, 255, 255], -1)
+        # image = cv2.circle(image, [height // 2, width // 2], 100, [255, 255, 255], -1)
+
+        image = self.add_circle_mask(image)
 
         self.layers.append(
             Layer(
@@ -64,6 +66,30 @@ class ArtBoard:
                 opacity=0.25
             )
         )
+
+    def add_circle_mask(self, img):
+        # Get the dimensions of the image
+        height, width = img.shape[:2]
+
+        # Create a black mask with the same size as the image
+        mask = np.zeros((height, width), dtype=np.uint8)
+
+        # Draw a white circle in the center of the mask
+        center = (int(width/2), int(height/2))
+        radius = int(min(height, width)/4)
+        cv2.circle(mask, center, radius, (255, 255, 255), -1)
+
+        # Apply the mask to the image
+        result = cv2.bitwise_and(img, img, mask=mask)
+
+        return result
+
+    def get_alpha_channel(self, img):
+        # Split the image into color and alpha channels
+        _, _, _, alpha = cv2.split(img)
+
+        # Return the alpha channel as a grayscale image
+        return alpha
 
     def add_layers(self, front: Layer, background: cv2. Mat) -> cv2.Mat:
         result = cv2.addWeighted(
@@ -91,10 +117,20 @@ class ArtBoard:
 
         return result
 
+    def composite_images(self, img1, img2, alpha1, alpha2):
+        # Normalize the alpha values
+        norm_alpha1 = alpha1 / 255.0
+        norm_alpha2 = alpha2 / 255.0
+
+        # Combine the images with varying opacities
+        result = cv2.addWeighted(img1, norm_alpha1, img2, norm_alpha2, 0)
+
+        return result
+
     def composite_layers(self) -> cv2.Mat:
         composite = np.zeros((self.width,self.height,self.channels), np.uint8)
         composite.fill(255)
-        composite[:, :, 3] = 1
+        # composite[:, :, 3] = 1
         # composite[:, :, 1] = composite[:, :, 1] / 2
         # composite[:, :, 0] = 190
         # composite[:, :, 2] = 190
@@ -104,21 +140,27 @@ class ArtBoard:
             # composite[composite[:, :, 1:].all(axis=-1)] = 0
             # composite = composite & layer.image
 
-            composite[:, :, 1] = composite[:, :, 1] * layer.opacity
-            composite[:, :, 0] = composite[:, :, 0] * layer.opacity
-            composite[:, :, 2] = composite[:, :, 2] * layer.opacity
+            # composite[:, :, 1] = composite[:, :, 1] * layer.opacity
+            # composite[:, :, 0] = composite[:, :, 0] * layer.opacity
+            # composite[:, :, 2] = composite[:, :, 2] * layer.opacity
 
             # layer.image[:, :, 1] = layer.image[:, :, 1] * layer.opacity
             # layer.image[:, :, 0] = layer.image[:, :, 0] * layer.opacity
             # layer.image[:, :, 2] = layer.image[:, :, 2] * layer.opacity
 
-            composite = cv2.addWeighted(
-                layer.image,
-                1.0,
-                composite,
-                1.0,
-                0
-            )
+            # mask = self.get_alpha_channel(layer.image)
+            # composite[:, :, 3] = ~mask
+
+            # composite = cv2.addWeighted(
+            #     layer.image,
+            #     1.0,
+            #     composite,
+            #     1.0,
+            #     0
+            # )
+
+            # composite = np.add(~layer.image, composite)
+            composite = self.composite_images(layer.image, composite, 100, 205)
 
             # composite = (composite * 1) + (layer.image * layer.opacity)
             # composite = self.add_layers(layer, composite)
