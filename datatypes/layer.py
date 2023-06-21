@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from PySide6.QtGui import QPainter, QPixmap, QImage
 
+from modes import get_mode
 
 id = 0
 parent_id = 0
@@ -58,17 +59,13 @@ class ArtBoard:
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = image[:, :, 1] = 0
-        # image[:, :, 3] = 0.5 * 255
-
-        height, width, channel = image.shape
-
-        # image = cv2.circle(image, [height // 2, width // 2], 100, [255, 255, 255], -1)
 
         image = self.add_circle_mask(image)
 
         return Layer(
                 image=image,
-                opacity=0.5
+                opacity=0.5,
+                # mode='Multiply'
             )
 
     def add_circle_mask(self, img):
@@ -88,40 +85,6 @@ class ArtBoard:
 
         return result
 
-    def get_alpha_channel(self, img):
-        # Split the image into color and alpha channels
-        _, _, _, alpha = cv2.split(img)
-
-        # Return the alpha channel as a grayscale image
-        return alpha
-
-    def composite_images(self, image_1, image_2):
-        # store the alpha channels only
-        m1 = image_1[:,:,3]
-        m2 = image_2[:,:,3]
-
-        # invert the alpha channel and obtain 3-channel mask of float data type
-        m1 = cv2.bitwise_not(m1)
-        alpha1i = cv2.cvtColor(m1, cv2.COLOR_GRAY2BGRA)/255.0
-
-        m2 = cv2.bitwise_not(m2)
-        alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
-
-        # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
-        b1i = cv2.convertScaleAbs(image_2*(1-alpha2i) + image_1*alpha2i)
-
-        # Finding common ground between both the inverted alpha channels
-        mul = cv2.multiply(alpha1i,alpha2i)
-
-        # converting to 8-bit
-        mulint = cv2.normalize(mul, dst=None, alpha=0, beta=255,norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-
-        # again create 3-channel mask of float data type
-        alpha = cv2.cvtColor(mulint[:,:,2], cv2.COLOR_GRAY2BGRA)/255.0
-
-        # perform blending using previous output and multiplied result
-        return cv2.convertScaleAbs(b1i*(1-alpha) + mulint*alpha)
-
     def move_image(self, image, x_offset, y_offset):
         h, w = image.shape[:2]
 
@@ -138,8 +101,12 @@ class ArtBoard:
         for index, layer in enumerate(self.layers):
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
             layer.image = self.move_image(layer.image, index * 30, index * 30)
-            composite = self.composite_images(composite, layer.image)
-            print(layer.name, layer.mode)
+
+            if index == 1:
+                layer.mode = 'Multiply'
+
+            composite = get_mode(layer.mode)(composite, layer.image)
+            print(layer.name, layer.opacity, layer.mode)
 
         return composite
 
