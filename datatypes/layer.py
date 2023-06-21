@@ -64,7 +64,7 @@ class ArtBoard:
 
         return Layer(
                 image=image,
-                opacity=0.5,
+                opacity=0.7,
                 # mode='Multiply'
             )
 
@@ -103,7 +103,7 @@ class ArtBoard:
             layer.image = self.move_image(layer.image, index * 30, index * 30)
 
             if index == 1:
-                layer.mode = 'Multiply'
+                layer.mode = 'Subtract'
 
             composite = get_mode(layer.mode)(composite, layer.image)
             print(layer.name, layer.opacity, layer.mode)
