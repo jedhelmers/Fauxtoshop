@@ -47,6 +47,37 @@ def multiply(image_1, image_2):
 def divide(a, b):
     return a[:, :, :] / b[:, :, :]
 
+def subtract(image_1, image_2):
+    # store the alpha channels only
+    m1 = image_1[:,:,3]
+    m2 = image_2[:,:,3]
+
+    # invert the alpha channel and obtain 3-channel mask of float data type
+    m1 = cv2.bitwise_not(m1)
+    alpha1i = cv2.cvtColor(m1, cv2.COLOR_GRAY2BGRA)/255.0
+
+    m2 = cv2.bitwise_not(m2)
+    alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
+
+    # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
+    # b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) + image_1 * (alpha2i))
+    b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) - image_1 * (alpha2i))
+
+    # Finding common ground between both the inverted alpha channels
+    mul = cv2.multiply(alpha1i, alpha2i)
+
+    # converting to 8-bit
+    mulint = cv2.normalize(mul, dst=None, alpha=0, beta=255,norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+    # again create 3-channel mask of float data type
+    alpha = cv2.cvtColor(mulint[:,:,2], cv2.COLOR_GRAY2BGRA)/255.0
+
+    # perform blending using previous output and multiplied result
+    return cv2.convertScaleAbs(
+        cv2.subtract(b1i * (1 - alpha), mulint * (alpha))
+        # cv2.subtract(mulint * (alpha), b1i * (1 - alpha))
+    )
+
 def normal(image_1, image_2):
     # store the alpha channels only
     m1 = image_1[:,:,3]
@@ -60,7 +91,7 @@ def normal(image_1, image_2):
     alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
 
     # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
-    b1i = cv2.convertScaleAbs(image_2*(1-alpha2i) + image_1*alpha2i)
+    b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) + image_1 * (alpha2i))
 
     # Finding common ground between both the inverted alpha channels
     mul = cv2.multiply(alpha1i, alpha2i)
@@ -72,11 +103,14 @@ def normal(image_1, image_2):
     alpha = cv2.cvtColor(mulint[:,:,2], cv2.COLOR_GRAY2BGRA)/255.0
 
     # perform blending using previous output and multiplied result
-    return cv2.convertScaleAbs(b1i*(1-alpha) + mulint*alpha)
+    return cv2.convertScaleAbs(
+        cv2.add(b1i * (1 - alpha), mulint * (alpha))
+    )
 
 def get_mode(mode: str='Normal'):
     switch = {
         'Normal': normal,
+        'Subtract': subtract,
         'Multiply': multiply,
         'Divide': divide
     }
