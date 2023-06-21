@@ -19,13 +19,19 @@ class ArtBoard:
         self.height = 600
         self.channels = 4
         self.layers: list[Layer] = []
+        self.background: Layer = None
 
         self.initialize()
         self.layers.append(
             self.new_layer()
         )
-        # self.add_layer()
-
+        self.layers.append(
+            self.new_layer()
+        )
+        self.layers.append(
+            self.new_layer()
+        )
+        
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
         image = pixmap.toImage()
         data = image.constBits()
@@ -43,18 +49,16 @@ class ArtBoard:
         background = np.zeros((self.width,self.height,self.channels), np.uint8)
         background.fill(255)
 
-        self.layers.append(
-            Layer(
-                name='Background',
-                image=background
-            )
+        self.background = Layer(
+            name='Background',
+            image=background
         )
 
     def new_layer(self):
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = image[:, :, 1] = 0
-        image[:, :, 3] = 0.25 * 255
+        # image[:, :, 3] = 0.5 * 255
 
         height, width, channel = image.shape
 
@@ -64,7 +68,7 @@ class ArtBoard:
 
         return Layer(
                 image=image,
-                opacity=0.25
+                opacity=0.5
             )
 
     def add_circle_mask(self, img):
@@ -91,83 +95,52 @@ class ArtBoard:
         # Return the alpha channel as a grayscale image
         return alpha
 
-    def add_layers(self, front: Layer, background: cv2. Mat) -> cv2.Mat:
-        result = cv2.addWeighted(
-            front.image[..., :3],
-            front.opacity,
-            background[..., :3],
-            0.5,
-            0
-        )
+    def composite_images(self, image_1, image_2):
+        # store the alpha channels only
+        m1 = image_1[:,:,3]
+        m2 = image_2[:,:,3]
 
-        try:
-            alphas = front.image[..., 3] + background[..., 3]
-            print('FRONT SHAPE', front.image[..., 3].shape)
-            print('BACK SHAPE', background[..., 3].shape)
-            # print(background[..., :3])
-            result[..., 3] = np.where(
-                alphas == 0,
-                0,
-                (
-                    front.image[..., 3] * 255 + background[..., 3] * 255 - front.image[..., 3] * background[..., 3]
-                ) / alphas
-            )
-        except Exception as e:
-            print(e)
+        # invert the alpha channel and obtain 3-channel mask of float data type
+        m1 = cv2.bitwise_not(m1)
+        alpha1i = cv2.cvtColor(m1, cv2.COLOR_GRAY2BGRA)/255.0
 
-        return result
+        m2 = cv2.bitwise_not(m2)
+        alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
 
-    def composite_images(self, img1, img2, alpha1, alpha2):
-        # Normalize the alpha values
-        norm_alpha1 = alpha1 / 255.0
-        norm_alpha2 = alpha2 / 255.0
+        # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
+        b1i = cv2.convertScaleAbs(image_2*(1-alpha2i) + image_1*alpha2i)
 
-        # Combine the images with varying opacities
-        result = cv2.addWeighted(img1, norm_alpha1, img2, norm_alpha2, 1)
+        # Finding common ground between both the inverted alpha channels
+        mul = cv2.multiply(alpha1i,alpha2i)
 
-        return result
+        # converting to 8-bit
+        mulint = cv2.normalize(mul, dst=None, alpha=0, beta=255,norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+
+        # again create 3-channel mask of float data type
+        alpha = cv2.cvtColor(mulint[:,:,2], cv2.COLOR_GRAY2BGRA)/255.0
+
+        # perform blending using previous output and multiplied result
+        return cv2.convertScaleAbs(b1i*(1-alpha) + mulint*alpha)
+
+    def move_image(self, image, x_offset, y_offset):
+        h, w = image.shape[:2]
+
+        M = np.float32([
+            [1, 0, x_offset],
+            [0, 1, y_offset]
+        ])
+
+        return cv2.warpAffine(image, M, (w, h))
 
     def composite_layers(self) -> cv2.Mat:
-        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
-        composite.fill(255)
-        composite[:, :, 3] = 255
-        # composite[:, :, 1] = composite[:, :, 1] / 2
-        # composite[:, :, 0] = 190
-        # composite[:, :, 2] = 190
-        # composite[:, :, 3] = 100
-        for layer in self.layers:
-            # layer.image[layer.image[:, :, 1:].all(axis=-1)] = 0
-            # composite[composite[:, :, 1:].all(axis=-1)] = 0
-            # composite = composite & layer.image
+        composite = self.background.image
 
-            # composite[:, :, 1] = composite[:, :, 1] * layer.opacity
-            # composite[:, :, 0] = composite[:, :, 0] * layer.opacity
-            # composite[:, :, 2] = composite[:, :, 2] * layer.opacity
+        for index, layer in enumerate(self.layers):
+            layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+            layer.image = self.move_image(layer.image, index * 30, index * 30)
+            composite = self.composite_images(composite, layer.image)
+            print(layer.name, layer.mode)
 
-            # layer.image[:, :, 1] = layer.image[:, :, 1] * layer.opacity
-            # layer.image[:, :, 0] = layer.image[:, :, 0] * layer.opacity
-            # layer.image[:, :, 2] = layer.image[:, :, 2] * layer.opacity
-
-            # mask = self.get_alpha_channel(layer.image)
-            # composite[:, :, 3] = ~mask
-
-            # composite = cv2.addWeighted(
-            #     composite,
-            #     (1.0 - layer.opacity),
-            #     layer.image,
-            #     layer.opacity,
-            #     0
-            # )
-
-            composite = np.bitwise_and(layer.image, composite)
-            # composite = self.composite_images(layer.image, composite, layer.opacity * 255, 255 - (layer.opacity * 255))
-
-            # composite = (composite * 1) + (layer.image * layer.opacity)
-            # composite = self.add_layers(layer, composite)
-            pass
-        # composite = cv2.imread('images/example.png')
-        # composite = cv2.cvtColor(composite, cv2.COLOR_RGBA2BGR)
-        # return self.new_layer().image
         return composite
 
 
