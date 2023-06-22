@@ -110,7 +110,7 @@ class ArtBoard:
             if index == 2:
                 layer.mode = 'Subtract'
 
-            composite = get_mode(layer.mode)(composite, layer.image)
+            composite = get_mode(layer.mode)(layer.image, composite)
             print(index, layer.name, layer.opacity, layer.mode)
 
         return composite

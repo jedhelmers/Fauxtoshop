@@ -54,11 +54,11 @@ def subtract(a, b):
     black.fill(0)
     black[:, :, 3] = 255
 
-    # composite = normal(a, black)
-    composite = normal(black, b)
+    composite = normal(-a, black)
+    # composite = normal(black, a)
 
-    composite = normal(composite, ~b)
-    # composite = np.subtract(composite, b)
+    composite = np.subtract(b, composite)
+    
     return composite
 
     m1 = a[:,:,3]
@@ -105,10 +105,10 @@ def normal(a, b):
     alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
 
     # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
-    b1i = cv2.convertScaleAbs(a * (alpha2i) + b * (1 - alpha2i))
+    b1i = cv2.convertScaleAbs(b * (alpha1i) + a * (1 - alpha1i))
 
     # Finding common ground between both the inverted alpha channels
-    mul = cv2.multiply(alpha1i, alpha2i)
+    mul = cv2.multiply(alpha2i, alpha1i)
 
     # converting to 8-bit
     mulint = cv2.normalize(mul, dst=None, alpha=0, beta=255,norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
