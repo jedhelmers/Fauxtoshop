@@ -47,10 +47,22 @@ def multiply(image_1, image_2):
 def divide(a, b):
     return a[:, :, :] / b[:, :, :]
 
-def subtract(image_1, image_2):
+def subtract(a, b):
     # store the alpha channels only
-    m1 = image_1[:,:,3]
-    m2 = image_2[:,:,3]
+
+    black = np.zeros_like(a)
+    black.fill(0)
+    black[:, :, 3] = 255
+
+    composite = normal(a, black)
+    composite = normal(black, a)
+
+    composite = np.add(b, composite)
+    # composite = np.subtract(composite, b)
+    return composite
+
+    m1 = a[:,:,3]
+    m2 = b[:,:,3]
 
     # invert the alpha channel and obtain 3-channel mask of float data type
     m1 = cv2.bitwise_not(m1)
@@ -60,8 +72,9 @@ def subtract(image_1, image_2):
     alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
 
     # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
-    # b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) + image_1 * (alpha2i))
-    b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) - image_1 * (alpha2i))
+    b1i = cv2.convertScaleAbs(b * (1 - alpha2i) + a * (alpha2i))
+    # b1i = cv2.convertScaleAbs(b * (1 - alpha2i) - a * (alpha2i))
+    # b1i = cv2.convertScaleAbs(b * (1 - alpha2i) - a * (alpha2i))
 
     # Finding common ground between both the inverted alpha channels
     mul = cv2.multiply(alpha1i, alpha2i)
@@ -74,14 +87,15 @@ def subtract(image_1, image_2):
 
     # perform blending using previous output and multiplied result
     return cv2.convertScaleAbs(
-        cv2.subtract(b1i * (1 - alpha), mulint * (alpha))
-        # cv2.subtract(mulint * (alpha), b1i * (1 - alpha))
+        # cv2.subtraadct(b1i * (1 - alpha), mulint * (alpha))
+        cv2.subtract(mulint * (alpha), b1i * (1 - alpha))
     )
 
-def normal(image_1, image_2):
+def normal(a, b):
+    # return a + (b * (1 - a))
     # store the alpha channels only
-    m1 = image_1[:,:,3]
-    m2 = image_2[:,:,3]
+    m1 = a[:,:,3]
+    m2 = b[:,:,3]
 
     # invert the alpha channel and obtain 3-channel mask of float data type
     m1 = cv2.bitwise_not(m1)
@@ -91,7 +105,7 @@ def normal(image_1, image_2):
     alpha2i = cv2.cvtColor(m2, cv2.COLOR_GRAY2BGRA)/255.0
 
     # Perform blending and limit pixel values to 0-255 (convert to 8-bit)
-    b1i = cv2.convertScaleAbs(image_2 * (1 - alpha2i) + image_1 * (alpha2i))
+    b1i = cv2.convertScaleAbs(a * (alpha2i) + b * (1 - alpha2i))
 
     # Finding common ground between both the inverted alpha channels
     mul = cv2.multiply(alpha1i, alpha2i)

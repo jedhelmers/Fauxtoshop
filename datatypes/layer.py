@@ -50,10 +50,12 @@ class ArtBoard:
         background = np.zeros((self.width,self.height,self.channels), np.uint8)
         background.fill(255)
 
-        self.background = Layer(
+        background = Layer(
             name='Background',
             image=background
         )
+
+        self.layers.append(background)
 
     def new_layer(self):
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
@@ -96,17 +98,17 @@ class ArtBoard:
         return cv2.warpAffine(image, M, (w, h))
 
     def composite_layers(self) -> cv2.Mat:
-        composite = self.background.image
+        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
 
         for index, layer in enumerate(self.layers):
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, index * 30, index * 30)
+            layer.image = self.move_image(layer.image, (index - 1) * 30, (index - 1) * 30)
 
-            if index == 1:
+            if index == 2:
                 layer.mode = 'Subtract'
 
             composite = get_mode(layer.mode)(composite, layer.image)
-            print(layer.name, layer.opacity, layer.mode)
+            print(index, layer.name, layer.opacity, layer.mode)
 
         return composite
 
