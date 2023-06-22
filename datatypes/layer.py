@@ -99,7 +99,10 @@ class ArtBoard:
 
     def composite_layers(self) -> cv2.Mat:
         composite = np.zeros((self.width,self.height,self.channels), np.uint8)
+        composite.fill(255)
 
+        # self.layers[1].image[:, :, 3] = self.layers[1].image[:, :, 3] * self.layers[1].opacity
+        # composite = get_mode('Subtract')(composite, self.layers[1].image)
         for index, layer in enumerate(self.layers):
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
             layer.image = self.move_image(layer.image, (index - 1) * 30, (index - 1) * 30)

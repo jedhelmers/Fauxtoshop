@@ -54,10 +54,10 @@ def subtract(a, b):
     black.fill(0)
     black[:, :, 3] = 255
 
-    composite = normal(a, black)
-    composite = normal(black, a)
+    # composite = normal(a, black)
+    composite = normal(black, b)
 
-    composite = np.add(b, composite)
+    composite = normal(composite, ~b)
     # composite = np.subtract(composite, b)
     return composite
 
