@@ -27,10 +27,10 @@ class ArtBoard:
             self.new_layer()
         )
         self.layers.append(
-            self.new_layer()
+            self.new_layer('Subtract')
         )
         self.layers.append(
-            self.new_layer()
+            self.new_layer('Subtract')
         )
         
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
@@ -57,7 +57,7 @@ class ArtBoard:
 
         self.layers.append(background)
 
-    def new_layer(self):
+    def new_layer(self, mode='Normal'):
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = image[:, :, 1] = 0
@@ -66,8 +66,8 @@ class ArtBoard:
 
         return Layer(
                 image=image,
-                opacity=0.7,
-                # mode='Multiply'
+                opacity=0.5,
+                mode=mode
             )
 
     def add_circle_mask(self, img):
@@ -105,7 +105,7 @@ class ArtBoard:
         # composite = get_mode('Subtract')(composite, self.layers[1].image)
         for index, layer in enumerate(self.layers):
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, (index - 1) * 30, (index - 1) * 30)
+            layer.image = self.move_image(layer.image, (index - 1) * 35, (index - 1) * 35)
 
             if index == 2:
                 layer.mode = 'Subtract'
