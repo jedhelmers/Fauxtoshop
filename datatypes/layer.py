@@ -21,8 +21,8 @@ class ArtBoard:
         self.channels = 4
         self.layers: list[Layer] = []
         self.background: Layer = None
-        self.active_layer_index = 3
-        self.cache = []
+        self.active_layer_index = 2
+        self.cache = [None, None]
 
         self.initialize()
 
@@ -36,6 +36,15 @@ class ArtBoard:
         self.layers.append(
             self.new_layer(mode='Subtract', opacity=0.5)
         )
+        self.layers.append(
+            self.new_layer(opacity=0.5)
+        )
+        self.layers.append(
+            self.new_layer(opacity=0.5)
+        )
+
+        self.cache_layers()
+
         
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
         image = pixmap.toImage()
@@ -68,11 +77,13 @@ class ArtBoard:
 
         image = self.add_circle_mask(image)
 
-        return Layer(
+        layer = Layer(
                 image=image,
                 opacity=opacity,
                 mode=mode
             )
+
+        return layer
 
     def add_circle_mask(self, img):
         # Get the dimensions of the image
@@ -84,7 +95,7 @@ class ArtBoard:
         # Draw a white circle in the center of the mask
         center = (int(width/3), int(height/3))
         radius = int(min(height, width)/4)
-        cv2.circle(mask, center, radius, (255, 255, 255), -1)
+        cv2.circle(mask, center, radius, (255, 255, 255), -1, lineType=cv2.LINE_AA)
 
         # Apply the mask to the image
         result = cv2.bitwise_and(img, img, mask=mask)
@@ -101,21 +112,56 @@ class ArtBoard:
 
         return cv2.warpAffine(image, M, (w, h))
 
+    def cache_layers(self):
+        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
+        cnt = 0
+
+        x = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
+
+        # TODO: Track alpha too
+        # Do I need to add some kind of alpha channel to the Layer class?
+
+        for index, layer in enumerate(self.layers[:self.active_layer_index]):
+            layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+            layer.image = self.move_image(layer.image, *x[cnt])
+            composite = get_mode(layer.mode)(layer.image, composite)
+            # print(x[cnt])
+            cnt += 1
+        self.cache[0] = np.copy(composite)
+        composite.fill(0)
+        # cnt += 1
+
+        for index, layer in enumerate(self.layers[self.active_layer_index + 1:]):
+            layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+            layer.image = self.move_image(layer.image, *x[cnt])
+            composite = get_mode(layer.mode)(layer.image, composite)
+            # print(x[cnt])
+            cnt += 1
+        self.cache[1] = np.copy(composite)
+
+
     def composite_layers(self) -> cv2.Mat:
         composite = np.zeros((self.width,self.height,self.channels), np.uint8)
-        composite.fill(255)
+        # composite.fill(255)
+        out = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
 
-        # self.layers[1].image[:, :, 3] = self.layers[1].image[:, :, 3] * self.layers[1].opacity
-        # composite = get_mode('Subtract')(composite, self.layers[1].image)
-        for index, layer in enumerate(self.layers):
+        if False:
+            for index, layer in enumerate(self.layers):
+                layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+                # out.append([(index - 1) * 20, (index - 1) * 40])
+                layer.image = self.move_image(layer.image, *out[index])
+
+                composite = get_mode(layer.mode)(layer.image, composite)
+                print(index, layer.name, layer.opacity, layer.mode)
+
+            print(out)
+        else:
+            layer = self.layers[self.active_layer_index]
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, (index - 1) * 60, (index - 1) * 60)
-
-            if index == 2:
-                layer.mode = 'Subtract'
-
-            composite = get_mode(layer.mode)(layer.image, composite)
-            print(index, layer.name, layer.opacity, layer.mode)
+            # layer.image = self.move_image(layer.image, *[20, 40])
+            # composite = get _mode()(self.cache[1], self.cache[0])
+            composite = get_mode()(composite, self.cache[0])
+            composite = get_mode()(layer.image, self.cache[1])
 
         return composite
 
