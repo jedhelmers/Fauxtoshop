@@ -37,7 +37,7 @@ def subtract(a, b):
 
     m1 = a[:,:,3]
     a = normal(a, black)
-    a = gammaCorrection(a, 0.00001) 
+    a = gammaCorrection(a, 0.3) 
     a = cv2.bitwise_not(a)
 
     a[:, :, 3] = m1
@@ -76,7 +76,7 @@ def normal(a, b):
         cv2.add(b1i * (1 - alpha), mulint * (alpha))
     )
 
-    return gammaCorrection(output, 0.7)
+    return gammaCorrection(output, 0.9)
 
 def get_mode(mode: str='Normal'):
     switch = {

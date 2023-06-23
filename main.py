@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
         self.initialize_document(new_file_information)
         self.draw_rulers()
         self.generate_window_panels()
-        self.render()
+        # self.render()
 
         # Set focus to label widget
         self.ui.scrollArea.ensureWidgetVisible(self.label, 0, 0)

@@ -21,16 +21,20 @@ class ArtBoard:
         self.channels = 4
         self.layers: list[Layer] = []
         self.background: Layer = None
+        self.active_layer_index = 3
+        self.cache = []
 
         self.initialize()
+
+        # for i in range(2):
         self.layers.append(
-            self.new_layer()
+            self.new_layer(opacity=0.5)
         )
         self.layers.append(
-            self.new_layer('Subtract')
+            self.new_layer(mode='Subtract', opacity=0.5)
         )
         self.layers.append(
-            self.new_layer('Subtract')
+            self.new_layer(mode='Subtract', opacity=0.5)
         )
         
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
@@ -57,7 +61,7 @@ class ArtBoard:
 
         self.layers.append(background)
 
-    def new_layer(self, mode='Normal'):
+    def new_layer(self, mode='Normal', opacity=1.0):
         image = np.zeros((self.width,self.height,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = image[:, :, 1] = 0
@@ -66,7 +70,7 @@ class ArtBoard:
 
         return Layer(
                 image=image,
-                opacity=0.5,
+                opacity=opacity,
                 mode=mode
             )
 
@@ -78,7 +82,7 @@ class ArtBoard:
         mask = np.zeros((height, width), dtype=np.uint8)
 
         # Draw a white circle in the center of the mask
-        center = (int(width/2), int(height/2))
+        center = (int(width/3), int(height/3))
         radius = int(min(height, width)/4)
         cv2.circle(mask, center, radius, (255, 255, 255), -1)
 
@@ -105,7 +109,7 @@ class ArtBoard:
         # composite = get_mode('Subtract')(composite, self.layers[1].image)
         for index, layer in enumerate(self.layers):
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, (index - 1) * 35, (index - 1) * 35)
+            layer.image = self.move_image(layer.image, (index - 1) * 60, (index - 1) * 60)
 
             if index == 2:
                 layer.mode = 'Subtract'
