@@ -16,8 +16,8 @@ class Layer:
 @dataclass
 class ArtBoard:
     def __init__(self):
-        self.width = 600
-        self.height = 600
+        self.width = 1000
+        self.height = 500
         self.channels = 4
         self.layers: list[Layer] = []
         self.background: Layer = None
@@ -45,11 +45,13 @@ class ArtBoard:
 
         self.cache_layers()
 
+    def get_ratio(self) -> float:
+        return self.width / self.height
         
     def pixmap_to_mat(self, pixmap: QPixmap) -> cv2.Mat:
         image = pixmap.toImage()
         data = image.constBits()
-        arr = np.array(data).reshape(image.height(), image.width(), 4)
+        arr = np.array(data).reshape(image.width(), image.height(), 4)
         arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2BGR)
         return cv2.Mat(arr)
 
@@ -60,7 +62,7 @@ class ArtBoard:
         return QPixmap.fromImage(qImg)
 
     def initialize(self):
-        background = np.zeros((self.width,self.height,self.channels), np.uint8)
+        background = np.zeros((self.height,self.width,self.channels), np.uint8)
         background.fill(255)
 
         background = Layer(
@@ -71,9 +73,9 @@ class ArtBoard:
         self.layers.append(background)
 
     def new_layer(self, mode='Normal', opacity=1.0):
-        image = np.zeros((self.width,self.height,self.channels), np.uint8)
+        image = np.zeros((self.height,self.width,self.channels), np.uint8)
         image.fill(255)
-        image[:, :, 1] = image[:, :, 1] = 0
+        image[:, :, 1] = 0
 
         image = self.add_circle_mask(image)
 
@@ -113,7 +115,7 @@ class ArtBoard:
         return cv2.warpAffine(image, M, (w, h))
 
     def cache_layers(self):
-        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
+        composite = np.zeros((self.height,self.width,self.channels), np.uint8)
         cnt = 0
 
         x = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
@@ -141,18 +143,19 @@ class ArtBoard:
 
 
     def composite_layers(self) -> cv2.Mat:
-        composite = np.zeros((self.width,self.height,self.channels), np.uint8)
+        composite = np.zeros((self.height,self.width,self.channels), np.uint8)
         # composite.fill(255)
         out = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
 
-        if False:
+        if True:
             for index, layer in enumerate(self.layers):
-                layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-                # out.append([(index - 1) * 20, (index - 1) * 40])
-                layer.image = self.move_image(layer.image, *out[index])
+                if layer.show:
+                    layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+                    # out.append([(index - 1) * 20, (index - 1) * 40])
+                    layer.image = self.move_image(layer.image, *out[index])
 
-                composite = get_mode(layer.mode)(layer.image, composite)
-                print(index, layer.name, layer.opacity, layer.mode)
+                    composite = get_mode(layer.mode)(layer.image, composite)
+                    # print(index, layer.name, layer.opacity, layer.mode)
 
             print(out)
         else:

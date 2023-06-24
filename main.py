@@ -514,8 +514,7 @@ class MainWindow(QMainWindow):
         layers_widget = LayersWindowWidget(
             signaler=self.signaler,
             settings=self.settings,
-            current_layer=self.current_layer,
-            layers=self.layers
+            artboard=self.artboard
         )
 
         layers_widget.setMouseTracking(True)

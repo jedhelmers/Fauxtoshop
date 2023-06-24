@@ -1,3 +1,5 @@
+import cv2
+import numpy as np
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QSize, QPoint, QRect
 from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
@@ -19,8 +21,7 @@ class LayerSignaler(QtCore.QObject):
 class LayersWindowWidget(QWidget):
     def __init__(
             self,
-            layers,
-            current_layer,
+            artboard,
             settings,
             signaler=None
         ):
@@ -30,19 +31,20 @@ class LayersWindowWidget(QWidget):
 
         self.signaler = LayerSignaler()
         self.main_signaler = signaler
-        self.layers = layers
-        self.current_layer = current_layer
+        self.artboard = artboard
+        self.layers = artboard.layers
+        self.current_layer = self.artboard.active_layer_index
         self.settings = settings
 
         # Signals
-        self.signaler.update_selected_layer.connect(self.update_selected_layer)
-        self.signaler.hide_layer.connect(self.hide_layer)
+        # self.signaler.update_selected_layer.connect(self.update_selected_layer)
+        # self.signaler.hide_layer.connect(self.hide_layer)
 
-        # Clicks
-        self.ui.newLayerPushButton.clicked.connect(self.new_layer)
-        self.ui.deleteLayerPushButton.clicked.connect(self.delete_layer)
-        self.ui.layerLockPushButton.clicked.connect(self.lock_layer)
-        self.ui.modeComboBox.currentTextChanged.connect(self.update_layer_mode)
+        # # Clicks
+        # self.ui.newLayerPushButton.clicked.connect(self.new_layer)
+        # self.ui.deleteLayerPushButton.clicked.connect(self.delete_layer)
+        # self.ui.layerLockPushButton.clicked.connect(self.lock_layer)
+        # self.ui.modeComboBox.currentTextChanged.connect(self.update_layer_mode)
 
         # UI
         self.ui.modeComboBox.addItems(modes())
@@ -129,98 +131,104 @@ class LayersWindowWidget(QWidget):
 
         """)
 
-    @property
-    def current_layer(self):
-        return self._current_layer
+    # @property
+    # def current_layer(self):
+    #     return self._current_layer
 
-    @current_layer.setter
-    def current_layer(self, current_layer):
-        self._current_layer = current_layer
-        layer = self.get_layer()
-        if layer:
-            self.update_layer_mode(layer.mode)
-        print(self.current_layer)
+    # @current_layer.setter
+    # def current_layer(self, current_layer):
+    #     self._current_layer = current_layer
+    #     layer = self.get_layer()
+    #     if layer:
+    #         self.update_layer_mode(layer.mode)
+    #     print(self.current_layer)
 
-    def update_selected_layer(self):
-        self.update_layers_selected()
+    # def update_selected_layer(self):
+    #     self.update_layers_selected()
 
-    def new_layer(self):
-        layer = Layer()
-        layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
-        layer.image.fill(QColor(255, 255, 0, 100))
-        self.main_signaler.new_layer.emit(layer)
+    # def new_layer(self):
+    #     layer = Layer()
+    #     layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
+    #     layer.image.fill(QColor(255, 255, 0, 100))
+    #     self.main_signaler.new_layer.emit(layer)
 
-    def get_layer(self) -> LayerWidget:
-        return self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
+    # def get_layer(self) -> LayerWidget:
+    #     return self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)
 
-    def image_to_pixmap(self, image) -> QPixmap:
-        # TODO: Move this into a utils
-        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+    # def image_to_pixmap(self, image) -> QPixmap:
+    #     # TODO: Move this into a utils
+    #     return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
-    def merge_images(self, image_1, image_2, mode: str='Normal'):
-        # TODO: Move this into a utils
-        mode = QPainter.CompositionMode.CompositionMode_SourceOver
+    # def merge_images(self, image_1, image_2, mode: str='Normal'):
+    #     # TODO: Move this into a utils
+    #     mode = QPainter.CompositionMode.CompositionMode_SourceOver
 
-        resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
-        painter = QPainter(resultImage)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(resultImage.rect(), Qt.transparent)
+    #     resultImage = QImage(QSize(*self.settings['absolute_dimensions']), QImage.Format_ARGB32_Premultiplied)
+    #     painter = QPainter(resultImage)
+    #     painter.setCompositionMode(QPainter.CompositionMode_Source)
+    #     painter.fillRect(resultImage.rect(), Qt.transparent)
 
-        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
-        painter.drawPixmap(0, 0, image_1)
-        painter.setCompositionMode(mode)
-        painter.drawPixmap(0, 0, image_2)
-        painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
-        painter.fillRect(resultImage.rect(), Qt.white)
-        painter.end()
+    #     painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+    #     painter.drawPixmap(0, 0, image_1)
+    #     painter.setCompositionMode(mode)
+    #     painter.drawPixmap(0, 0, image_2)
+    #     painter.setCompositionMode(QPainter.CompositionMode_DestinationOver)
+    #     painter.fillRect(resultImage.rect(), Qt.white)
+    #     painter.end()
 
-        return self.image_to_pixmap(resultImage)
+    #     return self.image_to_pixmap(resultImage)
 
-    def generate_checkerboard(self, dimensions=[0, 0], checker_width=5, grid_cnt=10):
-        image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
-        image.fill(Qt.white)
-        painter = QPainter(image)
-        color = QColor(Qt.black)
-        color.setAlphaF(0.5)
+    # def generate_checkerboard(self, dimensions=[0, 0], checker_width=5, grid_cnt=10):
+    #     image = QImage(QSize(*dimensions), QImage.Format_ARGB32_Premultiplied)
+    #     image.fill(Qt.white)
+    #     painter = QPainter(image)
+    #     color = QColor(Qt.black)
+    #     color.setAlphaF(0.5)
 
-        for i in range(grid_cnt):
-            for j in range(grid_cnt):
-                color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
-                painter.fillRect(QRect(
-                    i * checker_width, j * checker_width,
-                    checker_width, checker_width
-                ), color)
+    #     for i in range(grid_cnt):
+    #         for j in range(grid_cnt):
+    #             color = QColor(0, 0, 0, 30) if (i + j) % 2 != 0 else QColor(0, 0, 0, 0)
+    #             painter.fillRect(QRect(
+    #                 i * checker_width, j * checker_width,
+    #                 checker_width, checker_width
+    #             ), color)
 
-        painter.end()
+    #     painter.end()
 
-        return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
+    #     return QPixmap(image.size()).fromImage(image, Qt.ColorOnly)
 
-    def update_layers_selected(self):
-        for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
-            child.selected(child.objectName == self.current_layer)
+    # def update_layers_selected(self):
+    #     for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
+    #         child.selected(child.objectName == self.current_layer)
 
-    def delete_layer(self):
-        layer = self.get_layer()
-        self.main_signaler.delete_layer.emit(layer.layer_id)
-        layer.setParent(None)
-        self.current_layer = None
+    # def delete_layer(self):
+    #     layer = self.get_layer()
+    #     self.main_signaler.delete_layer.emit(layer.layer_id)
+    #     layer.setParent(None)
+    #     self.current_layer = None
 
-    def hide_layer(self, layer_id):
-        self.main_signaler.hide_layer.emit(layer_id)
+    # def hide_layer(self, layer_id):
+    #     self.main_signaler.hide_layer.emit(layer_id)
 
-    def update_layer_mode(self, mode=None):
-        layer = self.get_layer()
-        if layer and mode:
-            self.ui.modeComboBox.setCurrentText(mode)
-            self.main_signaler.update_layer_mode.emit(layer.layer_id, mode)
+    # def update_layer_mode(self, mode=None):
+    #     layer = self.get_layer()
+    #     if layer and mode:
+    #         self.ui.modeComboBox.setCurrentText(mode)
+    #         self.main_signaler.update_layer_mode.emit(layer.layer_id, mode)
 
-    def lock_layer(self):
-        layer = self.get_layer()
-        self.main_signaler.lock_layer.emit(layer.layer_id)
+    # def lock_layer(self):
+    #     layer = self.get_layer()
+    #     self.main_signaler.lock_layer.emit(layer.layer_id)
 
-    def lock_layer_ui(self, layer):
-        lock = QIcon('images/window_lock.svg').pixmap(QSize(12, 12))
-        layer.ui.lockLabel.setPixmap(lock)
+    # def lock_layer_ui(self, layer):
+    #     lock = QIcon('images/window_lock.svg').pixmap(QSize(12, 12))
+    #     layer.ui.lockLabel.setPixmap(lock)
+
+    def mat_to_pixmap(self, mat: cv2.Mat) -> QPixmap:
+        height, width, channel = mat.shape
+        bytesPerLine = channel * width
+        qImg = QImage(mat.data, width, height, bytesPerLine, QImage.Format_RGBA8888)
+        return QPixmap.fromImage(qImg)
 
     def render_layers(self, index=0):
         # Remove all existing layers from layout
@@ -244,17 +252,28 @@ class LayersWindowWidget(QWidget):
             layer.setObjectName(l.name)
             self.ui.verticalLayout_3.insertWidget(index, layer)
 
-            # Thumbnails
-            if self.settings['aspect_ratio'][0] < self.settings['aspect_ratio'][1]:
-                layer.ui.thumbnailWidget.setFixedWidth(25 * self.settings['aspect_ratio'][0])
-            else:
-                layer.ui.thumbnailWidget.setFixedHeight(32 * self.settings['aspect_ratio'][1])
-
             # Lock UI
             if l.lock:
                 self.lock_layer_ui(layer)
 
             # Add thumbnail to thumbnailwidget
             thumb = QLabel(layer.ui.thumbnailWidget)
-            thumb.setPixmap(self.merge_images(self.generate_checkerboard(dimensions=self.settings['document_dimensions']), l.image))
+            background = np.zeros((self.artboard.width,self.artboard.height,self.artboard.channels), np.uint8)
+            background.fill(200)
+
+            ratio = self.artboard.get_ratio()
+            if ratio > 1:
+                width = 32
+                height = int(32 / ratio)
+            else:
+                width = int(32 * ratio)
+                height = 32
+
+            # Thumbnails
+            layer.ui.thumbnailWidget.setFixedWidth(width)
+            layer.ui.thumbnailWidget.setFixedHeight(height)
+
+            dim = (width, height)
+            thumb_image = cv2.resize(np.copy(l.image), dim, interpolation = cv2.INTER_AREA)
+            thumb.setPixmap(self.artboard.mat_to_pixmap(thumb_image))
 
