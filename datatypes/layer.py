@@ -19,6 +19,7 @@ class ArtBoard:
         self.width = 1000
         self.height = 500
         self.channels = 4
+        self.grid_size = 20
         self.layers: list[Layer] = []
         self.background: Layer = None
         self.active_layer_index = 2
@@ -31,7 +32,7 @@ class ArtBoard:
         self.new_layer(name='Background', opacity=0.5)
         self.new_layer(opacity=0.5)
         self.new_layer(mode='Subtract', opacity=0.5)
-        self.new_layer(mode='Subtract', opacity=0.5)
+        self.new_layer(mode='Subtract', opacity=0.5, is_selected=True)
         self.new_layer(opacity=0.5)        
         self.new_layer(opacity=0.5)
 
@@ -56,7 +57,7 @@ class ArtBoard:
     def initialize(self):
         self.layers.append(self.draw_checkerboard())
 
-    def new_layer(self, name=None, mode='Normal', opacity=1.0):
+    def new_layer(self, **kwargs):
         image = np.zeros((self.height,self.width,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = 0
@@ -65,9 +66,7 @@ class ArtBoard:
 
         layer = Layer(
                 image=image,
-                name=name,
-                opacity=opacity,
-                mode=mode,
+                **kwargs
                 # show=False
             )
 
@@ -131,16 +130,15 @@ class ArtBoard:
         image = np.zeros((self.height, self.width, self.channels), np.uint8)
         image.fill(255)
 
-        size = 20
         color_1 = (255, 255, 255, 255)
         color_2 = (248, 248, 248, 255)
 
-        for i in range(self.width // (size // 2)):
-            for j in range(self.height // (size // 2)):
+        for i in range(self.width // (self.grid_size // 2)):
+            for j in range(self.height // (self.grid_size // 2)):
                 color =  color_1 if (i + j) % 2 != 0 else color_2
                 image = cv2.rectangle(
                     image,
-                    ((i - 1) * size, (j - 1) * size, i * self.width, j * self.height),
+                    ((i - 1) * self.grid_size, (j - 1) * self.grid_size, i * self.width, j * self.height),
                     color,
                     -1
                 )
@@ -202,6 +200,7 @@ class Layer:
         'parent',
         'effects',
         'opacity',
+        'is_selected',
     ]
 
     def __init__(
@@ -222,6 +221,7 @@ class Layer:
             parent=None,
             effects=[],
             opacity=1.0,
+            is_selected=False,
         ):
         global id
         self.index = index
@@ -250,6 +250,7 @@ class Layer:
         self.parent = parent
         self.effects = effects
         self.opacity = opacity
+        self.is_selected = is_selected
 
 
 @dataclass

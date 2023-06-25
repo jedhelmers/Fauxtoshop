@@ -250,7 +250,8 @@ class LayersWindowWidget(QWidget):
                     'is_selected': False,
                     'hidden': not l.show,
                     'name': l.name,
-                    'mode': l.mode
+                    'mode': l.mode,
+                    'is_selected': l.is_selected
                 }
             )
             layer.setObjectName(l.name)

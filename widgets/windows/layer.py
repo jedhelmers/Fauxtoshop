@@ -49,6 +49,8 @@ class LayerWidget(QWidget):
 
         self.hidden = layer['hidden']
         self.is_selected = layer['is_selected']
+        # print('self.is_selected', self.is_selected)
+        self.selected()
         self.render()
 
         self.ui.hidePushButton.clicked.connect(self.show)
@@ -61,9 +63,9 @@ class LayerWidget(QWidget):
     def set_current_layer(self):
         self.main_signaler.set_current_layer.emit(self.objectName)
 
-    def selected(self, is_selected=False):
+    def selected(self):
         # TODO: Update list onClick, and NOT on addNewLayer
-        if is_selected:
+        if self.is_selected:
             self.setStyleSheet("""
             QWidget {
                 border: 1px solid rgba(0, 0, 0, .5);
@@ -79,7 +81,7 @@ class LayerWidget(QWidget):
                 border: none;
             }
             QWidget[objectName*=thumbnailWidget] {
-                border: 3px solid rgba(255, 255, 255, .5);
+                border: 1px solid rgba(255, 255, 255, .5);
             }
         """)
         else:
