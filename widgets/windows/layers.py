@@ -41,7 +41,7 @@ class LayersWindowWidget(QWidget):
         # self.signaler.hide_layer.connect(self.hide_layer)
 
         # # Clicks
-        # self.ui.newLayerPushButton.clicked.connect(self.new_layer)
+        self.ui.newLayerPushButton.clicked.connect(self.new_layer)
         # self.ui.deleteLayerPushButton.clicked.connect(self.delete_layer)
         # self.ui.layerLockPushButton.clicked.connect(self.lock_layer)
         # self.ui.modeComboBox.currentTextChanged.connect(self.update_layer_mode)
@@ -146,11 +146,15 @@ class LayersWindowWidget(QWidget):
     # def update_selected_layer(self):
     #     self.update_layers_selected()
 
-    # def new_layer(self):
-    #     layer = Layer()
-    #     layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
-    #     layer.image.fill(QColor(255, 255, 0, 100))
-    #     self.main_signaler.new_layer.emit(layer)
+    def new_layer(self):
+        # layer = Layer()
+        # layer.image = QPixmap(QSize(*self.settings['absolute_dimensions']))
+        # layer.image.fill(QColor(255, 255, 0, 100))
+        # self.main_signaler.new_layer.emit(layer)
+        print('WEE')
+        self.artboard.new_layer()
+        self.layers = self.artboard.layers
+        self.artboard.render()
 
     # def get_layer(self) -> LayerWidget:
     #     return self.ui.scrollAreaWidgetContents.findChild(LayerWidget, self.current_layer)

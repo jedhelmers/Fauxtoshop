@@ -27,23 +27,15 @@ class ArtBoard:
         self.initialize()
 
         # for i in range(2):
-        self.layers.append(
-            self.new_layer(opacity=0.5)
-        )
-        self.layers.append(
-            self.new_layer(mode='Subtract', opacity=0.5)
-        )
-        self.layers.append(
-            self.new_layer(mode='Subtract', opacity=0.5)
-        )
-        self.layers.append(
-            self.new_layer(opacity=0.5)
-        )
-        self.layers.append(
-            self.new_layer(opacity=0.5)
-        )
 
-        self.cache_layers()
+        self.new_layer(name='Background', opacity=0.5)
+        self.new_layer(opacity=0.5)
+        self.new_layer(mode='Subtract', opacity=0.5)
+        self.new_layer(mode='Subtract', opacity=0.5)
+        self.new_layer(opacity=0.5)        
+        self.new_layer(opacity=0.5)
+
+        # self.cache_layers()
 
     def get_ratio(self) -> float:
         return self.width / self.height
@@ -62,17 +54,9 @@ class ArtBoard:
         return QPixmap.fromImage(qImg)
 
     def initialize(self):
-        background = np.zeros((self.height,self.width,self.channels), np.uint8)
-        background.fill(255)
+        self.layers.append(self.draw_checkerboard())
 
-        background = Layer(
-            name='Background',
-            image=background
-        )
-
-        self.layers.append(background)
-
-    def new_layer(self, mode='Normal', opacity=1.0):
+    def new_layer(self, name=None, mode='Normal', opacity=1.0):
         image = np.zeros((self.height,self.width,self.channels), np.uint8)
         image.fill(255)
         image[:, :, 1] = 0
@@ -81,11 +65,13 @@ class ArtBoard:
 
         layer = Layer(
                 image=image,
+                name=name,
                 opacity=opacity,
-                mode=mode
+                mode=mode,
+                # show=False
             )
 
-        return layer
+        self.layers.append(layer)
 
     def add_circle_mask(self, img):
         # Get the dimensions of the image
@@ -141,18 +127,41 @@ class ArtBoard:
             cnt += 1
         self.cache[1] = np.copy(composite)
 
+    def draw_checkerboard(self):
+        image = np.zeros((self.height, self.width, self.channels), np.uint8)
+        image.fill(255)
+
+        size = 20
+        color_1 = (255, 255, 255, 255)
+        color_2 = (248, 248, 248, 255)
+
+        for i in range(self.width // (size // 2)):
+            for j in range(self.height // (size // 2)):
+                color =  color_1 if (i + j) % 2 != 0 else color_2
+                image = cv2.rectangle(
+                    image,
+                    ((i - 1) * size, (j - 1) * size, i * self.width, j * self.height),
+                    color,
+                    -1
+                )
+
+        return Layer(
+            image=image,
+            name='Checkerboard'
+        )
 
     def composite_layers(self) -> cv2.Mat:
         composite = np.zeros((self.height,self.width,self.channels), np.uint8)
         # composite.fill(255)
-        out = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
+        out = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160], [100, 180]]
 
         if True:
             for index, layer in enumerate(self.layers):
                 if layer.show:
                     layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
                     # out.append([(index - 1) * 20, (index - 1) * 40])
-                    layer.image = self.move_image(layer.image, *out[index])
+                    if layer.name != 'Checkerboard':
+                        layer.image = self.move_image(layer.image, *out[index])
 
                     composite = get_mode(layer.mode)(layer.image, composite)
                     # print(index, layer.name, layer.opacity, layer.mode)
