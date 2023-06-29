@@ -6,7 +6,7 @@ from time import sleep
 
 from queue import Queue
 
-MOUSE_DELAY = 0.2
+MOUSE_DELAY = 0.02
 
 
 class ArtBoard:
@@ -159,11 +159,11 @@ while(1):
 
         # print(parab_pts)
 
-        cv.polylines(temp_layer, [pts], False, (120,0,255), 3)
+        # cv.polylines(temp_layer, [pts], False, (120,0,255), 3)
         # img = cv.addWeighted(img, 0.7, temp_layer, 0.3, 0)
         # draw_y = np.polyval(1, draw_x)
         # pts = (np.asarray(pts).T).astype(np.int32)
-        # cv.polylines(img, [pts], False,(120,0,255),cv.INTER_AREA, 10)
+        cv.polylines(img, [pts], False,(120,0,255),cv.INTER_AREA, 10)
 
     if k == 27:
         should_end = True
