@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QSize, QPoint, QRect
 from PySide6.QtWidgets import QWidget, QMainWindow, QVBoxLayout, QDockWidget, QFrame, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen, QImage
 
-from datatypes.layer import Layer, modes, mode_mappings
+from datatypes.layer import Layer, modes, mode_mappings, ArtBoard
 from styles.window_panel import window_panel_style
 from ui.windows import layerswindowui
 from widgets.windows.layer import LayerWidget
@@ -21,7 +21,7 @@ class LayerSignaler(QtCore.QObject):
 class LayersWindowWidget(QWidget):
     def __init__(
             self,
-            artboard,
+            artboard: ArtBoard,
             settings,
             signaler=None
         ):
@@ -234,19 +234,24 @@ class LayersWindowWidget(QWidget):
         qImg = QImage(mat.data, width, height, bytesPerLine, QImage.Format_RGBA8888)
         return QPixmap.fromImage(qImg)
 
+    def set_index(self, index: int):
+        self.artboard.active_layer_index = index
+
     def render_layers(self, index=0):
         # Remove all existing layers from layout
         for child in self.ui.scrollAreaWidgetContents.findChildren(LayerWidget):
             child.setParent(None)
 
         # Add all layers to layout
-        for l in self.layers[1:]:
+        for index, l in enumerate(self.layers[1:]):
             layer = LayerWidget(
                 parent=self.ui.verticalLayout_3.widget(),
                 main_signaler=self.main_signaler,
                 layer_signaler=self.signaler,
                 layer_id=l.layer_id,
                 layer={
+                    'index': index,
+                    'set_active_layer_index': self.set_index,
                     'is_selected': False,
                     'hidden': not l.show,
                     'name': l.name,

@@ -21,7 +21,9 @@ class LayerWidget(QWidget):
         self.ui.setupUi(self)
         self.objectName = layer['name']
         self.layer_id = layer_id
+        self.index = layer['index']
         self.mode = layer['mode']
+        self.set_active_layer_index = layer['set_active_layer_index']
         self.main_signaler = main_signaler
         self.layer_signaler = layer_signaler
 
@@ -57,6 +59,8 @@ class LayerWidget(QWidget):
         self.ui.layerNameLabel.setText(layer['name'])
 
     def mousePressEvent(self, event):
+        print(self.index)
+        self.set_active_layer_index(self.index)
         self.main_signaler.set_current_layer.emit(self.objectName)
         self.layer_signaler.update_selected_layer.emit()
 
