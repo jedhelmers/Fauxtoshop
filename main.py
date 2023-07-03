@@ -82,10 +82,14 @@ class MainWindow(QMainWindow):
         # Windows
         self.windows = {}
 
+        # Artboard
+        self.artboard = ArtBoard()
+
         # Tools
         self.tool = Tool(
             self.ui.scrollArea,
             self.label,
+            self.artboard
         )
         self.tool.setMouseTracking(True)
         self.tool.active_tool = 'brush'
@@ -103,7 +107,6 @@ class MainWindow(QMainWindow):
         self.ui.toolOptionsWidget.layout().addWidget(tool_options)
 
         # DATA
-        self.artboard = ArtBoard()
         self.layers = []
         self.current_layer = None
 
@@ -200,7 +203,7 @@ class MainWindow(QMainWindow):
         # print(self.get_workspace_dimensions(event))
         # print(event)
         # self.get_workspace_dimensions(event)
-        # print(event.windowPos(), self.ui.scrollArea.geometry())
+        print(event.windowPos(), self.ui.scrollArea.geometry())
         self.tool.draw(event)
         self.render()
 

@@ -1,14 +1,67 @@
 from dataclasses import dataclass
+from queue import Queue
+from time import time
 from typing import List
 
-import numpy as np
 import cv2
+import numpy as np
+from pynput import mouse
 from PySide6.QtGui import QPainter, QPixmap, QImage
 
 from modes import get_mode
 
 id = 0
 parent_id = 0
+
+t = time()
+drawing = False
+middle_point = []
+last_point = []
+MOUSE_QUEUE = Queue()
+MOUSE_DELAY = 0.2
+
+def on_click(x, y, button, pressed):
+    global temp_layer, drawing, last_point, middle_point
+    drawing = pressed
+
+    # if pressed:
+    #     temp_layer = np.zeros((800, 800, 3), np.uint8)
+    #     middle_point = []
+    #     last_point = []
+    # else:
+    #     img = cv2.addWeighted(img, 0.7, temp_layer, 0.3, 0)
+
+def on_move(x, y):
+    global drawing, t, last_point, middle_point, MOUSE_DELAY
+    
+    if drawing:
+        t_2 = time()
+        if t_2 - t > MOUSE_DELAY:
+            t = t_2
+            if not middle_point:
+                middle_point = [x, y]
+            if not last_point:
+                last_point = [x, y]
+
+            MOUSE_QUEUE.put([[x, y], middle_point, last_point])
+
+            last_point = middle_point
+            middle_point = [x, y]
+
+listener = mouse.Listener(
+    on_move=on_move,
+    on_click=on_click,
+)
+listener.start()
+
+# while(1):
+#     k = cv2.waitKey(1) & 0xFF
+#     # cv2.imshow('image',img)
+
+#     # cv.curve = cv.curve(curvePoints, true)
+#     if not MOUSE_QUEUE.empty():
+#         # [x, y] = [int(x) for x in q.get()]
+#         pts = np.array(MOUSE_QUEUE.get(), np.int32)
 
 class Layer:
     pass
@@ -27,8 +80,6 @@ class ArtBoard:
 
         self.initialize()
 
-        # for i in range(2):
-
         self.new_layer(name='Background', opacity=0.5)
         self.new_layer(opacity=0.5)
         self.new_layer(mode='Subtract', opacity=0.5)
@@ -36,7 +87,19 @@ class ArtBoard:
         self.new_layer(opacity=0.5)        
         self.new_layer(opacity=0.5)
 
-        # self.cache_layers()
+        # TEMP
+        self.CACHE = False
+
+        if self.CACHE:
+            self.cache_layers()
+
+    @property
+    def current_layer(self):
+        return self.layers[self.active_layer_index]
+
+    @current_layer.setter
+    def current_layer(self, index):
+        self.active_layer_index = index
 
     def get_ratio(self) -> float:
         return self.width / self.height
@@ -103,15 +166,20 @@ class ArtBoard:
         composite = np.zeros((self.height,self.width,self.channels), np.uint8)
         cnt = 0
 
+        print('CACHE')
+
         x = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160]]
 
         # TODO: Track alpha too
         # Do I need to add some kind of alpha channel to the Layer class?
 
         for index, layer in enumerate(self.layers[:self.active_layer_index]):
-            layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, *x[cnt])
-            composite = get_mode(layer.mode)(layer.image, composite)
+            if layer.show:
+                image = np.copy(layer.image)
+                image[:, :, 3] = image[:, :, 3] * layer.opacity
+                if index == self.active_layer_index:
+                    layer.image = self.move_image(layer.image, *x[cnt])
+                composite = get_mode(layer.mode)(image, composite)
             # print(x[cnt])
             cnt += 1
         self.cache[0] = np.copy(composite)
@@ -119,11 +187,14 @@ class ArtBoard:
         # cnt += 1
 
         for index, layer in enumerate(self.layers[self.active_layer_index + 1:]):
-            layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
-            layer.image = self.move_image(layer.image, *x[cnt])
-            composite = get_mode(layer.mode)(layer.image, composite)
-            # print(x[cnt])
-            cnt += 1
+            if layer.show:
+                image = np.copy(layer.image)
+                image[:, :, 3] = image[:, :, 3] * layer.opacity
+                if index == self.active_layer_index:
+                    layer.image = self.move_image(layer.image, *x[cnt])
+                composite = get_mode(layer.mode)(layer.image, composite)
+                # print(x[cnt])
+                cnt += 1
         self.cache[1] = np.copy(composite)
 
     def draw_checkerboard(self):
@@ -153,28 +224,29 @@ class ArtBoard:
         # composite.fill(255)
         out = [[-20, -40], [0, 0], [20, 40], [40, 80], [60, 120], [80, 160], [100, 180]]
 
-        if True:
+        if not self.CACHE:
             for index, layer in enumerate(self.layers):
                 if layer.show:
-                    layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
+                    image = np.copy(layer.image)
+                    image[:, :, 3] = image[:, :, 3] * layer.opacity
                     # out.append([(index - 1) * 20, (index - 1) * 40])
                     if layer.name != 'Checkerboard':
-                        layer.image = self.move_image(layer.image, *out[index])
+                        if index == self.active_layer_index:
+                            layer.image = self.move_image(layer.image, *out[index])
 
-                    composite = get_mode(layer.mode)(layer.image, composite)
+                    composite = get_mode(layer.mode)(image, composite)
                     # print(index, layer.name, layer.opacity, layer.mode)
-
-            print(out)
         else:
+            # image = np.copy(layer.image)
             layer = self.layers[self.active_layer_index]
             layer.image[:, :, 3] = layer.image[:, :, 3] * layer.opacity
             # layer.image = self.move_image(layer.image, *[20, 40])
             # composite = get _mode()(self.cache[1], self.cache[0])
+
             composite = get_mode()(composite, self.cache[0])
             composite = get_mode()(layer.image, self.cache[1])
 
         return composite
-
 
     def render(self) -> QPixmap:
         
@@ -345,3 +417,14 @@ def mode_mappings(mode):
         "Exclusion": QPainter.CompositionMode.CompositionMode_Exclusion,
     }
     return switch[mode] if mode in switch else switch['Normal']
+
+
+# while(1):
+#     k = cv2.waitKey(1) & 0xFF
+#     # cv2.imshow('image',img)
+
+#     # cv.curve = cv.curve(curvePoints, true)
+#     if not MOUSE_QUEUE.empty():
+#         # [x, y] = [int(x) for x in q.get()]
+#         # pts = np.array(MOUSE_QUEUE.get(), np.int32)
+#         print(MOUSE_QUEUE.get())

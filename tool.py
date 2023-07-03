@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 from datas.tools import get_tool_icon
-from datatypes.layer import Layer, mode_mappings
+from datatypes.layer import Layer, mode_mappings, ArtBoard
 from utils import image_to_pixmap
 
 BYTES_PER_LINE = 1
@@ -16,11 +16,13 @@ class Tool(QWidget):
     def __init__(
             self,
             canvas: QScrollArea,
-            parent
+            parent,
+            artboard: ArtBoard,
         ) -> None:
         super().__init__(parent)
         self.canvas = canvas
         self._layer = None
+        self.artboard = artboard
 
         # Brush settings
         self._brush_color = QColor(150, 50, 50, 50)
@@ -111,6 +113,9 @@ class Tool(QWidget):
     def mousePressEvent(self, event):
         self.down_mouse_pos = [event.position().x(), event.position().y()]
         self.up_mouse_pos = [event.position().x(), event.position().y()]
+
+    def mouseMoveEvent(self, event):
+        print(event.pos())
 
     def quantize(self, num):
         return num - (num % self.snap_to)
